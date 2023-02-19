@@ -107,8 +107,8 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     return customized;
   }
 
-  private static void upsert(Map<String, String> customized, ConfigProperties config, String key,
-      String value) {
+  private static void upsert(
+      Map<String, String> customized, ConfigProperties config, String key, String value) {
     if (config.getString(key) == null) {
       customized.put(key, value);
     }
