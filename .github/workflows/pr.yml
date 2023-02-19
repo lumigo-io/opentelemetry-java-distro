@@ -1,0 +1,74 @@
+name: Code quality checks
+
+# Trigger the workflow on pull requests and direct pushes to any branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ opened, synchronize ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          disallowScopes: |
+            release
+
+      - uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/xs'
+          xs_max_size: '15'
+          s_label: 'size/s'
+          s_max_size: '100'
+          m_label: 'size/m'
+          m_max_size: '500'
+          l_label: 'size/l'
+          l_max_size: '1000'
+          xl_label: 'size/xl'
+          fail_if_xl: 'false'
+          message_if_xl: >
+            This PR exceeds the recommended size of 1000 lines.
+            Please make sure you are NOT addressing multiple issues with one PR.
+            Note this PR might be rejected due to its size.
+          files_to_ignore: ''
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK for running Gradle
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Spotless
+        uses: gradle/gradle-build-action@v2
+        with:
+            # this is a common failure point, so we run it first
+          arguments: spotlessCheck
+          cache-read-only: true
+
+      - name: Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          # exclude spotlessCheck to avoid running it twice
+          arguments: check -x spotlessCheck
+          cache-read-only: true
+
+      - name: Report failure
+        if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'create-issue'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: 🐛 Checks failed for ${{ github.sha }}
+          body: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          labels: bug
