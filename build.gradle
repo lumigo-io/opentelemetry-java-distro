@@ -28,6 +28,7 @@ subprojects {
     versions = [
       // this line is managed by .github/scripts/update-sdk-version.sh
       opentelemetrySdk           : "1.23.0",
+      opentelemetryContrib       : "1.22.0-alpha",
 
       // these lines are managed by .github/scripts/update-version.sh
       opentelemetryJavaagent     : "1.23.0-SNAPSHOT",
@@ -66,6 +67,7 @@ subprojects {
   dependencies {
     // otel BOM
     implementation(platform("io.opentelemetry:opentelemetry-bom:${versions.opentelemetrySdk}"))
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}")
 
     // these serve as a test of the instrumentation BOMs
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:${versions.opentelemetryJavaagent}"))

@@ -11,9 +11,6 @@ dependencies {
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
 
-  compileOnly("com.squareup.okhttp3:okhttp:4.10.0")
-  compileOnly("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-
   annotationProcessor deps.autoservice
   compileOnly deps.autoservice
 }
