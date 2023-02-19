@@ -50,12 +50,11 @@ class SpringBootSmokeTest extends SmokeTest {
                 .get(Attributes.Name.IMPLEMENTATION_VERSION);
 
     Response response = client.newCall(request).execute();
-    System.out.println(response.headers().toString());
 
     Collection<ExportTraceServiceRequest> traces = waitForTraces();
 
     Assertions.assertEquals("Hi!", response.body().string());
-    Assertions.assertEquals(1, countSpansByName(traces, "/greeting"));
+    Assertions.assertEquals(1, countSpansByName(traces, "GET /greeting"));
     Assertions.assertEquals(1, countSpansByName(traces, "WebController.greeting"));
     Assertions.assertEquals(1, countSpansByName(traces, "WebController.withSpan"));
     Assertions.assertNotEquals(

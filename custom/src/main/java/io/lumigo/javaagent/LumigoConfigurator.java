@@ -91,8 +91,11 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
       headers.add("Authorization=LumigoToken " + accessToken);
 
       customized.put("otel.exporter.otlp.headers", String.join(",", headers));
-      customized.put("otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
-      customized.put("otel.exporter.otlp.protocol", "http/protobuf");
+
+      // Upsert only if not set by the user, this allows the user to override the endpoint (i.e. for
+      // testing)
+      upsert(customized, cfg, "otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
+      upsert(customized, cfg, "otel.exporter.otlp.protocol", "http/protobuf");
     }
 
     if (cfg.getBoolean(LUMIGO_DEBUG, false)) {
@@ -102,6 +105,13 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     }
 
     return customized;
+  }
+
+  private static void upsert(Map<String, String> customized, ConfigProperties config, String key,
+      String value) {
+    if (config.getString(key) == null) {
+      customized.put(key, value);
+    }
   }
 
   private Map<String, String> getDefaultProperties() {

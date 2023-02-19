@@ -63,7 +63,7 @@ subprojects {
   dependencies {
     // otel BOM
     implementation(platform("io.opentelemetry:opentelemetry-bom:${versions.opentelemetrySdk}"))
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}")
+    compileOnly("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}")
 
     // these serve as a test of the instrumentation BOMs
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:${versions.opentelemetryJavaagent}"))

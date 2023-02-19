@@ -69,7 +69,7 @@ abstract class SmokeTest {
   static void setupSpec() {
     backend =
         new GenericContainer<>(
-                "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend:20221127.3559314891")
+            "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend:20221127.3559314891")
             .withExposedPorts(8080)
             .withEnv("JAVA_TOOL_OPTIONS", "-Xmx128m")
             .waitingFor(Wait.forHttp("/health").forPort(8080))
@@ -164,8 +164,7 @@ abstract class SmokeTest {
         .map(
             it -> {
               ExportTraceServiceRequest.Builder builder = ExportTraceServiceRequest.newBuilder();
-              // TODO(anuraaga): Register parser into object mapper to avoid de -> re ->
-              // deserialize.
+              // TODO(anuraaga): Register parser into object mapper to avoid de -> re -> deserialize.
               try {
                 JsonFormat.parser().merge(OBJECT_MAPPER.writeValueAsString(it), builder);
               } catch (InvalidProtocolBufferException | JsonProcessingException e) {
