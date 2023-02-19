@@ -44,6 +44,8 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
   public static final String LUMIGO_DEBUG = "lumigo.debug";
   public static final String LUMIGO_DEBUG_SPANDUMP = "lumigo.debug.spandump";
 
+  public static final Logger logger = Logger.getLogger(LumigoConfigurator.class.getName());
+
   public static final String LUMIGO_ENDPOINT_URL =
       "https://ga-otlp.lumigo-tracer-edge.golumigo.com";
 
@@ -59,7 +61,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
       SdkTracerProviderBuilder tracerProvider, ConfigProperties cfg) {
 
     String debugSpanDump = cfg.getString(LUMIGO_DEBUG_SPANDUMP);
-    if (!debugSpanDump.isEmpty()) {
+    if (debugSpanDump != null && !debugSpanDump.isEmpty()) {
       if (debugSpanDump.split("/").length > 1) {
         Logger l = Logger.getLogger(LoggingSpanExporter.class.getName());
         try {
@@ -80,13 +82,17 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     Map<String, String> customized = new HashMap<>();
 
     String accessToken = cfg.getString(LUMIGO_TRACER_TOKEN);
-    if (!accessToken.isEmpty()) {
+    if (accessToken == null || accessToken.isEmpty()) {
+      logger.warning("Lumigo Tracer Token is not set. Tracing is disabled.");
+    } else {
       String rawHeaders = cfg.getString("otel.exporter.otlp.headers", "");
       List<String> headers = new ArrayList<>(Arrays.asList(rawHeaders.split(",")));
 
       headers.add("Authorization=LumigoToken " + accessToken);
 
       customized.put("otel.exporter.otlp.headers", String.join(",", headers));
+      customized.put("otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
+      customized.put("otel.exporter.otlp.protocol", "http/protobuf");
     }
 
     if (cfg.getBoolean(LUMIGO_DEBUG, false)) {
@@ -100,8 +106,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
   private Map<String, String> getDefaultProperties() {
     Map<String, String> properties = new HashMap<>();
-    properties.put("otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
-    properties.put("otel.exporter.otlp.protocol", "http/protobuf");
+    properties.put("otel.traces.sampler", "always_on");
     return properties;
   }
 }
