@@ -16,9 +16,29 @@
       </module>
       <module>
         <name>buf.build/googleapis/googleapis</name>
+        <path>$USER_HOME$/.cache/buf/v1/module/data/buf.build/googleapis/googleapis/62f35d8aed1149c291d606d958a7ce32</path>
+        <reference>buf.build/googleapis/googleapis:62f35d8aed1149c291d606d958a7ce32</reference>
+        <yaml>$USER_HOME$/.cache/buf/v1/module/data/buf.build/googleapis/googleapis/62f35d8aed1149c291d606d958a7ce32/buf.yaml</yaml>
+      </module>
+      <module>
+        <name>buf.build/googleapis/googleapis</name>
         <path>$USER_HOME$/.cache/buf/v1/module/data/buf.build/googleapis/googleapis/75b4300737fb4efca0831636be94e517</path>
         <reference>buf.build/googleapis/googleapis:75b4300737fb4efca0831636be94e517</reference>
         <yaml>$USER_HOME$/.cache/buf/v1/module/data/buf.build/googleapis/googleapis/75b4300737fb4efca0831636be94e517/buf.yaml</yaml>
+      </module>
+      <module>
+        <lockedDependencies>
+          <dependency>
+            <commit>62f35d8aed1149c291d606d958a7ce32</commit>
+            <owner>googleapis</owner>
+            <remote>buf.build</remote>
+            <repository>googleapis</repository>
+          </dependency>
+        </lockedDependencies>
+        <name>buf.build/grpc-ecosystem/grpc-gateway</name>
+        <path>$USER_HOME$/.cache/buf/v1/module/data/buf.build/grpc-ecosystem/grpc-gateway/a1ecdc58eccd49aa8bea2a7a9022dc27</path>
+        <reference>buf.build/grpc-ecosystem/grpc-gateway:a1ecdc58eccd49aa8bea2a7a9022dc27</reference>
+        <yaml>$USER_HOME$/.cache/buf/v1/module/data/buf.build/grpc-ecosystem/grpc-gateway/a1ecdc58eccd49aa8bea2a7a9022dc27/buf.yaml</yaml>
       </module>
     </libraries>
   </component>
