@@ -3,5 +3,10 @@
     "eu-central-1a",
     "eu-central-1b",
     "eu-central-1c"
+  ],
+  "availability-zones:account=934953988171:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
   ]
 }

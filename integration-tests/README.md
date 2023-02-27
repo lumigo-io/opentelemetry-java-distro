@@ -31,7 +31,7 @@ find . -name node_modules -prune -o -name package.json -execdir npm install \; &
 
 ```
 yarn install
-npm run build
+yarn run build
 cdk deploy --all
 ```
 

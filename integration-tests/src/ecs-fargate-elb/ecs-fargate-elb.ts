@@ -77,7 +77,7 @@ export class EcsFargateElbStack extends Stack {
             listenerPort: serverPort,
         });
         serverService.targetGroup.configureHealthCheck({
-            path: '/health',
+            path: '/greeting',
             interval: Duration.seconds(10),
             unhealthyThresholdCount: 5,
             port: String(serverPort),

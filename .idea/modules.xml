@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/custom/custom.lumigo-otel-javaagent.custom.main.iml" filepath="$PROJECT_DIR$/.idea/modules/custom/custom.lumigo-otel-javaagent.custom.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/custom/lumigo-otel-javaagent.custom.main.iml" filepath="$PROJECT_DIR$/.idea/modules/custom/lumigo-otel-javaagent.custom.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/custom/opentelemetry-java-distro.custom.lumigo-otel-javaagent.custom.main.iml" filepath="$PROJECT_DIR$/.idea/modules/custom/opentelemetry-java-distro.custom.lumigo-otel-javaagent.custom.main.iml" />
     </modules>
   </component>
 </project>
