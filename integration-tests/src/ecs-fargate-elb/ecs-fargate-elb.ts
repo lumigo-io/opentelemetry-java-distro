@@ -56,6 +56,7 @@ export class EcsFargateElbStack extends Stack {
             environment: {
                 AWS_REGION: props.env?.region || 'unknown_region',
                 SERVER_PORT: String(serverPort),
+                LUMIGO_DEBUG_SPANDUMP: 'true'
             },
             secrets: {
                 LUMIGO_TRACER_TOKEN: lumigoTokenSecret,

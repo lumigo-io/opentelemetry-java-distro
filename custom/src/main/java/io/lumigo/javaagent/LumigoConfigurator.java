@@ -18,7 +18,6 @@
 package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
-import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
@@ -26,7 +25,6 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 /**
@@ -62,17 +60,17 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
     String debugSpanDump = cfg.getString(LUMIGO_DEBUG_SPANDUMP);
     if (debugSpanDump != null && !debugSpanDump.isEmpty()) {
-      if (debugSpanDump.split("/").length > 1) {
-        Logger l = Logger.getLogger(LoggingSpanExporter.class.getName());
-        try {
-          l.addHandler(new FileHandler(debugSpanDump));
-        } catch (IOException e) {
-          throw new RuntimeException("Failed to create file handler for " + debugSpanDump, e);
-        }
+      if (!(debugSpanDump.split("/").length > 1)) {
+        debugSpanDump = "/dev/stdout";
       }
+      try {
+        tracerProvider =
+            tracerProvider.addSpanProcessor(
+                SimpleSpanProcessor.create(FileLoggingSpanExporter.create(debugSpanDump)));
 
-      tracerProvider =
-          tracerProvider.addSpanProcessor(SimpleSpanProcessor.create(LoggingSpanExporter.create()));
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to create file handler for " + debugSpanDump, e);
+      }
     }
 
     return tracerProvider;

@@ -61,6 +61,9 @@ class SpringBootSmokeTest extends SmokeTest {
         0, countResourcesByValue(traces, "telemetry.auto.version", currentAgentVersion));
     Assertions.assertNotEquals(0, countResourcesByValue(traces, "lumigo.distro.version", "dev"));
 
+    String spanLog = fetchSpanDumpFromTarget();
+    Assertions.assertNotEquals("", spanLog);
+
     stopTarget();
   }
 }

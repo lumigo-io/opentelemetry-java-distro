@@ -24,6 +24,8 @@ import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import io.opentelemetry.proto.trace.v1.Span;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -81,6 +83,8 @@ abstract class SmokeTest {
 
   protected GenericContainer target;
 
+  private static final String SPANDUMP_FILE = "/opt/lumigo.log";
+
   void startTarget(int jdk) {
     target =
         new GenericContainer<>(getTargetImage(jdk))
@@ -95,8 +99,21 @@ abstract class SmokeTest {
             .withEnv("OTEL_BSP_MAX_EXPORT_BATCH", "1")
             .withEnv("OTEL_BSP_SCHEDULE_DELAY", "10ms")
             .withEnv("LUMIGO_TRACER_TOKEN", "test-123")
+            .withEnv("LUMIGO_DEBUG_SPANDUMP", SPANDUMP_FILE)
             .withEnv(getExtraEnv());
     target.start();
+  }
+
+  String fetchSpanDumpFromTarget() {
+    try {
+      Path temp = Files.createTempFile("spandump", ".log");
+      target.copyFileFromContainer(SPANDUMP_FILE, temp.toString());
+
+      return Files.readString(temp);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return "";
+    }
   }
 
   @AfterEach
