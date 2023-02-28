@@ -26,6 +26,12 @@ public class LumigoAgent {
   }
 
   public static void agentmain(final String agentArgs, final Instrumentation inst) {
+    if (isDebugMode()) {
+      System.setProperty("otel.javaagent.debug", "true");
+      System.setProperty("io.opentelemetry.javaagent.slf4j.simpleLogger.defaultLogLevel", "debug");
+      System.setProperty("otel.log.level", "debug");
+      System.setProperty("lumigo.debug", "true");
+    }
     if (is_switch_off()) {
       return;
     }
