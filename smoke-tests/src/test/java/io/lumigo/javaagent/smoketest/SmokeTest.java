@@ -173,6 +173,22 @@ abstract class SmokeTest {
         .flatMap(it -> it.getSpansList().stream());
   }
 
+  protected Collection<ExportTraceServiceRequest> tracesFromSpanDump() {
+    String spanDump = fetchSpanDumpFromTarget();
+    return Stream.of(spanDump.split("\r\n"))
+        .map(
+            it -> {
+              ExportTraceServiceRequest.Builder builder = ExportTraceServiceRequest.newBuilder();
+              try {
+                JsonFormat.parser().merge(it, builder);
+              } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+              }
+              return builder.build();
+            })
+        .collect(Collectors.toList());
+  }
+
   protected Collection<ExportTraceServiceRequest> waitForTraces()
       throws IOException, InterruptedException {
     String content = waitForContent();

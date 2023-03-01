@@ -51,15 +51,14 @@ public final class FileLoggingSpanExporter implements SpanExporter {
     TraceRequestMarshaler traceRequestMarshaler = TraceRequestMarshaler.create(spans);
 
     try {
-      outputStream.write("\r\n\r\n".getBytes());
       JsonGenerator generator =
           new JsonFactory()
               .createGenerator(outputStream)
               .disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT)
-              .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
-              .useDefaultPrettyPrinter();
+              .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
       traceRequestMarshaler.writeJsonTo(generator);
       generator.close();
+      outputStream.write("\r\n".getBytes());
     } catch (IOException e) {
       e.printStackTrace();
     }
