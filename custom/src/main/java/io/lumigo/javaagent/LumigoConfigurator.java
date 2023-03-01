@@ -86,7 +86,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
       String rawHeaders = cfg.getString("otel.exporter.otlp.headers");
       if (rawHeaders != null) {
-        headers = new ArrayList<>(Arrays.asList(rawHeaders.split(",")));
+        headers.addAll(Arrays.asList(rawHeaders.split(",")));
       }
 
       headers.add("Authorization=LumigoToken " + accessToken);
