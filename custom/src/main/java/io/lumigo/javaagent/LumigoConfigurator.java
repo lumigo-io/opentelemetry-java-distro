@@ -61,15 +61,18 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     String debugSpanDump = cfg.getString(LUMIGO_DEBUG_SPANDUMP);
     if (debugSpanDump != null && !debugSpanDump.isEmpty()) {
       if (!(debugSpanDump.split("/").length > 1)) {
-        debugSpanDump = "/dev/stdout";
-      }
-      try {
-        tracerProvider =
-            tracerProvider.addSpanProcessor(
-                SimpleSpanProcessor.create(FileLoggingSpanExporter.create(debugSpanDump)));
+        logger.warning(
+            "Lumigo debug span dump is not a valid path. Tracing is disabled. Path: "
+                + debugSpanDump);
+      } else {
+        try {
+          tracerProvider =
+              tracerProvider.addSpanProcessor(
+                  SimpleSpanProcessor.create(FileLoggingSpanExporter.create(debugSpanDump)));
 
-      } catch (IOException e) {
-        throw new RuntimeException("Failed to create file handler for " + debugSpanDump, e);
+        } catch (IOException e) {
+          throw new RuntimeException("Failed to create file handler for " + debugSpanDump, e);
+        }
       }
     }
 

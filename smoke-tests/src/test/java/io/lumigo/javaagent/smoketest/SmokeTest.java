@@ -60,11 +60,6 @@ abstract class SmokeTest {
 
   protected abstract String getTargetImage(int jdk);
 
-  /** Subclasses can override this method to customise target application's environment */
-  protected Map<String, String> getExtraEnv() {
-    return Collections.emptyMap();
-  }
-
   private static GenericContainer backend;
 
   @BeforeAll
@@ -85,7 +80,7 @@ abstract class SmokeTest {
 
   private static final String SPANDUMP_FILE = "/opt/lumigo.log";
 
-  void startTarget(int jdk) {
+  void startTarget(int jdk, Map<String, String> extraEnv) {
     target =
         new GenericContainer<>(getTargetImage(jdk))
             .withExposedPorts(8080)
@@ -99,8 +94,11 @@ abstract class SmokeTest {
             .withEnv("OTEL_BSP_MAX_EXPORT_BATCH", "1")
             .withEnv("OTEL_BSP_SCHEDULE_DELAY", "10ms")
             .withEnv("LUMIGO_TRACER_TOKEN", "test-123")
-            .withEnv("LUMIGO_DEBUG_SPANDUMP", SPANDUMP_FILE)
-            .withEnv(getExtraEnv());
+            .withEnv("LUMIGO_DEBUG_SPANDUMP", SPANDUMP_FILE);
+
+    if (extraEnv != null) {
+      target = target.withEnv(extraEnv);
+    }
     target.start();
   }
 

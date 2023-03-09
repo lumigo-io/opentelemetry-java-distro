@@ -20,6 +20,8 @@ package io.lumigo.javaagent.smoketest;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import okhttp3.Request;
@@ -37,8 +39,16 @@ class SpringBootSmokeTest extends SmokeTest {
   }
 
   @Test
+  public void testInvalidSpanDump() throws IOException, InterruptedException {
+    startTarget(8, Map.of("LUMIGO_DEBUG_SPANDUMP", "invalid"));
+
+    Assertions.assertTrue(
+        target.getLogs().contains("Lumigo debug span dump is not a valid path"));
+  }
+
+  @Test
   public void springBootSmokeTestOnJDK() throws IOException, InterruptedException {
-    startTarget(8);
+    startTarget(8, null);
     String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
     Request request = new Request.Builder().url(url).get().build();
 
