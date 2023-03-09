@@ -20,6 +20,7 @@ package io.lumigo.javaagent.smoketest;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import okhttp3.Request;
@@ -37,8 +38,15 @@ class SpringBootSmokeTest extends SmokeTest {
   }
 
   @Test
+  public void testInvalidSpanDump() throws IOException, InterruptedException {
+    startTarget(8, Map.of("LUMIGO_DEBUG_SPANDUMP", "invalid"));
+
+    Assertions.assertTrue(target.getLogs().contains("Lumigo debug span dump is not a valid path"));
+  }
+
+  @Test
   public void springBootSmokeTestOnJDK() throws IOException, InterruptedException {
-    startTarget(8);
+    startTarget(8, null);
 
     // check if the debug log is printed
     Assertions.assertTrue(
@@ -66,8 +74,10 @@ class SpringBootSmokeTest extends SmokeTest {
         0, countResourcesByValue(traces, "telemetry.auto.version", currentAgentVersion));
     Assertions.assertNotEquals(0, countResourcesByValue(traces, "lumigo.distro.version", "dev"));
 
-    String spanLog = fetchSpanDumpFromTarget();
-    Assertions.assertNotEquals("", spanLog);
+    Collection<ExportTraceServiceRequest> dumpTraces = tracesFromSpanDump();
+    Assertions.assertEquals(1, countSpansByName(dumpTraces, "GET /greeting"));
+    Assertions.assertNotEquals(
+        0, countResourcesByValue(dumpTraces, "lumigo.distro.version", "dev"));
 
     stopTarget();
   }
