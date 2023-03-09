@@ -21,7 +21,6 @@ import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import okhttp3.Request;
@@ -42,8 +41,7 @@ class SpringBootSmokeTest extends SmokeTest {
   public void testInvalidSpanDump() throws IOException, InterruptedException {
     startTarget(8, Map.of("LUMIGO_DEBUG_SPANDUMP", "invalid"));
 
-    Assertions.assertTrue(
-        target.getLogs().contains("Lumigo debug span dump is not a valid path"));
+    Assertions.assertTrue(target.getLogs().contains("Lumigo debug span dump is not a valid path"));
   }
 
   @Test
@@ -73,6 +71,8 @@ class SpringBootSmokeTest extends SmokeTest {
 
     Collection<ExportTraceServiceRequest> dumpTraces = tracesFromSpanDump();
     Assertions.assertEquals(1, countSpansByName(dumpTraces, "GET /greeting"));
+    Assertions.assertNotEquals(
+        0, countResourcesByValue(dumpTraces, "lumigo.distro.version", "dev"));
 
     stopTarget();
   }
