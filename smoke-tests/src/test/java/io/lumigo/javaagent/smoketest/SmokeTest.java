@@ -38,6 +38,7 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,7 +174,7 @@ abstract class SmokeTest {
 
   protected Collection<ExportTraceServiceRequest> tracesFromSpanDump() {
     String spanDump = fetchSpanDumpFromTarget();
-    return Stream.of(spanDump.split("\r\n"))
+    return Stream.of(spanDump.split(System.lineSeparator()))
         .map(
             it -> {
               ExportTraceServiceRequest.Builder builder = ExportTraceServiceRequest.newBuilder();
@@ -181,6 +182,7 @@ abstract class SmokeTest {
                 JsonFormat.parser().merge(it, builder);
               } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
+                Assertions.fail("Failed to parse span dump: " + e.getMessage());
               }
               return builder.build();
             })
