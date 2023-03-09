@@ -26,6 +26,7 @@ import io.opentelemetry.proto.trace.v1.Span;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 
@@ -67,6 +69,7 @@ abstract class SmokeTest {
     backend =
         new GenericContainer<>(
                 "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend:20221127.3559314891")
+            .withStartupTimeout(Duration.ofMinutes(3))
             .withExposedPorts(8080)
             .withEnv("JAVA_TOOL_OPTIONS", "-Xmx128m")
             .waitingFor(Wait.forHttp("/health").forPort(8080))
@@ -83,6 +86,7 @@ abstract class SmokeTest {
   void startTarget(int jdk, Map<String, String> extraEnv) {
     target =
         new GenericContainer<>(getTargetImage(jdk))
+            .withStartupTimeout(Duration.ofMinutes(3))
             .withExposedPorts(8080)
             .withNetwork(network)
             .withLogConsumer(new Slf4jLogConsumer(logger))
