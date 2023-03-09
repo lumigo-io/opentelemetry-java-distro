@@ -23,7 +23,7 @@ import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,18 +31,19 @@ import java.util.logging.Logger;
 
 /** A Span Exporter that logs every span at INFO level using java.util.logging. */
 public final class FileLoggingSpanExporter implements SpanExporter {
-  private FileOutputStream outputStream = null;
-  private final AtomicBoolean isShutdown = new AtomicBoolean();
 
   public static final Logger logger = Logger.getLogger(FileLoggingSpanExporter.class.getName());
 
   /** Returns a new {@link FileLoggingSpanExporter}. */
   public static FileLoggingSpanExporter create(String file) throws IOException {
-    FileLoggingSpanExporter ret = new FileLoggingSpanExporter();
+    return new FileLoggingSpanExporter(file);
+  }
 
-    ret.outputStream = new FileOutputStream(file, true);
+  private FileWriter out;
+  private final AtomicBoolean isShutdown = new AtomicBoolean();
 
-    return ret;
+  private FileLoggingSpanExporter(String file) throws IOException {
+    this.out = new FileWriter(file, true);
   }
 
   @Override
@@ -53,15 +54,17 @@ public final class FileLoggingSpanExporter implements SpanExporter {
 
     TraceRequestMarshaler traceRequestMarshaler = TraceRequestMarshaler.create(spans);
 
-    try {
-      JsonGenerator generator =
-          new JsonFactory()
-              .createGenerator(outputStream)
-              .disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT)
-              .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+    /*
+     * The fact that we are printing one JSON object per line makes the overall document,
+     * so we need to recreate the JsonGenerator every time.
+     */
+    try (JsonGenerator generator =
+        new JsonFactory()
+            .createGenerator(out)
+            .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET) // Do not close the underpinning file
+    ) {
       traceRequestMarshaler.writeJsonTo(generator);
-      generator.close();
-      outputStream.write(System.lineSeparator().getBytes());
+      out.write(System.lineSeparator());
     } catch (IOException e) {
       logger.log(java.util.logging.Level.SEVERE, "Failed to export spans", e);
       return CompletableResultCode.ofFailure();
@@ -78,7 +81,7 @@ public final class FileLoggingSpanExporter implements SpanExporter {
   @Override
   public CompletableResultCode flush() {
     try {
-      outputStream.flush();
+      this.out.flush();
     } catch (IOException e) {
       logger.log(java.util.logging.Level.SEVERE, "Failed to flush spans", e);
       return CompletableResultCode.ofFailure();
@@ -95,13 +98,13 @@ public final class FileLoggingSpanExporter implements SpanExporter {
 
     Boolean failed = false;
     try {
-      outputStream.flush();
+      this.out.flush();
     } catch (IOException e) {
       logger.log(java.util.logging.Level.SEVERE, "Failed to flush spans", e);
       failed = true;
     }
     try {
-      outputStream.close();
+      this.out.close();
     } catch (IOException e) {
       logger.log(java.util.logging.Level.SEVERE, "Failed to close file", e);
       failed = true;
