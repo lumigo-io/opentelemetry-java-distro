@@ -39,6 +39,11 @@ class SpringBootSmokeTest extends SmokeTest {
   @Test
   public void springBootSmokeTestOnJDK() throws IOException, InterruptedException {
     startTarget(8);
+
+    // check if the debug log is printed
+    Assertions.assertTrue(
+        target.getLogs().contains("DEBUG io.opentelemetry.javaagent.tooling.AgentInstaller"));
+
     String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
     Request request = new Request.Builder().url(url).get().build();
 
