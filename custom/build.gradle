@@ -14,13 +14,3 @@ dependencies {
   annotationProcessor deps.autoservice
   compileOnly deps.autoservice
 }
-
-task injectVersion(dependsOn: processResources) {
-  doLast {
-    new File("$buildDir/generated/properties/lumigo.properties").withWriter { w ->
-      Properties p = new Properties()
-      p['lumigo.distro.version'] = project.version.toString()
-      p.store w, null
-    }
-  }
-}

@@ -18,15 +18,13 @@
 package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider;
 import io.opentelemetry.sdk.resources.Resource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @AutoService(ResourceProvider.class)
 public class LumigoDistroResource implements ResourceProvider {
@@ -34,18 +32,17 @@ public class LumigoDistroResource implements ResourceProvider {
   private static final String DISTRO_VERSION = getVersion();
 
   private static String getVersion() {
-    try (InputStream in =
-        ResourceProvider.class.getClassLoader().getResourceAsStream("lumigo.properties")) {
-      if (in == null) {
-        return "dev";
+    String version = LumigoDistroResource.class.getPackage().getImplementationVersion();
+    if (version != null) {
+      try {
+        Matcher pt = Pattern.compile("^lumigo\\-(.*)?\\-otel.*$").matcher(version);
+        if (pt.find()) {
+          return pt.group(1);
+        }
+      } catch (Exception e) {
       }
-      Properties splunkProps = new Properties();
-      splunkProps.load(in);
-      AttributeKey<String> key = AttributeKey.stringKey(LUMIGO_DISTRO_VERSION);
-      return splunkProps.getProperty(key.getKey());
-    } catch (IOException e) {
-      return "dev";
     }
+    return "dev";
   }
 
   @Override

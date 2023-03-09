@@ -59,7 +59,7 @@ class SpringBootSmokeTest extends SmokeTest {
     Assertions.assertEquals(1, countSpansByName(traces, "WebController.withSpan"));
     Assertions.assertNotEquals(
         0, countResourcesByValue(traces, "telemetry.auto.version", currentAgentVersion));
-    Assertions.assertNotEquals(0, countResourcesByValue(traces, "lumigo.distro.version", "dev"));
+    Assertions.assertNotEquals(0, countResourcesByValue(traces, "lumigo.distro.version", "dev-SNAPSHO0T"));
 
     String spanLog = fetchSpanDumpFromTarget();
     Assertions.assertNotEquals("", spanLog);

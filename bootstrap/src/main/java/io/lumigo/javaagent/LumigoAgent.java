@@ -19,6 +19,8 @@ package io.lumigo.javaagent;
 
 import io.opentelemetry.javaagent.OpenTelemetryAgent;
 import java.lang.instrument.Instrumentation;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LumigoAgent {
   public static void premain(final String agentArgs, final Instrumentation inst) {
@@ -27,8 +29,14 @@ public class LumigoAgent {
 
   public static void agentmain(final String agentArgs, final Instrumentation inst) {
     if (is_switch_off()) {
+      System.err.println(
+          "Lumigo OpenTelemetry JavaAgent distribution disabled via the 'LUMIGO_SWITCH_OFF' environment variable");
       return;
     }
+    System.out.println(
+        "Loading the Lumigo OpenTelemetry JavaAgent distribution (version "
+            + parseVersion()
+            + ") (injection mode: automatic injection)");
     OpenTelemetryAgent.agentmain(agentArgs, inst);
   }
 
@@ -44,6 +52,20 @@ public class LumigoAgent {
       value = System.getenv("LUMIGO_DEBUG");
     }
     return Boolean.parseBoolean(value);
+  }
+
+  private static String parseVersion() {
+    String version = LumigoAgent.class.getPackage().getImplementationVersion();
+    if (version != null) {
+      try {
+        Matcher pt = Pattern.compile("^lumigo\\-(.*)?\\-otel.*$").matcher(version);
+        if (pt.find()) {
+          return pt.group(1);
+        }
+      } catch (Exception e) {
+      }
+    }
+    return "dev";
   }
 
   private static boolean is_switch_off() {
