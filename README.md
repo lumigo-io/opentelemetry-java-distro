@@ -66,8 +66,8 @@ For example, the environment variable `LUMIGO_TRACER_TOKEN` can be set using the
 | Name                    | Valid values                   | Required? | Description                                                                              |
 |-------------------------|--------------------------------|-----------|------------------------------------------------------------------------------------------|
 | `LUMIGO_TRACER_TOKEN`   | `t_...` token                  | Yes       | The token of the account to report to.                                                   |
-| `LUMIGO_DEBUG`          | `true\                         | false`    | No                                                                                       | Enable extensive debug logging.                                                          |
-| `LUMIGO_SWITCH_OFF`     | `true\                         | false`    | No                                                                                       | Disable the agent.                                                                       |
+| `LUMIGO_DEBUG`          | `true` or `false`              | No        | Enable extensive debug logging.                                                          |
+| `LUMIGO_SWITCH_OFF`     | `true` or `false`              | No        | Disable the agent.                                                                       |
 | `LUMIGO_DEBUG_SPANDUMP` | path-like, e.g., `/dev/stdout` | No        | Enable debug span dump. If the value is a path-like, it'll export the spans to this path |
 
 For more configuration options, see
@@ -134,7 +134,7 @@ specification:
   a [`SimpleSpanProcessor`](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/SimpleSpanProcessor.java),
   which uses
   a [`FileLoggingSpanExporter`](https://github.com/lumigo-io/opentelemetry-java-distro/blob/main/custom/src/main/java/io/lumigo/javaagent/FileLoggingSpanExporter.java),
- to save to file the spans collected. Do not use this in production!
+  to save to file the spans collected. Do not use this in production!
 
 ### SDK configuration
 
