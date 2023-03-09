@@ -94,6 +94,7 @@ abstract class SmokeTest {
             .withEnv("OTEL_BSP_MAX_EXPORT_BATCH", "1")
             .withEnv("OTEL_BSP_SCHEDULE_DELAY", "10ms")
             .withEnv("LUMIGO_TRACER_TOKEN", "test-123")
+            .withEnv("LUMIGO_DEBUG", "true")
             .withEnv("LUMIGO_DEBUG_SPANDUMP", SPANDUMP_FILE);
 
     if (extraEnv != null) {
@@ -102,7 +103,7 @@ abstract class SmokeTest {
     target.start();
   }
 
-  String fetchSpanDumpFromTarget() {
+  protected String fetchSpanDumpFromTarget() {
     try {
       Path temp = Files.createTempFile("spandump", ".log");
       target.copyFileFromContainer(SPANDUMP_FILE, temp.toString());

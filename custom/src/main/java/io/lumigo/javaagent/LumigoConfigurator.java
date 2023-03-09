@@ -86,8 +86,12 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     if (accessToken == null || accessToken.isEmpty()) {
       logger.warning("Lumigo Tracer Token is not set. Tracing is disabled.");
     } else {
-      String rawHeaders = cfg.getString("otel.exporter.otlp.headers", "");
-      List<String> headers = new ArrayList<>(Arrays.asList(rawHeaders.split(",")));
+      List<String> headers = new ArrayList<>();
+
+      String rawHeaders = cfg.getString("otel.exporter.otlp.headers");
+      if (rawHeaders != null) {
+        headers.addAll(Arrays.asList(rawHeaders.split(",")));
+      }
 
       headers.add("Authorization=LumigoToken " + accessToken);
 
@@ -97,12 +101,6 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
       // testing)
       upsert(customized, cfg, "otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
       upsert(customized, cfg, "otel.exporter.otlp.protocol", "http/protobuf");
-    }
-
-    if (cfg.getBoolean(LUMIGO_DEBUG, false)) {
-      customized.put("otel.javaagent.debug", "true");
-      System.setProperty("io.opentelemetry.javaagent.slf4j.simpleLogger.defaultLogLevel", "debug");
-      customized.put("otel.log.level", "debug");
     }
 
     return customized;
