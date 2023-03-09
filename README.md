@@ -4,7 +4,7 @@ The Lumigo OpenTelemetry Distro for Java is made of several upstream OpenTelemet
 
 ## Setup
 
-The set up of Lumigo OpenTelemetry Distro for Java is made of the three following steps:
+The setup of Lumigo OpenTelemetry Distro for Java is made of the three following steps:
 1. [Download](#download) the Lumigo OpenTelemetry Distro for Java
 2. [Configure](#environment-based-configuration) the Lumigo tracer token
 3. [Activate](#tracer-activation) the Lumigo OpenTelemetry Distro for Java
@@ -63,11 +63,87 @@ For example, the environment variable `LUMIGO_TRACER_TOKEN` can be set using the
 
 ### Environment variables
 
-| Name                    | Valid values  | Required? | Description                                                                              |
-|-------------------------|---------------|-----------|------------------------------------------------------------------------------------------|
-| `LUMIGO_TRACER_TOKEN`   | `t_...` token | Yes       | The token of the account to report to.                                                   |
-| `LUMIGO_DEBUG`          | `true\|false`  | No        | Enable extensive debug logging.                                                          |
-| `LUMIGO_SWITCH_OFF`     | `true\|false`  | No        | Disable the agent.                                                                       |
+| Name                    | Valid values                   | Required? | Description                                                                              |
+|-------------------------|--------------------------------|-----------|------------------------------------------------------------------------------------------|
+| `LUMIGO_TRACER_TOKEN`   | `t_...` token                  | Yes       | The token of the account to report to.                                                   |
+| `LUMIGO_DEBUG`          | `true\                         | false`    | No                                                                                       | Enable extensive debug logging.                                                          |
+| `LUMIGO_SWITCH_OFF`     | `true\                         | false`    | No                                                                                       | Disable the agent.                                                                       |
 | `LUMIGO_DEBUG_SPANDUMP` | path-like, e.g., `/dev/stdout` | No        | Enable debug span dump. If the value is a path-like, it'll export the spans to this path |
 
-For more configuration options, see the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
+For more configuration options, see
+the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
+
+## Baseline setup
+
+The Lumigo OpenTelemetry Distro will automatically create the following OpenTelemetry constructs
+provided to a `TraceProvider`.
+
+### Resource attributes
+
+#### SDK resource attributes
+
+* The attributes from the default resource:
+  * `telemetry.sdk.language`: `java`
+  * `telemetry.sdk.name`: `opentelemetry`
+  * `telemetry.sdk.version`: depends on the version of the `opentelemetry-sdk` included in
+    the [dependencies](./setup.py)
+
+* The `lumigo.distro.version` containing the version of the Lumigo OpenTelemetry Distro for Python
+  as specified in the [VERSION file](./src/lumigo_opentelemetry/VERSION)
+
+#### Process resource attributes
+
+* The following `process.runtime.*` attributes as specified in
+  the [Process Semantic Conventions](https://opentelemetry.io/docs/reference/specification/resource/semantic_conventions/process/#process-runtimes):
+  * `process.runtime.description`
+  * `process.runtime.name`
+  * `process.runtime.version`
+
+#### Amazon ECS resource attributes
+
+If the instrumented Python application is running on the Amazon Elastic Container Service (ECS):
+
+* `cloud.provider` attribute with value `aws`
+* `cloud.platform` with value `aws_ecs`
+* `container.name` with the hostname of the ECS Task container
+* `container.id` with the ID of the Docker container (based on the cgroup id)
+
+If the ECS task uses the ECS agent v1.4.0, and has therefore access to
+the [Task metadata endpoint version 4](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-metadata-endpoint-v4.html),
+the following experimental attributes as specified in
+the [AWS ECS Resource Attributes](https://github.com/open-telemetry/opentelemetry-specification/blob/42081e023b3827d824c45031e3ccd19318ff3411/specification/resource/semantic_conventions/cloud_provider/aws/ecs.md)
+specification:
+
+* `aws.ecs.container.arn`
+* `aws.ecs.cluster.arn`
+* `aws.ecs.launchtype`
+* `aws.ecs.task.arn`
+* `aws.ecs.task.family`
+* `aws.ecs.task.revision`
+
+#### Kubernetes resource attributes
+
+* `k8s.pod.uid` with the Pod identifier, supported for both cgroups v1 and v2
+
+### Span exporters
+
+* If the `LUMIGO_TRACER_TOKEN` environment variable is set:
+  an [`OTLP Exporter`](https://github.com/open-telemetry/opentelemetry-java/tree/main/exporters/otlp)
+  is configured to push data to Lumigo
+* If the `LUMIGO_DEBUG_SPANDUMP` environment variable is set to a path-like:
+  a [`SimpleSpanProcessor`](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/SimpleSpanProcessor.java),
+  which uses
+  a [`FileLoggingSpanExporter`](https://github.com/lumigo-io/opentelemetry-java-distro/blob/main/custom/src/main/java/io/lumigo/javaagent/FileLoggingSpanExporter.java),
+ to save to file the spans collected. Do not use this in production!
+
+### SDK configuration
+
+* The
+  following [SDK environment variables](https://opentelemetry.io/docs/reference/specification/sdk-environment-variables/)
+  are supported:
+  * `OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT`
+  * `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT`
+
+  ** If the `OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT` environment variable is not set, the span
+  attribute size limit will be taken from `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` environment variable.
+  The default size limit when both are not set is 2048.
