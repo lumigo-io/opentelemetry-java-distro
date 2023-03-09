@@ -26,10 +26,11 @@ subprojects {
   ext {
     versions = [
       opentelemetrySdk           : "1.23.0",
-      opentelemetryContrib       : "1.22.0-alpha",
+      opentelemetryContrib       : "1.23.0-alpha",
       opentelemetryJavaagent     : "1.23.0-SNAPSHOT",
       opentelemetryJavaagentAlpha: "1.23.0-alpha-SNAPSHOT",
 
+      jackson                    : "2.14.2",
       bytebuddy                  : "1.13.0",
       autoservice                : "1.0.1",
       junit                      : "5.9.2"
@@ -71,8 +72,8 @@ subprojects {
 
     testImplementation("org.mockito:mockito-core:5.1.1")
     testImplementation(enforcedPlatform("org.junit:junit-bom:${versions.junit}"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   }
 
   tasks {

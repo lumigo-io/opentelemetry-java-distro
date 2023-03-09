@@ -26,8 +26,8 @@ import io.opentelemetry.proto.trace.v1.Span;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,6 +38,7 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,11 +61,6 @@ abstract class SmokeTest {
 
   protected abstract String getTargetImage(int jdk);
 
-  /** Subclasses can override this method to customise target application's environment */
-  protected Map<String, String> getExtraEnv() {
-    return Collections.emptyMap();
-  }
-
   private static GenericContainer backend;
 
   @BeforeAll
@@ -72,6 +68,7 @@ abstract class SmokeTest {
     backend =
         new GenericContainer<>(
                 "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend:20221127.3559314891")
+            .withStartupTimeout(Duration.ofMinutes(3))
             .withExposedPorts(8080)
             .withEnv("JAVA_TOOL_OPTIONS", "-Xmx128m")
             .waitingFor(Wait.forHttp("/health").forPort(8080))
@@ -85,9 +82,10 @@ abstract class SmokeTest {
 
   private static final String SPANDUMP_FILE = "/opt/lumigo.log";
 
-  void startTarget(int jdk) {
+  void startTarget(int jdk, Map<String, String> extraEnv) {
     target =
         new GenericContainer<>(getTargetImage(jdk))
+            .withStartupTimeout(Duration.ofMinutes(3))
             .withExposedPorts(8080)
             .withNetwork(network)
             .withLogConsumer(new Slf4jLogConsumer(logger))
@@ -99,12 +97,16 @@ abstract class SmokeTest {
             .withEnv("OTEL_BSP_MAX_EXPORT_BATCH", "1")
             .withEnv("OTEL_BSP_SCHEDULE_DELAY", "10ms")
             .withEnv("LUMIGO_TRACER_TOKEN", "test-123")
-            .withEnv("LUMIGO_DEBUG_SPANDUMP", SPANDUMP_FILE)
-            .withEnv(getExtraEnv());
+            .withEnv("LUMIGO_DEBUG", "true")
+            .withEnv("LUMIGO_DEBUG_SPANDUMP", SPANDUMP_FILE);
+
+    if (extraEnv != null) {
+      target = target.withEnv(extraEnv);
+    }
     target.start();
   }
 
-  String fetchSpanDumpFromTarget() {
+  protected String fetchSpanDumpFromTarget() {
     try {
       Path temp = Files.createTempFile("spandump", ".log");
       target.copyFileFromContainer(SPANDUMP_FILE, temp.toString());
@@ -171,6 +173,23 @@ abstract class SmokeTest {
         .flatMap(it -> it.getResourceSpansList().stream())
         .flatMap(it -> it.getScopeSpansList().stream())
         .flatMap(it -> it.getSpansList().stream());
+  }
+
+  protected Collection<ExportTraceServiceRequest> tracesFromSpanDump() {
+    String spanDump = fetchSpanDumpFromTarget();
+    return Stream.of(spanDump.split(System.lineSeparator()))
+        .map(
+            it -> {
+              ExportTraceServiceRequest.Builder builder = ExportTraceServiceRequest.newBuilder();
+              try {
+                JsonFormat.parser().merge(it, builder);
+              } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+                Assertions.fail("Failed to parse span dump: " + e.getMessage());
+              }
+              return builder.build();
+            })
+        .collect(Collectors.toList());
   }
 
   protected Collection<ExportTraceServiceRequest> waitForTraces()
