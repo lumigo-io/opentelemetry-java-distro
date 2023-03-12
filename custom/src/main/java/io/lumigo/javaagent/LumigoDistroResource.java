@@ -23,33 +23,16 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider;
 import io.opentelemetry.sdk.resources.Resource;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @AutoService(ResourceProvider.class)
 public class LumigoDistroResource implements ResourceProvider {
   private static final String LUMIGO_DISTRO_VERSION = "lumigo.distro.version";
-  private static final String DISTRO_VERSION = getVersion();
-
-  private static String getVersion() {
-    String version = LumigoDistroResource.class.getPackage().getImplementationVersion();
-    if (version != null) {
-      try {
-        Matcher pt = Pattern.compile("^lumigo\\-(.*)?\\-otel.*$").matcher(version);
-        if (pt.find()) {
-          return pt.group(1);
-        }
-      } catch (Exception e) {
-      }
-    }
-    return "dev";
-  }
 
   @Override
   public Resource createResource(ConfigProperties config) {
     AttributesBuilder ab = Attributes.builder();
 
-    ab.put(LUMIGO_DISTRO_VERSION, DISTRO_VERSION);
+    ab.put(LUMIGO_DISTRO_VERSION, LumigoVersion.VERSION);
     return Resource.create(ab.build());
   }
 }
