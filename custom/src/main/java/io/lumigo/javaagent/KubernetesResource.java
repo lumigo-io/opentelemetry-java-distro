@@ -29,21 +29,6 @@ import java.io.FileReader;
 
 @AutoService(ResourceProvider.class)
 public class KubernetesResource implements ResourceProvider {
-  private static final Boolean IS_KUBERNETES = isContainerOnKubernetes();
-
-  private static final String KUBERNETES_MANAGED_HOSTS_FILE = "# Kubernetes-managed hosts file";
-
-  private static boolean isContainerOnKubernetes() {
-    try {
-      BufferedReader br = new BufferedReader(new FileReader("/etc/hosts"));
-      Boolean ret = br.readLine().equals(KUBERNETES_MANAGED_HOSTS_FILE);
-      br.close();
-      return ret;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
   private static final int POD_ID_LENGTH = 36;
   private static final String KUBERNETES_POD_UID = GetKubernetesPodUid();
 
@@ -64,6 +49,7 @@ public class KubernetesResource implements ResourceProvider {
         line = line.trim();
         if (line.length() > POD_ID_LENGTH && line.contains("/pods/")) {
           podId = line.split("/pods/")[1].substring(0, POD_ID_LENGTH);
+          break;
         }
       }
       br.close();
@@ -100,7 +86,7 @@ public class KubernetesResource implements ResourceProvider {
 
   @Override
   public Resource createResource(ConfigProperties config) {
-    if (!IS_KUBERNETES || KUBERNETES_POD_UID.isEmpty()) {
+    if (KUBERNETES_POD_UID.isEmpty()) {
       return null;
     }
 

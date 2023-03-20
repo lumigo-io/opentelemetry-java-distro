@@ -4,8 +4,14 @@ name: Code quality checks
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
   pull_request:
     types: [ opened, synchronize ]
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
 
 jobs:
   release:

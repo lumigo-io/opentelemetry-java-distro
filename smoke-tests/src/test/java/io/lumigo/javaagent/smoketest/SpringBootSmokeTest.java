@@ -42,6 +42,7 @@ class SpringBootSmokeTest extends SmokeTest {
     startTarget(8, Map.of("LUMIGO_DEBUG_SPANDUMP", "invalid"));
 
     Assertions.assertTrue(target.getLogs().contains("Lumigo debug span dump is not a valid path"));
+    stopTarget();
   }
 
   @Test

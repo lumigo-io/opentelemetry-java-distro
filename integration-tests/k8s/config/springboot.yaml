@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      containers:
+        - name: springboot
+          image: ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-spring-boot:jdk8-20211213.1570880324
+          imagePullPolicy: Always
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/opt/javaagent/opentelemetry-javaagent.jar"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-backend:8080"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_BSP_MAX_EXPORT_BATCH
+              value: "1"
+            - name: OTEL_BSP_SCHEDULE_DELAY
+              value: "10ms"
+            - name: LUMIGO_TRACER_TOKEN
+              value: "test-123"
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /greeting
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /greeting
+            initialDelaySeconds: 15
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot
+  labels:
+    app: springboot
+spec:
+  type: NodePort
+  selector:
+    app: springboot
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 32010
