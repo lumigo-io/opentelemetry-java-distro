@@ -36,14 +36,16 @@ spec:
             httpGet:
               port: 8080
               path: /greeting
-            initialDelaySeconds: 15
+            initialDelaySeconds: 25
             periodSeconds: 15
+            failureThreshold: 5
           livenessProbe:
             httpGet:
               port: 8080
               path: /greeting
-            initialDelaySeconds: 15
+            initialDelaySeconds: 25
             periodSeconds: 15
+            failureThreshold: 5
 ---
 apiVersion: v1
 kind: Service

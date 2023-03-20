@@ -11,7 +11,7 @@ help: ## Display this help.
 .PHONY: test
 test: build-injector ## Run integration tests
 	@echo "Running integration tests"
-	go tests -v -timeout 30m ./... --args -v 5 --build-tag=$(VERSION)
+	go test -v -timeout 30m ./... --args -v 5 --build-tag=$(VERSION)
 
 ##@ Build
 
