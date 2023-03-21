@@ -14,11 +14,10 @@ on:
       - '**.md'
 
 jobs:
-  quality-checks:
+  pr-labeling:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
       issues: write
     steps:
       - uses: amannn/action-semantic-pull-request@v5
@@ -47,7 +46,9 @@ jobs:
             Please make sure you are NOT addressing multiple issues with one PR.
             Note this PR might be rejected due to its size.
           files_to_ignore: ''
-
+  spotless:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -60,9 +61,20 @@ jobs:
       - name: Spotless
         uses: gradle/gradle-build-action@v2
         with:
-            # this is a common failure point, so we run it first
+          # this is a common failure point, so we run it first
           arguments: spotlessCheck
           cache-read-only: true
+  smoke-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK for running Gradle
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Tests
         uses: gradle/gradle-build-action@v2
@@ -71,6 +83,62 @@ jobs:
           arguments: check -x spotlessCheck
           cache-read-only: true
 
+  k8s-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the code
+        uses: actions/checkout@v3
+      - name: Cache go dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install KiND
+        uses: helm/kind-action@v1.5.0
+        with:
+          install_only: true
+
+      - name: Set up JDK for running Gradle
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build the injector container
+        run: make -C integration-tests/k8s build-injector
+        shell: bash
+
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+        with:
+          # Optional: pass GITHUB_TOKEN to avoid rate limiting.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Integration tests
+        shell: bash
+        working-directory: integration-tests/k8s
+        run: |
+          set -euo pipefail
+          go test -v -timeout 1h -json ./... --args -v 5 -build-tag=$(git rev-parse --short HEAD) 2>&1 | tee /tmp/gotest.log | gotestfmt
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-log
+          path: /tmp/gotest.log
+          if-no-files-found: error
+  checks:
+    permissions:
+      contents: write
+      issues: write
+    runs-on: ubuntu-latest
+    needs: [ pr-labeling, spotless, smoke-tests, k8s-e2e ]
+    steps:
       - name: Report failure
         if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions-cool/issues-helper@v3
