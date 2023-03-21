@@ -55,9 +55,10 @@ jobs:
 
       - name: Run Integration tests
         shell: bash
+        working-directory: integration-tests/k8s
         run: |
           set -euo pipefail
-          go test -v -timeout 1h -json -tags e2e integration-tests/k8s/... --args -v 5 -build-tag=$(git rev-parse --short HEAD) 2>&1 | tee /tmp/gotest.log | gotestfmt
+          go test -v -timeout 1h -json ./... --args -v 5 -build-tag=$(git rev-parse --short HEAD) 2>&1 | tee /tmp/gotest.log | gotestfmt
 
       - name: Upload test log
         uses: actions/upload-artifact@v3
