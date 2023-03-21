@@ -18,41 +18,21 @@
 package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider;
 import io.opentelemetry.sdk.resources.Resource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 @AutoService(ResourceProvider.class)
 public class LumigoDistroResource implements ResourceProvider {
   private static final String LUMIGO_DISTRO_VERSION = "lumigo.distro.version";
-  private static final String DISTRO_VERSION = getVersion();
-
-  private static String getVersion() {
-    try (InputStream in =
-        ResourceProvider.class.getClassLoader().getResourceAsStream("lumigo.properties")) {
-      if (in == null) {
-        return "dev";
-      }
-      Properties splunkProps = new Properties();
-      splunkProps.load(in);
-      AttributeKey<String> key = AttributeKey.stringKey(LUMIGO_DISTRO_VERSION);
-      return splunkProps.getProperty(key.getKey());
-    } catch (IOException e) {
-      return "dev";
-    }
-  }
 
   @Override
   public Resource createResource(ConfigProperties config) {
     AttributesBuilder ab = Attributes.builder();
 
-    ab.put(LUMIGO_DISTRO_VERSION, DISTRO_VERSION);
+    ab.put(LUMIGO_DISTRO_VERSION, LumigoVersion.VERSION);
     return Resource.create(ab.build());
   }
 }
