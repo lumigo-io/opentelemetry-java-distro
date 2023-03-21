@@ -3,6 +3,7 @@ module github.com/lumigo-io/opentelemetry-java-distro/integration-tests/k8s
 go 1.20
 
 require (
+	github.com/stretchr/testify v1.8.2
 	go.opentelemetry.io/proto/otlp v0.19.0
 	google.golang.org/protobuf v1.28.1
 	k8s.io/api v0.26.0
@@ -34,6 +35,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/vladimirvivien/gexe v0.2.0 // indirect
 	golang.org/x/net v0.3.1-0.20221206200815-1e63c2f08a10 // indirect
