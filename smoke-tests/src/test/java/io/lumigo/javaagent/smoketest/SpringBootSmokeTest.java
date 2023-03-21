@@ -46,6 +46,14 @@ class SpringBootSmokeTest extends SmokeTest {
   }
 
   @Test
+  public void testSwitchoff() throws IOException, InterruptedException {
+    startTarget(8, Map.of("LUMIGO_SWITCH_OFF", "true"));
+
+    Assertions.assertTrue(
+        target.getLogs().contains("Lumigo OpenTelemetry JavaAgent distribution disabled"));
+  }
+
+  @Test
   public void springBootSmokeTestOnJDK() throws IOException, InterruptedException {
     startTarget(8, null);
 
@@ -73,12 +81,13 @@ class SpringBootSmokeTest extends SmokeTest {
     Assertions.assertEquals(1, countSpansByName(traces, "WebController.withSpan"));
     Assertions.assertNotEquals(
         0, countResourcesByValue(traces, "telemetry.auto.version", currentAgentVersion));
-    Assertions.assertNotEquals(0, countResourcesByValue(traces, "lumigo.distro.version", "dev"));
+    Assertions.assertNotEquals(
+        0, countResourcesByValue(traces, "lumigo.distro.version", "dev-SNAPSHOT"));
 
     Collection<ExportTraceServiceRequest> dumpTraces = tracesFromSpanDump();
     Assertions.assertEquals(1, countSpansByName(dumpTraces, "GET /greeting"));
     Assertions.assertNotEquals(
-        0, countResourcesByValue(dumpTraces, "lumigo.distro.version", "dev"));
+        0, countResourcesByValue(dumpTraces, "lumigo.distro.version", "dev-SNAPSHOT"));
 
     stopTarget();
   }
