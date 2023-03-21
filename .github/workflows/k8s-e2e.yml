@@ -1,4 +1,4 @@
-name: Code quality checks
+name: Kubernetes E2E tests
 
 # Trigger the workflow on pull requests and direct pushes to any branch
 on:

@@ -14,7 +14,7 @@ on:
       - '**.md'
 
 jobs:
-  release:
+  quality-checks:
     runs-on: ubuntu-latest
     permissions:
       contents: write
