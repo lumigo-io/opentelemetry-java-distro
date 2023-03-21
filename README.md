@@ -32,7 +32,7 @@ OTEL_SERVICE_NAME=<service name>
 
 Replace `<service name>` with the desired name of the service.
 
-**Note:** While you setting environment variables for configuration, consider also providing the one needed for [no-code tracer activation](#no-code-activation) :-)
+**Note:** While you setting environment variables for configuration, consider also providing the one needed for [no-code tracer activation](#option-1-java_tool_options) :-)
 
 ### Tracer activation
 
@@ -129,7 +129,7 @@ specification:
 
 * If the `LUMIGO_TRACER_TOKEN` environment variable is set: an [`OTLP Exporter`](https://github.com/open-telemetry/opentelemetry-java/tree/main/exporters/otlp)
   is configured to push data to Lumigo
-* If the `LUMIGO_DEBUG_SPANDUMP` environment variable is set to a path-like value: java/blob/main/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/SimpleSpanProcessor.java), which uses a [`FileLoggingSpanExporter`](https://github.com/lumigo-io/opentelemetry-java-distro/blob/main/custom/src/main/java/io/lumigo/javaagent/FileLoggingSpanExporter.java), to save to file the spans collected.
+* If the `LUMIGO_DEBUG_SPANDUMP` environment variable is set to a path-like value, we define the [`FileLoggingSpanExporter`](https://github.com/lumigo-io/opentelemetry-java-distro/blob/main/custom/src/main/java/io/lumigo/javaagent/FileLoggingSpanExporter.java), to save to file the spans collected.
   Do not use this flag in production unless you need to troubleshoot trace data!
 
 ### SDK configuration
