@@ -36,7 +36,7 @@ public class KubernetesResource implements ResourceProvider {
   private static boolean isContainerOnKubernetes() {
     try {
       BufferedReader br = new BufferedReader(new FileReader("/etc/hosts"));
-      Boolean ret = br.readLine().equals(KUBERNETES_MANAGED_HOSTS_FILE);
+      Boolean ret = br.readLine().startsWith(KUBERNETES_MANAGED_HOSTS_FILE);
       br.close();
       return ret;
     } catch (Exception e) {
@@ -64,6 +64,7 @@ public class KubernetesResource implements ResourceProvider {
         line = line.trim();
         if (line.length() > POD_ID_LENGTH && line.contains("/pods/")) {
           podId = line.split("/pods/")[1].substring(0, POD_ID_LENGTH);
+          break;
         }
       }
       br.close();

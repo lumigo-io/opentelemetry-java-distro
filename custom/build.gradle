@@ -4,12 +4,13 @@ plugins {
 
 dependencies {
   compileOnly(project(":bootstrap"))
-  compileOnly("io.opentelemetry:opentelemetry-sdk")
+  compileOnly("io.opentelemetry:opentelemetry-exporter-otlp-common")
   compileOnly("io.opentelemetry:opentelemetry-semconv")
-  compileOnly("io.opentelemetry:opentelemetry-exporter-logging")
+  compileOnly("io.opentelemetry:opentelemetry-sdk")
   compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
+  compileOnly("com.fasterxml.jackson.core:jackson-core:${versions.jackson}")
 
   implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}") {
     exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
@@ -20,14 +21,4 @@ dependencies {
 
   annotationProcessor deps.autoservice
   compileOnly deps.autoservice
-}
-
-task injectVersion(dependsOn: processResources) {
-  doLast {
-    new File("$buildDir/generated/properties/lumigo.properties").withWriter { w ->
-      Properties p = new Properties()
-      p['lumigo.distro.version'] = project.version.toString()
-      p.store w, null
-    }
-  }
 }
