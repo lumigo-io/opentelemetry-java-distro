@@ -151,6 +151,16 @@ abstract class SmokeTest {
             .count();
   }
 
+  protected static int countResourcesByName(
+      Collection<ExportTraceServiceRequest> traces, String resourceName) {
+    return (int)
+        traces.stream()
+            .flatMap(it -> it.getResourceSpansList().stream())
+            .flatMap(it -> it.getResource().getAttributesList().stream())
+            .filter(kv -> kv.getKey().equals(resourceName))
+            .count();
+  }
+
   protected static int countSpansByName(
       Collection<ExportTraceServiceRequest> traces, String spanName) {
     return (int) getSpanStream(traces).filter(it -> it.getName().equals(spanName)).count();
