@@ -15,26 +15,20 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent.smoketest;
+package io.lumigo.javaagent;
 
-import java.util.concurrent.TimeUnit;
-import okhttp3.OkHttpClient;
+public class Strings {
 
-public class OkHttpUtils {
-
-  static OkHttpClient.Builder clientBuilder() {
-    TimeUnit unit = TimeUnit.MINUTES;
-    return new OkHttpClient.Builder()
-        .connectTimeout(1, unit)
-        .writeTimeout(1, unit)
-        .readTimeout(1, unit);
-  }
-
-  public static OkHttpClient client() {
-    return client(false);
-  }
-
-  public static OkHttpClient client(boolean followRedirects) {
-    return clientBuilder().followRedirects(followRedirects).build();
+  public static boolean isBlank(String s) {
+    int strLen;
+    if (s == null || (strLen = s.length()) == 0) {
+      return true;
+    }
+    for (int i = 0; i < strLen; i++) {
+      if ((Character.isWhitespace(s.charAt(i)) == false)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

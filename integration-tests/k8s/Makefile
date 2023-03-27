@@ -18,5 +18,5 @@ test: build-injector ## Run integration tests
 .PHONY: build-injector
 build-injector: ## Build injector image
 	@echo "Building injector"
-	cd ../../ && ./gradlew clean assemble
+	cd ../../ && ./gradlew clean build assemble
 	docker build -t javaagent-loader:$(VERSION) -t javaagent-loader:latest -f Dockerfile ./../../
