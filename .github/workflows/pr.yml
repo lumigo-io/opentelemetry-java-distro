@@ -132,6 +132,67 @@ jobs:
           name: test-log
           path: /tmp/gotest.log
           if-no-files-found: error
+  ecs-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the code
+        uses: actions/checkout@v3
+      - name: Set up JDK for running Gradle
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Assemble the agent
+        uses: gradle/gradle-build-action@v2
+        with:
+          # exclude spotlessCheck to avoid running it twice
+          arguments: clean assemble
+          cache-read-only: true
+      - uses: actions/setup-node@v3
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: 'us-west-2'
+      - name: Create a random deployment suffix
+        id: deployment-suffix
+        run: |
+          suffix = $(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+          echo "DEPLOYMENT_SUFFIX=${suffix}" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: yarn
+        working-directory: integration-tests/ecs
+      - name: Synth stack
+        run: yarn cdk synth
+        working-directory: integration-tests/ecs
+        env:
+          DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
+      - name: Deploy stack
+        run: yarn cdk deploy --all --require-approval never
+        working-directory: integration-tests/ecs
+        env:
+          DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
+      - name: Test the agent
+        env:
+          DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
+        run: |
+          suffix = $(DEPLOYMENT_SUFFIX)
+          if [ ! -z "$suffix" ]; then
+            suffix = "-$suffix"
+          fi
+          start_time=$(($(date +%s000) - 100000))
+          log_count=$(aws logs filter-log-events --log-stream-name-prefix springboot --log-group-name JavaagentFargateTestLogGroup$(suffix) --output text --start-time $start_time --end-time $(date +%s000) | grep -o "aws.ecs.task.arn" | wc -l | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          log_count=$(($log_count + 0))
+          if [ $log_count -lt 1 ]; then
+            echo -e "\033[0;31mNo evidence for the aws.ecs.task.arn resource attribute in the logs. Expected at least 1 occurrence.\033[0m"
+            exit 1
+          fi
+      - name: remove stack
+        run: yarn cdk destroy --all --force --require-approval never
+        working-directory: integration-tests/ecs
+        env:
+          DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
   checks:
     permissions:
       contents: write
