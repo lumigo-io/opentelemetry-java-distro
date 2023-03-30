@@ -17,16 +17,12 @@ import {Construct} from 'constructs';
 import {ApplicationProtocol, Protocol} from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import {LogGroup} from "aws-cdk-lib/aws-logs";
 
-// get suffix from env
-let suffix = process.env.DEPLOYMENT_SUFFIX || '';
-if (suffix !== '') {
-  suffix = '-' + suffix;
-}
-
 export class EcsFargateElbStack extends Stack {
 
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
+
+    const suffix = props.tags?.['lumigo:suffix'] || '';
 
     const lumigoTokenSecret = EcsSecret.fromSecretsManager(
         Secret.fromSecretNameV2(this, 'Secret', 'AccessKeys'),
