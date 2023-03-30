@@ -87,7 +87,17 @@ tasks {
     dependsOn(tasks.relocateJavaagentLibs)
     with isolateClasses(tasks.relocateJavaagentLibs.outputs.files)
 
-    into("$buildDir/isolated/javaagentLibs")
+    def javaagentLibs = "$buildDir/isolated/javaagentLibs"
+    into(javaagentLibs)
+
+    doLast {
+      def file = file("${javaagentLibs}/inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider")
+      def lines = file.readLines()
+      def newLines = lines.findAll { !it.contains("io.opentelemetry.contrib.aws.resource.Ec2ResourceProvider") }
+      file.newWriter().withWriter { w ->
+        w << newLines.join(System.getProperty("line.separator"))
+      }
+    }
   }
 
   // 3. the relocated and isolated javaagent libs are merged together with the bootstrap libs (which undergo relocation
