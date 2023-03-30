@@ -99,8 +99,8 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
       // Upsert only if not set by the user, this allows the user to override the endpoint (i.e. for
       // testing)
-      upsert(customized, cfg, "otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
-      upsert(customized, cfg, "otel.exporter.otlp.protocol", "http/protobuf");
+      upsert(customized, cfg, "otel.exporter.otlp.traces.endpoint", LUMIGO_ENDPOINT_URL);
+      upsert(customized, cfg, "otel.exporter.otlp.traces.protocol", "http/protobuf");
     }
 
     return customized;

@@ -19,9 +19,9 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-javaagent:/opt/javaagent/opentelemetry-javaagent.jar"
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
               value: "http://otel-backend:8080"
-            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+            - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
               value: "grpc"
             - name: OTEL_BSP_MAX_EXPORT_BATCH
               value: "1"
