@@ -157,8 +157,9 @@ jobs:
           aws-region: 'us-west-2'
       - name: Create a random deployment suffix
         id: deployment-suffix
+        shell: bash
         run: |
-          suffix = $(dd bs=512 if=/dev/urandom count=1 2>/dev/null | LC_ALL=C tr -dc "a-zA-Z0-9" | head -c 10)
+          suffix=$(dd bs=512 if=/dev/urandom count=1 2>/dev/null | LC_ALL=C tr -dc "a-zA-Z0-9" | head -c 10)
           echo "DEPLOYMENT_SUFFIX=${suffix}" >> $GITHUB_ENV
       - name: Install dependencies
         run: yarn
