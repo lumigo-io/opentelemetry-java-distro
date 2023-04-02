@@ -17,6 +17,8 @@
  */
 package io.lumigo.javaagent.smoketest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import java.io.IOException;
 import java.util.Collection;
@@ -29,12 +31,81 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class SpringBootSmokeTest extends SmokeTest {
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   @Override
   protected String getTargetImage(int jdk) {
     return "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-spring-boot:jdk"
         + jdk
         + "-20211213.1570880324";
+  }
+
+  @Test
+  public void testEnvResource() throws IOException, InterruptedException {
+    startTarget(
+        8,
+        Map.of(
+            "LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT", "[\"DONT_TELL\"]",
+            "DONT_TELL", "SECRET",
+            "HELLO", "WORLD",
+            "LUMIGO_SECRET_MASKING_REGEX", "[\"TOP_SECRET\"]",
+            "TOP_SECRET", "shhhh",
+            "MY_PASS", "1234"));
+
+    String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    Request request = new Request.Builder().url(url).get().build();
+    Response response = client.newCall(request).execute();
+
+    Collection<ExportTraceServiceRequest> traces = waitForTraces();
+
+    Assertions.assertNotEquals(0, traces.size());
+    Assertions.assertNotEquals(0, countResourcesByName(traces, "process.environ"));
+
+    traces.stream()
+        .flatMap(it -> it.getResourceSpansList().stream())
+        .flatMap(it -> it.getResource().getAttributesList().stream())
+        .filter(it -> it.getKey().equals("process.environ"))
+        .map(it -> parseEnv(it.getValue().getStringValue()))
+        .forEach(
+            envs -> {
+              Assertions.assertEquals("WORLD", envs.get("HELLO"));
+              Assertions.assertEquals("****", envs.get("DONT_TELL"));
+              Assertions.assertEquals("****", envs.get("TOP_SECRET"));
+            });
+  }
+
+  @Test
+  public void testEnvResourceWithDefault() throws IOException, InterruptedException {
+    startTarget(8, Map.of("MY_PASS", "1234"));
+
+    String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    Request request = new Request.Builder().url(url).get().build();
+    Response response = client.newCall(request).execute();
+
+    Collection<ExportTraceServiceRequest> traces = waitForTraces();
+
+    Assertions.assertNotEquals(0, traces.size());
+    Assertions.assertNotEquals(0, countResourcesByName(traces, "process.environ"));
+
+    traces.stream()
+        .flatMap(it -> it.getResourceSpansList().stream())
+        .flatMap(it -> it.getResource().getAttributesList().stream())
+        .filter(it -> it.getKey().equals("process.environ"))
+        .map(it -> parseEnv(it.getValue().getStringValue()))
+        .forEach(
+            envs -> {
+              Assertions.assertEquals("****", envs.get("MY_PASS"));
+            });
+  }
+
+  public static Map<String, String> parseEnv(String value) {
+    try {
+      return OBJECT_MAPPER.readValue(
+          value,
+          TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Test
@@ -55,7 +126,7 @@ class SpringBootSmokeTest extends SmokeTest {
 
   @Test
   public void springBootSmokeTestOnJDK() throws IOException, InterruptedException {
-    startTarget(8, null);
+    startTarget(8, Map.of("LUMIGO_DEBUG", "true"));
 
     // check if the debug log is printed
     Assertions.assertTrue(
@@ -63,6 +134,7 @@ class SpringBootSmokeTest extends SmokeTest {
 
     String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
     Request request = new Request.Builder().url(url).get().build();
+    Response response = client.newCall(request).execute();
 
     String currentAgentVersion =
         (String)
@@ -70,8 +142,6 @@ class SpringBootSmokeTest extends SmokeTest {
                 .getManifest()
                 .getMainAttributes()
                 .get(Attributes.Name.IMPLEMENTATION_VERSION);
-
-    Response response = client.newCall(request).execute();
 
     Collection<ExportTraceServiceRequest> traces = waitForTraces();
 
