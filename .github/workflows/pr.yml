@@ -164,6 +164,11 @@ jobs:
       - name: Install dependencies
         run: yarn
         working-directory: integration-tests/ecs
+      - name: CDK Bootstrap
+        run: yarn cdk bootstrap
+        working-directory: integration-tests/ecs
+        env:
+          DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
       - name: Synth stack
         run: yarn cdk synth
         working-directory: integration-tests/ecs
