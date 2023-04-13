@@ -7,13 +7,10 @@ const env = {
 };
 
 // Allow to deploy multiple stacks in the same account
-let suffix = process.env.DEPLOYMENT_SUFFIX || '';
-if (suffix !== '') {
-  suffix = '-' + suffix;
-}
+let suffix = '-' + (process.env.DEPLOYMENT_SUFFIX || 'dev');
 
 const app = new App();
 
-new EcsFargateElbStack(app, 'lumigo-java-distro-itests-dev'+ suffix, { env, tags: { 'lumigo:suffix': suffix } });
+new EcsFargateElbStack(app, 'lumigo-java-distro-itests'+ suffix, { env, tags: { 'lumigo:suffix': suffix } });
 
 app.synth();

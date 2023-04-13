@@ -1,7 +1,7 @@
 import {copyFileSync, existsSync} from 'fs';
 import {dirname, join} from 'path';
 import {Duration, Stack, StackProps} from 'aws-cdk-lib';
-import {SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
+import {IpAddresses, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
 import {Platform} from 'aws-cdk-lib/aws-ecr-assets';
 import {
   AwsLogDriver,
@@ -22,7 +22,7 @@ export class EcsFargateElbStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
 
-    const suffix = props.tags?.['lumigo:suffix'] || '';
+    const suffix = props.tags?.['lumigo:suffix'] || '-dev';
 
     const lumigoTokenSecret = EcsSecret.fromSecretsManager(
         Secret.fromSecretNameV2(this, 'Secret', 'AccessKeys'),
@@ -30,7 +30,7 @@ export class EcsFargateElbStack extends Stack {
     );
 
     const vpc = new Vpc(this, 'JavaagentFargateTestVpc' + suffix, {
-      cidr: '10.0.0.0/16',
+      ipAddresses: IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 3, // Default is all AZs in region
       natGateways: 1,
       subnetConfiguration: [
