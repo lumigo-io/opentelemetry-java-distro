@@ -30,6 +30,7 @@ dependencies {
   bootstrapLibs(project(":bootstrap"))
 
   javaagentLibs(project(":custom"))
+//  javaagentLibs(project(":instrumentation:okhttp-body-3.0"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
