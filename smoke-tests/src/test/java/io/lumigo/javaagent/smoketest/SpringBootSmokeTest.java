@@ -84,6 +84,13 @@ class SpringBootSmokeTest extends SmokeTest {
     Assertions.assertNotEquals(
         0, countResourcesByValue(traces, "lumigo.distro.version", "dev-SNAPSHOT"));
 
+    Assertions.assertNotEquals(0, countResourcesByValue(traces, "telemetry.sdk.language", "java"));
+    Assertions.assertNotEquals(
+        0, countResourcesByValue(traces, "telemetry.sdk.name", "opentelemetry"));
+    Assertions.assertNotEquals(0, countResourcesByName(traces, "process.runtime.description"));
+    Assertions.assertNotEquals(0, countResourcesByName(traces, "process.runtime.name"));
+    Assertions.assertNotEquals(0, countResourcesByName(traces, "process.runtime.version"));
+
     Collection<ExportTraceServiceRequest> dumpTraces = tracesFromSpanDump();
     Assertions.assertEquals(1, countSpansByName(dumpTraces, "GET /greeting"));
     Assertions.assertNotEquals(
