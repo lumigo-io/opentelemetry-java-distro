@@ -160,7 +160,7 @@ jobs:
         shell: bash
         run: |
           suffix=$(dd bs=512 if=/dev/urandom count=1 2>/dev/null | LC_ALL=C tr -dc "a-zA-Z0-9" | head -c 10)
-          echo "DEPLOYMENT_SUFFIX=${suffix}" >> $GITHUB_ENV
+          echo "DEPLOYMENT_SUFFIX=${suffix}" >> $GITHUB_OUTPUT
       - name: Install dependencies
         run: yarn
         working-directory: integration-tests/ecs
@@ -184,9 +184,10 @@ jobs:
           DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
         run: |
           suffix = $(DEPLOYMENT_SUFFIX)
-          if [ ! -z "$suffix" ]; then
-            suffix = "-$suffix"
+          if [ -z "$suffix" ]; then
+            suffix = "dev"
           fi
+          suffix = "-$suffix"
           start_time=$(($(date +%s000) - 100000))
           log_count=$(aws logs filter-log-events --log-stream-name-prefix springboot --log-group-name JavaagentFargateTestLogGroup$(suffix) --output text --start-time $start_time --end-time $(date +%s000) | grep -o "aws.ecs.task.arn" | wc -l | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           log_count=$(($log_count + 0))
