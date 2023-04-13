@@ -196,6 +196,8 @@ jobs:
             echo -e "\033[0;31mNo evidence for the aws.ecs.task.arn resource attribute in the logs. Expected at least 1 occurrence.\033[0m"
             exit 1
           fi
+          echo -e "\033[0;32mFound $log_count occurrences of the aws.ecs.task.arn resource attribute in the logs.\033[0m"
+          echo -e "\033[0;32mTest passes.\033[0m"
       - name: remove stack
         if: always()
         run: yarn cdk destroy --all --force --require-approval never
