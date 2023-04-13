@@ -184,13 +184,13 @@ jobs:
           DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
         shell: bash
         run: |
-          suffix=$DEPLOYMENT_SUFFIX
+          suffix=${DEPLOYMENT_SUFFIX}
           if [ -z "$suffix" ]; then
             suffix="dev"
           fi
-          suffix="-$suffix"
+          suffix="-${suffix}"
           start_time=$(($(date +%s000) - 100000))
-          log_count=$(aws logs filter-log-events --log-stream-name-prefix springboot --log-group-name JavaagentFargateTestLogGroup$(suffix) --output text --start-time $start_time --end-time $(date +%s000) | grep -o "aws.ecs.task.arn" | wc -l | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          log_count=$(aws logs filter-log-events --log-stream-name-prefix springboot --log-group-name JavaagentFargateTestLogGroup${suffix} --output text --start-time $start_time --end-time $(date +%s000) | grep -o "aws.ecs.task.arn" | wc -l | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           log_count=$(($log_count + 0))
           if [ $log_count -lt 1 ]; then
             echo -e "\033[0;31mNo evidence for the aws.ecs.task.arn resource attribute in the logs. Expected at least 1 occurrence.\033[0m"
