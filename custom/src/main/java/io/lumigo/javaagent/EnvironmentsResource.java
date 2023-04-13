@@ -87,13 +87,13 @@ public class EnvironmentsResource implements ResourceProvider {
         patternsFromConfig(config, LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT);
 
     for (String key : envs.keySet()) {
-      Stream.concat(MaskingRegex.stream(), MaskingRegexEnv.stream())
-          .forEach(
-              pattern -> {
-                if (pattern.matcher(key).matches()) {
-                  envs.put(key, "****");
-                }
-              });
+      boolean masked =
+          Stream.concat(MaskingRegex.stream(), MaskingRegexEnv.stream())
+              .anyMatch(pattern -> pattern.matcher(key).matches());
+
+      if (masked) {
+        envs.put(key, "****");
+      }
     }
 
     try {
