@@ -182,8 +182,9 @@ jobs:
       - name: Test the agent
         env:
           DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
+        shell: bash
         run: |
-          suffix = $(DEPLOYMENT_SUFFIX)
+          suffix = $DEPLOYMENT_SUFFIX
           if [ -z "$suffix" ]; then
             suffix = "dev"
           fi
@@ -196,6 +197,7 @@ jobs:
             exit 1
           fi
       - name: remove stack
+        if: always()
         run: yarn cdk destroy --all --force --require-approval never
         working-directory: integration-tests/ecs
         env:
