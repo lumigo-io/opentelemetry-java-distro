@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 @AutoService(AutoConfigurationCustomizerProvider.class)
 public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
   public static final String LUMIGO_TRACER_TOKEN = "lumigo.tracer.token";
+  public static final String LUMIGO_ENDPOINT = "lumigo.endpoint";
   public static final String LUMIGO_DEBUG_SPANDUMP = "lumigo.debug.spandump";
 
   public static final Logger LOGGER = Logger.getLogger(LumigoConfigurator.class.getName());
@@ -97,9 +98,15 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
     customizedCfg.put("otel.exporter.otlp.headers", String.join(",", headers));
 
-    // Upsert only if not set by the user, this allows the user to override the endpoint (i.e. for
-    // testing)
-    setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
+    String lumigoEndpoint = originalCfg.getString(LUMIGO_ENDPOINT);
+    if (!Strings.isBlank(lumigoEndpoint)) {
+      setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.endpoint", lumigoEndpoint);
+    } else {
+      /*
+       * Upsert only if not set by the user, this allows the user to override the endpoint
+       */
+      setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
+    }
     setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.protocol", "http/protobuf");
 
     /*
