@@ -18,7 +18,11 @@
 package io.lumigo.javaagent.smoketest;
 
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -29,6 +33,20 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class SpringBootSmokeTest extends SmokeTest {
+  @Test
+  public void testResourceProviders() throws IOException {
+    URL url =
+        new URL(
+            "jar:file:"
+                + agentPath
+                + "!/inst/META-INF/services/io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider");
+    InputStream is = url.openStream();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    String line;
+    while ((line = reader.readLine()) != null) {
+      Assertions.assertNotEquals("io.opentelemetry.contrib.aws.resource.Ec2ResourceProvider", line);
+    }
+  }
 
   @Override
   protected String getTargetImage(int jdk) {
