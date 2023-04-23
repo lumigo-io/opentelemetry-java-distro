@@ -14,4 +14,8 @@ dependencies {
 
   annotationProcessor deps.autoservice
   compileOnly deps.autoservice
+
+  testImplementation(project(":test-utils"))
+  testImplementation("io.opentelemetry:opentelemetry-sdk")
+  testImplementation("org.hamcrest:hamcrest:2.2")
 }

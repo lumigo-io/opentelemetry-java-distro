@@ -19,7 +19,7 @@ package io.lumigo.javaagent;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler;
+import io.opentelemetry.exporter.internal.otlp.traces.SpanDumpMarshaler;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -28,45 +28,40 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 
 /** A Span Exporter that logs every span at INFO level using java.util.logging. */
-public final class FileLoggingSpanExporter implements SpanExporter {
+public final class FileSpanExporter implements SpanExporter {
 
-  public static final Logger logger = Logger.getLogger(FileLoggingSpanExporter.class.getName());
+  static final JsonFactory JSON_FACTORY =
+      new JsonFactory().disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
 
-  /** Returns a new {@link FileLoggingSpanExporter}. */
-  public static FileLoggingSpanExporter create(String file) throws IOException {
-    return new FileLoggingSpanExporter(file);
+  private static final Logger LOGGER = Logger.getLogger(FileSpanExporter.class.getName());
+
+  /** Returns a new {@link FileSpanExporter}. */
+  public static FileSpanExporter create(String file) throws IOException {
+    return new FileSpanExporter(file);
   }
 
-  private FileWriter out;
+  private final FileWriter out;
   private final AtomicBoolean isShutdown = new AtomicBoolean();
 
-  private FileLoggingSpanExporter(String file) throws IOException {
+  FileSpanExporter(@Nonnull String file) throws IOException {
     this.out = new FileWriter(file, true);
   }
 
   @Override
-  public CompletableResultCode export(Collection<SpanData> spans) {
+  public CompletableResultCode export(@Nonnull Collection<SpanData> spans) {
     if (isShutdown.get()) {
       return CompletableResultCode.ofFailure();
     }
 
-    TraceRequestMarshaler traceRequestMarshaler = TraceRequestMarshaler.create(spans);
-
-    /*
-     * The fact that we are printing one JSON object per line makes the overall document,
-     * so we need to recreate the JsonGenerator every time.
-     */
-    try (JsonGenerator generator =
-        new JsonFactory()
-            .createGenerator(out)
-            .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET) // Do not close the underpinning file
-    ) {
-      traceRequestMarshaler.writeJsonTo(generator);
-      out.write(System.lineSeparator());
-    } catch (IOException e) {
-      logger.log(java.util.logging.Level.SEVERE, "Failed to export spans", e);
+    try (JsonGenerator gen = JSON_FACTORY.createGenerator(out)) {
+      for (final SpanData span : spans) {
+        final SpanDumpMarshaler spanDumpMarshaler = SpanDumpMarshaler.create(span);
+        spanDumpMarshaler.writeJsonTo(gen);
+      }
+    } catch (Exception e) {
       return CompletableResultCode.ofFailure();
     }
 
@@ -83,7 +78,7 @@ public final class FileLoggingSpanExporter implements SpanExporter {
     try {
       this.out.flush();
     } catch (IOException e) {
-      logger.log(java.util.logging.Level.SEVERE, "Failed to flush spans", e);
+      LOGGER.log(java.util.logging.Level.SEVERE, "Failed to flush spans", e);
       return CompletableResultCode.ofFailure();
     }
 
@@ -96,23 +91,20 @@ public final class FileLoggingSpanExporter implements SpanExporter {
       return CompletableResultCode.ofSuccess();
     }
 
-    Boolean failed = false;
+    boolean success = true;
     try {
       this.out.flush();
     } catch (IOException e) {
-      logger.log(java.util.logging.Level.SEVERE, "Failed to flush spans", e);
-      failed = true;
+      LOGGER.log(java.util.logging.Level.SEVERE, "Failed to flush spans", e);
+      success = false;
     }
     try {
       this.out.close();
     } catch (IOException e) {
-      logger.log(java.util.logging.Level.SEVERE, "Failed to close file", e);
-      failed = true;
+      LOGGER.log(java.util.logging.Level.SEVERE, "Failed to close file", e);
+      success = false;
     }
 
-    if (failed) {
-      return CompletableResultCode.ofFailure();
-    }
-    return CompletableResultCode.ofSuccess();
+    return success ? CompletableResultCode.ofSuccess() : CompletableResultCode.ofFailure();
   }
 }

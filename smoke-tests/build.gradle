@@ -3,14 +3,17 @@ plugins {
 }
 
 dependencies {
-  testImplementation("org.testcontainers:testcontainers:1.17.6")
-  testImplementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+  testImplementation(project(":custom"))
+  testImplementation(project(":test-utils"))
+
+  testImplementation("ch.qos.logback:logback-classic:1.4.5")
+  testImplementation("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")
   testImplementation("com.google.protobuf:protobuf-java-util:3.21.12")
   testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testImplementation("io.opentelemetry.proto:opentelemetry-proto:0.19.0-alpha")
-  testImplementation("io.opentelemetry:opentelemetry-api:${versions.opentelemetry}")
-
-  testImplementation("ch.qos.logback:logback-classic:1.4.5")
+  testImplementation("io.opentelemetry:opentelemetry-sdk:${versions.opentelemetry}")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-trace:${versions.opentelemetry}")
+  testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
 tasks.test {
