@@ -60,6 +60,7 @@ public final class FileSpanExporter implements SpanExporter {
       for (final SpanData span : spans) {
         final SpanDumpMarshaler spanDumpMarshaler = SpanDumpMarshaler.create(span);
         spanDumpMarshaler.writeJsonTo(gen);
+        out.write(System.lineSeparator());
       }
     } catch (Exception e) {
       return CompletableResultCode.ofFailure();

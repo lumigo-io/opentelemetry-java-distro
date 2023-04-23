@@ -18,8 +18,9 @@
 package io.lumigo.javaagent.smoketest;
 
 import static io.lumigo.javaagent.spandump.SpanMatchers.*;
+import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
+import static io.opentelemetry.api.trace.SpanKind.SERVER;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,14 +30,16 @@ import io.lumigo.javaagent.junitextensions.TestAppExtension;
 import io.lumigo.javaagent.junitextensions.TestAppExtension.Configuration;
 import io.lumigo.javaagent.junitextensions.TestAppExtension.EnvVar;
 import io.lumigo.javaagent.spandump.SpanDumpEntry;
-import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -71,17 +74,55 @@ class SpringBootSmokeTest {
       assertThat(body.string(), is("Hi!"));
     }
 
-    List<SpanDumpEntry> entries = target.getSpanDump();
-    assertThat(entries.size(), equalTo(1));
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(30))
+        .untilAsserted(
+            () -> {
+              List<SpanDumpEntry> entries = target.getSpanDump();
 
-    SpanDumpEntry entry = entries.get(0);
-    assertThat(entry, hasSpanName("WebController.withSpan"));
-    assertThat(entry, hasSpanKind(SpanKind.SERVER));
-    assertThat(entry, hasSpanStatus(StatusData.unset()));
-    assertThat(entry, hasAttribute("code.function", "withSpan"));
-    assertThat(entry, hasAttributeString("thread.name"));
-    assertThat(entry, hasAttributeLong("thread.id"));
-    assertThat(entry, hasResourceAttributeString("lumigo.distro.version"));
-    assertThat(entry, hasResourceAttributeString("container.id"));
+              SpanDumpEntry serverSpan =
+                  entries.stream()
+                      .filter(entry -> "GET /greeting".equals(entry.getSpan().getName()))
+                      .findFirst()
+                      .orElseThrow();
+
+              assertThat(serverSpan, hasSpanName("GET /greeting"));
+              assertThat(serverSpan, hasSpanKind(SERVER));
+              assertThat(serverSpan, hasSpanStatus(StatusData.unset()));
+              assertThat(serverSpan, hasAttribute("http.target", "/greeting"));
+              assertThat(serverSpan, hasAttribute("http.route", "/greeting"));
+              assertThat(serverSpan, hasAttribute("http.status_code", 200L));
+              assertThat(serverSpan, hasAttributeOfTypeString("thread.name"));
+              assertThat(serverSpan, hasAttributeOfTypeLong("thread.id"));
+              assertThat(serverSpan, hasResourceAttributeOfTypeString("lumigo.distro.version"));
+              assertThat(serverSpan, hasResourceAttributeOfTypeString("container.id"));
+
+              SpanDumpEntry internalSpan =
+                  entries.stream()
+                      .filter(entry -> "WebController.greeting".equals(entry.getSpan().getName()))
+                      .findFirst()
+                      .orElseThrow();
+
+              assertThat(internalSpan, hasSpanName("WebController.greeting"));
+              assertThat(internalSpan, hasSpanKind(INTERNAL));
+              assertThat(internalSpan, hasTraceId(serverSpan.getSpan().getTraceId()));
+              assertThat(internalSpan, hasParentSpanId(serverSpan.getSpan().getSpanId()));
+              assertThat(internalSpan, hasAttributeOfTypeString("thread.name"));
+              assertThat(internalSpan, hasAttributeOfTypeString("thread.id"));
+              assertThat(
+                  internalSpan,
+                  hasResourceAttribute(
+                      "container.id",
+                      serverSpan
+                          .getResource()
+                          .getAttribute(AttributeKey.stringKey("container.id"))));
+              assertThat(
+                  internalSpan,
+                  hasResourceAttribute(
+                      "lumigo.distro.version",
+                      serverSpan
+                          .getResource()
+                          .getAttribute(AttributeKey.stringKey("container.id"))));
+            });
   }
 }

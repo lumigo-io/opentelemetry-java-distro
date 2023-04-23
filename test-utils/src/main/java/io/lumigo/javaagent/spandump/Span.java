@@ -28,6 +28,7 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -54,13 +55,13 @@ public abstract class Span {
 
   public abstract String getSpanId();
 
-  public abstract String getParentSpanId();
+  public abstract Optional<String> getParentSpanId();
 
   public abstract long getStartTimeUnixNano();
 
   public abstract long getEndTimeUnixNano();
 
-  public abstract StatusData getStatus();
+  public abstract Optional<StatusData> getStatus();
 
   public abstract SpanKind getKind();
 

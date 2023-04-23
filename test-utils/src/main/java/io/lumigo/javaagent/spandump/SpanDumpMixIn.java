@@ -49,6 +49,7 @@ public final class SpanDumpMixIn {
           .registerModule(
               new SimpleModule("Span")
                   .addDeserializer(SpanDumpEntry.class, new SpanDumpEntryDeserializer())
+                  .addDeserializer(SpanKind.class, new SpanKindEntryDeserializer())
                   .addDeserializer(SpanContext.class, new SpanContextDeserializer())
                   .addDeserializer(StatusData.class, new StatusDataDeserializer())
                   .addDeserializer(EventData.class, new EventDeserializer())
@@ -78,6 +79,24 @@ final class SpanDumpEntryDeserializer extends JsonDeserializer<SpanDumpEntry> {
     Resource resource = ctxt.readTreeAsValue(node.get("resource"), Resource.class);
 
     return new SpanDumpEntry(span, resource);
+  }
+}
+
+final class SpanKindEntryDeserializer extends JsonDeserializer<SpanKind> {
+  @Override
+  public SpanKind deserialize(JsonParser p, DeserializationContext ctxt)
+      throws IOException {
+    JsonNode node = p.getCodec().readTree(p);
+    switch (node.asInt()) {
+      // Unspecified
+      case 0: return null;
+      case 1: return SpanKind.INTERNAL;
+      case 2: return SpanKind.SERVER;
+      case 3: return SpanKind.CLIENT;
+      case 4: return SpanKind.PRODUCER;
+      case 5: return SpanKind.CONSUMER;
+      default: throw new IllegalArgumentException(String.format("Unexpected span kind '%d'", node.asInt()));
+    }
   }
 }
 

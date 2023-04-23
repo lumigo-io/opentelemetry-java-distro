@@ -19,6 +19,8 @@ package io.lumigo.javaagent;
 
 import static io.lumigo.javaagent.spandump.SpanMatchers.*;
 import static io.opentelemetry.api.common.AttributeKey.*;
+import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
+import static io.opentelemetry.api.trace.SpanKind.SERVER;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,11 +28,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import io.lumigo.javaagent.spandump.Span;
 import io.lumigo.javaagent.spandump.SpanDumpEntry;
 import io.lumigo.javaagent.spandump.SpanDumpMixIn;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class SpanDumpMixInTest {
@@ -87,4 +93,64 @@ public class SpanDumpMixInTest {
             stringKey("container.id"),
             "979f62f6207cb932c1ed1b8ae1485c13baf912dd8094129563dd3043fd14a1e6"));
   }
+
+  @Test
+  public void testSpringBootHttpExample() throws Exception {
+    List<SpanDumpEntry> entries = Files
+        .readAllLines(Paths.get("src/test/resources/springboot_http_example.spandump"))
+        .stream()
+        .map(line -> {
+          try {
+            return SpanDumpMixIn.OBJECT_MAPPER.readValue(line, SpanDumpEntry.class);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        })
+        .toList();
+
+    SpanDumpEntry serverSpan =
+        entries.stream()
+            .filter(entry -> "GET /greeting".equals(entry.getSpan().getName()))
+            .findFirst()
+            .orElseThrow();
+
+    assertThat(serverSpan, hasSpanName("GET /greeting"));
+    assertThat(serverSpan, hasSpanKind(SERVER));
+    assertThat(serverSpan, hasSpanStatus(StatusData.unset()));
+    assertThat(serverSpan, hasAttribute("http.target", "/greeting"));
+    assertThat(serverSpan, hasAttribute("http.route", "/greeting"));
+    assertThat(serverSpan, hasAttribute("http.status_code", 200L));
+    assertThat(serverSpan, hasAttributeOfTypeString("thread.name"));
+    assertThat(serverSpan, hasAttributeOfTypeLong("thread.id"));
+    assertThat(serverSpan, hasResourceAttributeOfTypeString("lumigo.distro.version"));
+    assertThat(serverSpan, hasResourceAttributeOfTypeString("container.id"));
+
+    SpanDumpEntry internalSpan =
+        entries.stream()
+            .filter(entry -> "WebController.greeting".equals(entry.getSpan().getName()))
+            .findFirst()
+            .orElseThrow();
+
+    assertThat(internalSpan, hasSpanName("WebController.greeting"));
+    assertThat(internalSpan, hasSpanKind(INTERNAL));
+    assertThat(internalSpan, hasTraceId(serverSpan.getSpan().getTraceId()));
+    assertThat(internalSpan, hasParentSpanId(serverSpan.getSpan().getSpanId()));
+    assertThat(internalSpan, hasAttributeOfTypeString("thread.name"));
+    assertThat(internalSpan, hasAttributeOfTypeLong("thread.id"));
+    assertThat(
+        internalSpan,
+        hasResourceAttribute(
+            "container.id",
+            serverSpan
+                .getResource()
+                .getAttribute(AttributeKey.stringKey("container.id"))));
+    assertThat(
+        internalSpan,
+        hasResourceAttribute(
+            "lumigo.distro.version",
+            serverSpan
+                .getResource()
+                .getAttribute(AttributeKey.stringKey("lumigo.distro.version"))));
+  }
+
 }

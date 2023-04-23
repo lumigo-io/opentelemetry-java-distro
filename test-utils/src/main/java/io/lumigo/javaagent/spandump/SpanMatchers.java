@@ -79,7 +79,7 @@ public class SpanMatchers {
 
   public static TypeSafeMatcher<SpanDumpEntry> hasParentSpanId(final String expected) {
     return new SpanDumpEntryMatcher<>(
-        "parent span id", (SpanDumpEntry entry) -> entry.getSpan().getParentSpanId(), expected);
+        "parent span id", entry -> entry.getSpan().getParentSpanId().orElse(null), expected);
   }
 
   public static TypeSafeMatcher<SpanDumpEntry> hasSpanId(final String expected) {
@@ -94,19 +94,17 @@ public class SpanMatchers {
 
   public static TypeSafeMatcher<SpanDumpEntry> hasStartTime(final long expected) {
     return new SpanDumpEntryMatcher<>(
-        "span start time",
-        (SpanDumpEntry entry) -> entry.getSpan().getStartTimeUnixNano(),
-        expected);
+        "span start time", entry -> entry.getSpan().getStartTimeUnixNano(), expected);
   }
 
   public static TypeSafeMatcher<SpanDumpEntry> hasEndTime(final long expected) {
     return new SpanDumpEntryMatcher<>(
-        "span end time", (SpanDumpEntry entry) -> entry.getSpan().getEndTimeUnixNano(), expected);
+        "span end time", entry -> entry.getSpan().getEndTimeUnixNano(), expected);
   }
 
   public static TypeSafeMatcher<SpanDumpEntry> hasSpanStatus(final StatusData expected) {
     return new SpanDumpEntryMatcher<>(
-        "span status", (SpanDumpEntry entry) -> entry.getSpan().getStatus(), expected);
+        "span status", entry -> entry.getSpan().getStatus().orElse(null), expected);
   }
 
   public static TypeSafeMatcher<SpanDumpEntry> hasAttribute(
@@ -165,19 +163,20 @@ public class SpanMatchers {
     };
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeString(final String attributeKey) {
+  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeOfTypeString(final String attributeKey) {
     return hasAttribute(stringKey(attributeKey));
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeBoolean(final String attributeKey) {
+  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeOfTypeBoolean(
+      final String attributeKey) {
     return hasAttribute(booleanKey(attributeKey));
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeLong(final String attributeKey) {
+  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeOfTypeLong(final String attributeKey) {
     return hasAttribute(longKey(attributeKey));
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeDouble(final String attributeKey) {
+  public static TypeSafeMatcher<SpanDumpEntry> hasAttributeOfTypeDouble(final String attributeKey) {
     return hasAttribute(doubleKey(attributeKey));
   }
 
@@ -265,21 +264,22 @@ public class SpanMatchers {
     };
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeString(
+  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeOfTypeString(
       final String attributeKey) {
     return hasResourceAttribute(stringKey(attributeKey));
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeBoolean(
+  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeOfTypeBoolean(
       final String attributeKey) {
     return hasResourceAttribute(booleanKey(attributeKey));
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeLong(final String attributeKey) {
+  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeOfTypeLong(
+      final String attributeKey) {
     return hasResourceAttribute(longKey(attributeKey));
   }
 
-  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeDouble(
+  public static TypeSafeMatcher<SpanDumpEntry> hasResourceAttributeOfTypeDouble(
       final String attributeKey) {
     return hasResourceAttribute(doubleKey(attributeKey));
   }
