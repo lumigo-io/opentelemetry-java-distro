@@ -96,17 +96,18 @@ public class SpanDumpMixInTest {
 
   @Test
   public void testSpringBootHttpExample() throws Exception {
-    List<SpanDumpEntry> entries = Files
-        .readAllLines(Paths.get("src/test/resources/springboot_http_example.spandump"))
-        .stream()
-        .map(line -> {
-          try {
-            return SpanDumpMixIn.OBJECT_MAPPER.readValue(line, SpanDumpEntry.class);
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        })
-        .toList();
+    List<SpanDumpEntry> entries =
+        Files.readAllLines(Paths.get("src/test/resources/springboot_http_example.spandump"))
+            .stream()
+            .map(
+                line -> {
+                  try {
+                    return SpanDumpMixIn.OBJECT_MAPPER.readValue(line, SpanDumpEntry.class);
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
 
     SpanDumpEntry serverSpan =
         entries.stream()
@@ -141,9 +142,7 @@ public class SpanDumpMixInTest {
         internalSpan,
         hasResourceAttribute(
             "container.id",
-            serverSpan
-                .getResource()
-                .getAttribute(AttributeKey.stringKey("container.id"))));
+            serverSpan.getResource().getAttribute(AttributeKey.stringKey("container.id"))));
     assertThat(
         internalSpan,
         hasResourceAttribute(
@@ -152,5 +151,4 @@ public class SpanDumpMixInTest {
                 .getResource()
                 .getAttribute(AttributeKey.stringKey("lumigo.distro.version"))));
   }
-
 }

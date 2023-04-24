@@ -134,11 +134,13 @@ specification:
 
 ### SDK configuration
 
-* The
-  following [SDK environment variables](https://opentelemetry.io/docs/reference/specification/sdk-environment-variables/)
-  are supported:
-  * `OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT`
-  * `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT`
+The default maximum span attribute length is 1024.
+This can be overwritten with the `OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT` and `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` environment variables, but when sending data to Lumigo, the span attributes will be truncated to 2048 maximum length.
 
-If the `OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT` environment variable is not set, the span attribute size limit will be taken from `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` environment variable.
-The default size limit when both are not set is 2048.
+The Lumigo OpenTelemetry Java distro automatically configures a [`BatchSpanProcessor`](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/BatchSpanProcessor.java) to export tracing data to Lumigo, with the following settings:
+
+* `otel.bsp.schedule.delay`: `10ms` (at least how often the `BatchSpanProcessor` will flush data to Lumigo)
+* `otel.bsp.max.export.batch.size`: `100` (maximum amount of spans queued before flushing; when the limit is passed, a flush will occur) 
+* `otel.bsp.export.timeout`: `1s` (timeout for flushing data to Lumigo)
+
+The metrics and logs exporters are disabled (`otel.logs.exporter` and `otel.metrics.exporter` are set to `none`) as [Lumigo OpenTelemetry endpoint](https://docs.lumigo.io/docs/lumigo-opentelemetry-endpoint) currently does not provide support for the `/v1/metrics` and `/v1/logs` endpoints.

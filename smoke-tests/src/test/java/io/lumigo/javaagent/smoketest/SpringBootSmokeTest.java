@@ -22,6 +22,7 @@ import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.SpanKind.SERVER;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -40,6 +41,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.awaitility.Awaitility;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -47,12 +49,44 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class SpringBootSmokeTest {
 
   @Test
+  public void testDefaultSettings(final TestAppExtension.TestApplication target) {
+    final String logs = target.getLogs();
+
+    /*
+     * Max span attribute length is 1024, match also the closing curly bracket to avoid
+     * false positives.
+     */
+    assertThat(logs, containsString("maxAttributeValueLength=1024}"));
+    /*
+     * Batch schedule delay; matching also the comma, as the default value is 10 times
+     * what we set (""scheduleDelayNanos=5000000000", mind the zeroes) and, without
+     * matching the trailing comma, we might mistake the default value for a match.
+     *
+     * See https://github.com/open-telemetry/opentelemetry-java/blob/f92e02e4caffab0d964c02a32fe305d6d6ba372e/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/BatchSpanProcessor.java#L133
+     */
+    assertThat(logs, containsString("scheduleDelayNanos=10000000,"));
+    /*
+     * Batch max size; matching also the trailing comma to avoid false positives.
+     *
+     * See https://github.com/open-telemetry/opentelemetry-java/blob/f92e02e4caffab0d964c02a32fe305d6d6ba372e/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/BatchSpanProcessor.java#L133
+     */
+    assertThat(logs, containsString("maxExportBatchSize=100,"));
+    /*
+     * Batch export timeout; matching also the following closing curly bracket to avoid
+     * false positives.
+     *
+     * See https://github.com/open-telemetry/opentelemetry-java/blob/f92e02e4caffab0d964c02a32fe305d6d6ba372e/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/export/BatchSpanProcessor.java#L133
+     */
+    assertThat(logs, containsString("exporterTimeoutNanos=1000000000}"));
+  }
+
+  @Test
   public void testInvalidSpanDump(
       final @Configuration(env = {@EnvVar(key = "LUMIGO_DEBUG_SPANDUMP", value = "invalid")})
           TestAppExtension.TestApplication target) {
-    assertThat(
-        target.getLogs(),
-        containsString("Spandump path 'invalid' is not valid; spandump is disabled"));
+    final String logs = target.getLogs();
+    assertThat(logs, containsString("Spandump path 'invalid' is not valid; spandump is disabled"));
+    assertThat(logs, not(containsString("spanExporter=io.lumigo.javaagent.FileSpanExporter")));
   }
 
   @Test
@@ -65,6 +99,10 @@ class SpringBootSmokeTest {
   @Test
   public void testSpanDump(final TestAppExtension.TestApplication target, final OkHttpClient client)
       throws IOException {
+    assertThat(
+        target.getLogs(),
+        containsString("SimpleSpanProcessor{spanExporter=io.lumigo.javaagent.FileSpanExporter"));
+
     final String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
     final Request request = new Request.Builder().url(url).get().build();
 
@@ -80,12 +118,7 @@ class SpringBootSmokeTest {
             () -> {
               List<SpanDumpEntry> entries = target.getSpanDump();
 
-              SpanDumpEntry serverSpan =
-                  entries.stream()
-                      .filter(entry -> "GET /greeting".equals(entry.getSpan().getName()))
-                      .findFirst()
-                      .orElseThrow();
-
+              SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
               assertThat(serverSpan, hasSpanName("GET /greeting"));
               assertThat(serverSpan, hasSpanKind(SERVER));
               assertThat(serverSpan, hasSpanStatus(StatusData.unset()));
@@ -97,32 +130,22 @@ class SpringBootSmokeTest {
               assertThat(serverSpan, hasResourceAttributeOfTypeString("lumigo.distro.version"));
               assertThat(serverSpan, hasResourceAttributeOfTypeString("container.id"));
 
-              SpanDumpEntry internalSpan =
-                  entries.stream()
-                      .filter(entry -> "WebController.greeting".equals(entry.getSpan().getName()))
-                      .findFirst()
-                      .orElseThrow();
-
+              SpanDumpEntry internalSpan = findSpan(entries, hasSpanName("WebController.greeting"));
               assertThat(internalSpan, hasSpanName("WebController.greeting"));
               assertThat(internalSpan, hasSpanKind(INTERNAL));
               assertThat(internalSpan, hasTraceId(serverSpan.getSpan().getTraceId()));
               assertThat(internalSpan, hasParentSpanId(serverSpan.getSpan().getSpanId()));
               assertThat(internalSpan, hasAttributeOfTypeString("thread.name"));
               assertThat(internalSpan, hasAttributeOfTypeString("thread.id"));
-              assertThat(
-                  internalSpan,
-                  hasResourceAttribute(
-                      "container.id",
-                      serverSpan
-                          .getResource()
-                          .getAttribute(AttributeKey.stringKey("container.id"))));
-              assertThat(
-                  internalSpan,
-                  hasResourceAttribute(
-                      "lumigo.distro.version",
-                      serverSpan
-                          .getResource()
-                          .getAttribute(AttributeKey.stringKey("container.id"))));
+
+              final String expectedContainerId =
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey("container.id"));
+              assertThat(internalSpan, hasResourceAttribute("container.id", expectedContainerId));
             });
+  }
+
+  private static SpanDumpEntry findSpan(
+      List<SpanDumpEntry> entries, TypeSafeMatcher<SpanDumpEntry> matcher) {
+    return entries.stream().filter(matcher::matches).findFirst().orElseThrow();
   }
 }
