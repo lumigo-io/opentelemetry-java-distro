@@ -107,6 +107,15 @@ public class TestAppExtension implements ParameterResolver, AfterEachCallback {
       ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
 
+    /*
+     * If this is true, we will be running Docker in emulation, and it is
+     * *much* slower.
+     */
+    final boolean isArchAmd64 = "amd64".equals(System.getProperty("os.arch"));
+
+    final Duration backendContainerStartTimeout = Duration.ofMinutes(isArchAmd64 ? 3 : 15);
+    final Duration appContainerStartTimeout = Duration.ofMinutes(isArchAmd64 ? 2 : 15);
+
     final String jdkVersion =
         parameterContext
             .findAnnotation(Configuration.class)
@@ -116,7 +125,7 @@ public class TestAppExtension implements ParameterResolver, AfterEachCallback {
     this.backend =
         new GenericContainer<>(
                 "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend:20221127.3559314891")
-            .withStartupTimeout(Duration.ofMinutes(3))
+            .withStartupTimeout(backendContainerStartTimeout)
             .withExposedPorts(8080)
             .withEnv("JAVA_TOOL_OPTIONS", "-Xmx128m")
             .waitingFor(Wait.forHttp("/health").forPort(8080))
@@ -132,7 +141,7 @@ public class TestAppExtension implements ParameterResolver, AfterEachCallback {
 
     this.testApp =
         new GenericContainer<>(testAppImage)
-            .withStartupTimeout(Duration.ofMinutes(5))
+            .withStartupTimeout(appContainerStartTimeout)
             .withExposedPorts(8080)
             .withNetwork(NETWORK)
             .withLogConsumer(new Slf4jLogConsumer(LOGGER))

@@ -29,7 +29,6 @@ import io.lumigo.javaagent.spandump.Span;
 import io.lumigo.javaagent.spandump.SpanDumpEntry;
 import io.lumigo.javaagent.spandump.SpanDumpMixIn;
 import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import java.io.File;
@@ -59,11 +58,11 @@ public class SpanDumpMixInTest {
     assertThat(span.getSpanId(), equalTo("c4c176857c601fb8"));
     assertThat(entry, hasSpanId("c4c176857c601fb8"));
 
-    assertThat(span.getParentSpanId(), equalTo("f291d2c3c13d356f"));
+    assertThat(span.getParentSpanId().orElseThrow(), equalTo("f291d2c3c13d356f"));
     assertThat(entry, hasParentSpanId("f291d2c3c13d356f"));
 
-    assertThat(span.getKind(), equalTo(SpanKind.SERVER));
-    assertThat(entry, hasSpanKind(SpanKind.SERVER));
+    assertThat(span.getKind(), equalTo(INTERNAL));
+    assertThat(entry, hasSpanKind(INTERNAL));
 
     assertThat(span.getStartTimeUnixNano(), equalTo(1682175628455443917L));
     assertThat(entry, hasStartTime(1682175628455443917L));
@@ -71,7 +70,7 @@ public class SpanDumpMixInTest {
     assertThat(span.getEndTimeUnixNano(), equalTo(1682175628458434334L));
     assertThat(entry, hasEndTime(1682175628458434334L));
 
-    assertThat(span.getStatus(), equalTo(StatusData.unset()));
+    assertThat(span.getStatus().orElseThrow(), equalTo(StatusData.unset()));
     assertThat(entry, hasSpanStatus(StatusData.unset()));
 
     assertThat(span.getEvents(), equalTo(Collections.emptyList()));
@@ -96,17 +95,18 @@ public class SpanDumpMixInTest {
 
   @Test
   public void testSpringBootHttpExample() throws Exception {
-    List<SpanDumpEntry> entries = Files
-        .readAllLines(Paths.get("src/test/resources/springboot_http_example.spandump"))
-        .stream()
-        .map(line -> {
-          try {
-            return SpanDumpMixIn.OBJECT_MAPPER.readValue(line, SpanDumpEntry.class);
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        })
-        .toList();
+    List<SpanDumpEntry> entries =
+        Files.readAllLines(Paths.get("src/test/resources/springboot_http_example.spandump"))
+            .stream()
+            .map(
+                line -> {
+                  try {
+                    return SpanDumpMixIn.OBJECT_MAPPER.readValue(line, SpanDumpEntry.class);
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
 
     SpanDumpEntry serverSpan =
         entries.stream()
@@ -141,9 +141,7 @@ public class SpanDumpMixInTest {
         internalSpan,
         hasResourceAttribute(
             "container.id",
-            serverSpan
-                .getResource()
-                .getAttribute(AttributeKey.stringKey("container.id"))));
+            serverSpan.getResource().getAttribute(AttributeKey.stringKey("container.id"))));
     assertThat(
         internalSpan,
         hasResourceAttribute(
@@ -152,5 +150,4 @@ public class SpanDumpMixInTest {
                 .getResource()
                 .getAttribute(AttributeKey.stringKey("lumigo.distro.version"))));
   }
-
 }

@@ -120,6 +120,19 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
      */
     setIfNotSet(originalCfg, customizedCfg, "otel.logs.exporter", "none");
 
+    /*
+     * Set limits in terms of span attribute length to match those that we have
+     * in the ingestion pipeline.
+     */
+    setIfNotSet(originalCfg, customizedCfg, "otel.span.attribute.value.length.limit", "1024");
+
+    /*
+     * Configure span batching.
+     */
+    setIfNotSet(originalCfg, customizedCfg, "otel.bsp.schedule.delay", "10ms");
+    setIfNotSet(originalCfg, customizedCfg, "otel.bsp.max.export.batch.size", "100");
+    setIfNotSet(originalCfg, customizedCfg, "otel.bsp.export.timeout", "1s");
+
     return customizedCfg;
   }
 
