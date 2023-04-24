@@ -210,12 +210,13 @@ jobs:
         working-directory: integration-tests/ecs
         env:
           DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
+
   checks:
     permissions:
       contents: write
       issues: write
     runs-on: ubuntu-latest
-    needs: [ pr-labeling, spotless, smoke-tests, k8s-e2e ]
+    needs: [ pr-labeling, spotless, smoke-tests, k8s-e2e, ecs-e2e ]
     steps:
       - name: Report failure
         if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
