@@ -64,6 +64,7 @@ jobs:
           # this is a common failure point, so we run it first
           arguments: spotlessCheck
           cache-read-only: true
+
   smoke-tests:
     runs-on: ubuntu-latest
     steps:
@@ -132,6 +133,7 @@ jobs:
           name: test-log
           path: /tmp/gotest.log
           if-no-files-found: error
+
   ecs-e2e:
     runs-on: ubuntu-latest
     steps:
@@ -149,7 +151,7 @@ jobs:
           # of PRs with issues
           arguments: |
             clean assemble
-            -X test
+            -x test
             -x spotlessCheck
           cache-read-only: true
       - uses: actions/setup-node@v3
