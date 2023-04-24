@@ -145,8 +145,12 @@ jobs:
       - name: Assemble the agent
         uses: gradle/gradle-build-action@v2
         with:
-          # exclude spotlessCheck to avoid running it twice
-          arguments: clean assemble
+          # Skip tests and spotless to get more specific K8s info in case
+          # of PRs with issues
+          arguments: |
+            clean assemble
+            -X test
+            -x spotlessCheck
           cache-read-only: true
       - uses: actions/setup-node@v3
       - name: Configure aws credentials
