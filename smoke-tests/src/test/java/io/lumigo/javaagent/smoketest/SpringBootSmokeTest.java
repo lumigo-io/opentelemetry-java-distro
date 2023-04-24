@@ -119,7 +119,6 @@ class SpringBootSmokeTest {
               List<SpanDumpEntry> entries = target.getSpanDump();
 
               SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
-              assertThat(serverSpan, hasSpanName("GET /greeting"));
               assertThat(serverSpan, hasSpanKind(SERVER));
               assertThat(serverSpan, hasSpanStatus(StatusData.unset()));
               assertThat(serverSpan, hasAttribute("http.target", "/greeting"));
@@ -131,12 +130,11 @@ class SpringBootSmokeTest {
               assertThat(serverSpan, hasResourceAttributeOfTypeString("container.id"));
 
               SpanDumpEntry internalSpan = findSpan(entries, hasSpanName("WebController.greeting"));
-              assertThat(internalSpan, hasSpanName("WebController.greeting"));
               assertThat(internalSpan, hasSpanKind(INTERNAL));
               assertThat(internalSpan, hasTraceId(serverSpan.getSpan().getTraceId()));
               assertThat(internalSpan, hasParentSpanId(serverSpan.getSpan().getSpanId()));
               assertThat(internalSpan, hasAttributeOfTypeString("thread.name"));
-              assertThat(internalSpan, hasAttributeOfTypeString("thread.id"));
+              assertThat(internalSpan, hasAttributeOfTypeLong("thread.id"));
 
               final String expectedContainerId =
                   serverSpan.getResource().getAttribute(AttributeKey.stringKey("container.id"));
