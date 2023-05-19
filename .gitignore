@@ -71,6 +71,7 @@ fabric.properties
 **/build/
 !src/**/build/
 !**/gradle/wrapper/*
+**/bin/
 
 
 # Ignore Gradle GUI config
@@ -90,6 +91,9 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# VSCode settings file
+settings.json
 
 ### Kotlin template
 # Compiled class file
@@ -116,6 +120,9 @@ gradle-app.setting
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# jenv version files
+.java-version
 
 # OS generated files #
 ######################
