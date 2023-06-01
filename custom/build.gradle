@@ -24,5 +24,6 @@ dependencies {
 
   testImplementation(project(":test-utils"))
   testImplementation("io.opentelemetry:opentelemetry-sdk")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
   testImplementation("org.hamcrest:hamcrest:2.2")
 }

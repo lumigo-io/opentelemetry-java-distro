@@ -17,6 +17,7 @@
  */
 package io.lumigo.javaagent.junitextensions;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.lumigo.javaagent.spandump.SpanDumpEntry;
 import io.lumigo.javaagent.spandump.SpanDumpMixIn;
 import java.io.IOException;
@@ -29,11 +30,15 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -47,6 +52,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.MountableFile;
 
 public class TestAppExtension
@@ -108,6 +114,8 @@ public class TestAppExtension
 
     List<SpanDumpEntry> getSpanDump() throws IOException;
 
+    List<JsonNode> getTraces() throws IOException;
+
     int getMappedPort(int originalPort);
   }
 
@@ -116,9 +124,9 @@ public class TestAppExtension
     this.backend =
         new GenericContainer<>(
                 "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend:20221127.3559314891")
-            // .withStartupTimeout(BACKEND_CONTAINER_START_TIMEOUT)
+            .withStartupTimeout(BACKEND_CONTAINER_START_TIMEOUT)
             .withExposedPorts(8080)
-            // .withEnv("JAVA_TOOL_OPTIONS", "-Xmx128m")
+            .withEnv("JAVA_TOOL_OPTIONS", "-Xmx128m")
             .waitingFor(Wait.forHttp("/health").forPort(8080))
             .withNetwork(NETWORK)
             .withNetworkAliases("backend")
@@ -137,7 +145,9 @@ public class TestAppExtension
         .close();
 
     try {
-      this.testApp.stop();
+      if (this.testApp != null) {
+        this.testApp.stop();
+      }
     } finally {
       this.testApp = null;
     }
@@ -146,8 +156,14 @@ public class TestAppExtension
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
     try {
-      this.backend.stop();
+      if (this.testApp != null) {
+        this.testApp.stop();
+      }
+      if (this.backend != null) {
+        this.backend.stop();
+      }
     } finally {
+      this.testApp = null;
       this.backend = null;
       NETWORK.close();
     }
@@ -199,12 +215,12 @@ public class TestAppExtension
             (configuration) -> {
               if (configuration.env() != null) {
                 for (final EnvVar envVar : configuration.env()) {
-                  TestAppExtension.this.testApp =
-                      TestAppExtension.this.testApp.withEnv(envVar.key(), envVar.value());
+                  TestAppExtension.this.testApp.addEnv(envVar.key(), envVar.value());
                 }
               }
             });
 
+    this.testApp.setWaitStrategy(Wait.forHttp("/greeting").forStatusCode(200));
     this.testApp.start();
 
     return new TestApplication() {
@@ -229,6 +245,7 @@ public class TestAppExtension
           testApp.copyFileFromContainer(SPANDUMP_FILE, temp.toString());
 
           return Files.readAllLines(temp).stream()
+              .filter(line -> !line.isEmpty())
               .map(
                   line -> {
                     try {
@@ -243,6 +260,36 @@ public class TestAppExtension
           if (Objects.nonNull(temp)) {
             Files.deleteIfExists(temp);
           }
+        }
+      }
+
+      @Override
+      public List<JsonNode> getTraces() throws IOException {
+        AtomicReference<String> content = new AtomicReference<>();
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(15))
+            .until(
+                () -> {
+                  content.set(getContent());
+                  return !content.get().isEmpty() && content.get().length() > 0;
+                });
+
+        return StreamSupport.stream(
+                SpanDumpMixIn.OBJECT_MAPPER.readTree(content.get()).spliterator(), false)
+            .collect(Collectors.toList());
+      }
+
+      private String getContent() throws IOException {
+        final Request request =
+            new Request.Builder()
+                .url(String.format("http://localhost:%d/get-traces", backend.getMappedPort(8080)))
+                .addHeader("Accepts", "application/json")
+                .get()
+                .build();
+
+        try (final Response response = client.newCall(request).execute()) {
+          ResponseBody body = response.body();
+          return body.string();
         }
       }
 

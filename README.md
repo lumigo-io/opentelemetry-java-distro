@@ -64,19 +64,27 @@ java -javaagent:<path-to-lumigo-otel-javaagent> -jar app.jar
 
 ## Configuration
 
-Configuring the Lumigo OpenTelemetry Distro for Java is done using environment variables or system properties.
+### OpenTelemetry configurations
+
+The Lumigo OpenTelemetry Distro for Java is made of upstream OpenTelemetry packages as well as some additional logic and, as such, the environment variables that work with "vanilla" OpenTelemetry work also with the Lumigo OpenTelemetry Distro for Java.
+Specifically supported are:
+
+* [General configurations](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration)
 
 The system properties are lower case versions of the environment variables, and with dots replaced by underscores.
 For example, the environment variable `LUMIGO_TRACER_TOKEN` can be set using the system property `lumigo.tracer.token`.
 
-### Environment variables
+### Lumigo-specific configurations
 
-| Name                    | Valid values                   | Required? | Description                                                                              |
-|-------------------------|--------------------------------|-----------|------------------------------------------------------------------------------------------|
-| `LUMIGO_TRACER_TOKEN`   | `t_...` token                  | Yes       | The token of the account to report to. see the [Lumigo Tokens](https://docs.lumigo.io/docs/lumigo-tokens) documentation for how to retrieve your Lumigo token. |
-| `LUMIGO_DEBUG`          | `true` or `false`              | No        | Enable debug logging. |
-| `LUMIGO_SWITCH_OFF`     | `true` or `false`              | No        | If set to `true`, disable the Lumigo OpenTelemetry Distro for Java. Default: `false`. |
-| `LUMIGO_DEBUG_SPANDUMP` | path-like, e.g., `/dev/stdout` | No        | Print a copy of the spans to to the file path specified as value. In containers, `/dev/stdout` and `/dev/stderr` are often a good choice. |
+The Lumigo OpenTelemetry Distro for Java additionally supports the following configuration options as environment variables:
+
+* `LUMIGO_TRACER_TOKEN=<token>`: Configure the Lumigo token to enable to upload of telemetry to Lumigo; without this environment variable, your Java process will not send telemetry to Lumigo.
+* `LUMIGO_DEBUG=TRUE`: Enables debug logging
+* `LUMIGO_DEBUG_SPANDUMP=<path>`: Log all spans collected to the `<path>` file; this is an option intended only for debugging purposes and should *not* be used in production. In containers, `/dev/stdout` and `/dev/stderr` are often a good choice.
+  This setting is independent from `LUMIGO_DEBUG`, that is, `LUMIGO_DEBUG` does not need to additionally be set for `LUMIGO_DEBUG_SPANDUMP` to work.
+* `LUMIGO_SWITCH_OFF=TRUE`: This option disables the Lumigo OpenTelemetry Distro entirely; no instrumentation will be injected, no tracing data will be collected.
+* `LUMIGO_SECRET_MASKING_REGEX='["regex1", "regex2"]'`: Prevents Lumigo from sending keys that match the supplied regular expressions in process environment data. All regular expressions are case-insensitive. The "magic" value `all` will redact everything. By default, Lumigo applies the following regular expressions: `[".*pass.*", ".*key.*", ".*secret.*", ".*credential.*", ".*passphrase.*"]`. More fine-grained settings can be applied via the following environment variable, which will override `LUMIGO_SECRET_MASKING_REGEX` for a specific type of data:
+  * `LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT` applies secret redaction to process environment variables (that is, the content of `System.getenv()`)
 
 For more configuration options, see the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
 
