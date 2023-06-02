@@ -21,6 +21,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -39,11 +40,7 @@ public class ProcessEnvironmentScrubberTest {
   private static final String MY_SECRET_KEY = "my.secret.key";
   private static final String MY_SECRET_VALUE = "SECRET_VALUE";
 
-  @Test
-  public void testDefaultScrubber() {
-    ConfigProperties mockConfig = mock();
-    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
-
+  private void verifyScrubbing(ProcessEnvironmentScrubber scrubber, String expectedSecretValue, String expectedSpecialValue) {
     Map<String, String> envVars = new HashMap<>();
     envVars.put(MY_SECRET_KEY, MY_SECRET_VALUE);
     envVars.put(SPECIAL_KEY, SPECIAL_VALUE);
@@ -70,7 +67,115 @@ public class ProcessEnvironmentScrubberTest {
       Assertions.fail();
     }
 
-    assertThat(secretValue, equalTo(ProcessEnvironmentScrubber.SCRUBBED_VALUE));
-    assertThat(specialValue, equalTo(SPECIAL_VALUE));
+    assertThat(secretValue, equalTo(expectedSecretValue));
+    assertThat(specialValue, equalTo(expectedSpecialValue));
+  }
+
+  @Test
+  public void testDefaults() {
+    ConfigProperties mockConfig = mock();
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testEmptyEnvironmentMasking() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT))
+        .thenReturn("[]");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+    assertThat(scrubber.expressionPatterns.size(), equalTo(0));
+
+    verifyScrubbing(scrubber, MY_SECRET_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testInvalidJsonEnvironmentMasking() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("['.*\"my.*']");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testInvalidRegExEnvironmentMasking() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("[\"(ad\"]");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testInvalidJsonNumberArray() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("[42]");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testInvalidJsonBooleanArray() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("[true]");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testInvalidJsonPlainString() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("foo");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
+  }
+
+  @Test
+  public void testInvalidJsonObject() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("{\"foo\": \"bar\"}");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+
+    verifyScrubbing(scrubber, ProcessEnvironmentScrubber.SCRUBBED_VALUE, SPECIAL_VALUE);
   }
 }
