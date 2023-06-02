@@ -84,6 +84,16 @@ jobs:
           arguments: check -x spotlessCheck
           cache-read-only: true
 
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: smoke-test-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          if-no-files-found: error
+
   k8s-e2e:
     runs-on: ubuntu-latest
     steps:
@@ -130,7 +140,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: test-log
+          name: k8s-e2e-test-log
           path: /tmp/gotest.log
           if-no-files-found: error
 
