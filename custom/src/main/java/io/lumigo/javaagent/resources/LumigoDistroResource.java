@@ -15,9 +15,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent;
+package io.lumigo.javaagent.resources;
 
 import com.google.auto.service.AutoService;
+import io.lumigo.javaagent.LumigoVersion;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
