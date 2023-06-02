@@ -23,12 +23,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ProcessEnvironmentScrubber extends SecretScrubber {
-  public static final Logger LOGGER = Logger.getLogger(ProcessEnvironmentScrubber.class.getName());
-
   public static final String LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT =
       "lumigo.secret.masking.regex.environment";
 
@@ -47,8 +44,8 @@ public class ProcessEnvironmentScrubber extends SecretScrubber {
       return SCRUBBED_VALUE;
     }
 
-    StringWriter writer = new StringWriter();
-    try (JsonGenerator generator = JSON_FACTORY.createGenerator(writer)) {
+    try (StringWriter writer = new StringWriter();
+        JsonGenerator generator = JSON_FACTORY.createGenerator(writer)) {
       generator.writeStartObject();
 
       for (Map.Entry<String, String> entry : content.entrySet()) {
@@ -62,10 +59,12 @@ public class ProcessEnvironmentScrubber extends SecretScrubber {
       }
 
       generator.writeEndObject();
+
+      // Writer returns the JSON as a string, but we need the JSON to be escaped for storing in a
+      // single String.
+      return writer.toString().replaceAll("\"", "\\\\\"");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
-    return writer.toString().replaceAll("\"", "\\\\\"");
   }
 }

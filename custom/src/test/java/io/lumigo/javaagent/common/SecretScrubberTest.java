@@ -19,62 +19,20 @@ package io.lumigo.javaagent.common;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class SecretScrubberTest {
   @Test
   public void testEmptyEnvironmentMasking() {
-    ConfigProperties config =
-        new ConfigProperties() {
-          @Override
-          public String getString(String name) {
-            if (name.equals(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT)) {
-              return "[]";
-            }
-            return null;
-          }
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT))
+        .thenReturn("[]");
 
-          @Override
-          public Boolean getBoolean(String name) {
-            return null;
-          }
-
-          @Override
-          public Integer getInt(String name) {
-            return null;
-          }
-
-          @Override
-          public Long getLong(String name) {
-            return null;
-          }
-
-          @Override
-          public Double getDouble(String name) {
-            return null;
-          }
-
-          @Override
-          public Duration getDuration(String name) {
-            return null;
-          }
-
-          @Override
-          public List<String> getList(String name) {
-            return null;
-          }
-
-          @Override
-          public Map<String, String> getMap(String name) {
-            return null;
-          }
-        };
-    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(config);
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
 
     assertThat(scrubber.regExps, equalTo("[]"));
     assertThat(scrubber.expressionPatterns.size(), equalTo(0));
@@ -82,52 +40,11 @@ public class SecretScrubberTest {
 
   @Test
   public void testInvalidJsonEnvironmentMasking() {
-    ConfigProperties config =
-        new ConfigProperties() {
-          @Override
-          public String getString(String name) {
-            if (name.equals(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX)) {
-              return "['.*\"my.*']";
-            }
-            return null;
-          }
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("['.*\"my.*']");
 
-          @Override
-          public Boolean getBoolean(String name) {
-            return null;
-          }
-
-          @Override
-          public Integer getInt(String name) {
-            return null;
-          }
-
-          @Override
-          public Long getLong(String name) {
-            return null;
-          }
-
-          @Override
-          public Double getDouble(String name) {
-            return null;
-          }
-
-          @Override
-          public Duration getDuration(String name) {
-            return null;
-          }
-
-          @Override
-          public List<String> getList(String name) {
-            return null;
-          }
-
-          @Override
-          public Map<String, String> getMap(String name) {
-            return null;
-          }
-        };
-    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(config);
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
 
     assertThat(scrubber.regExps, equalTo("['.*\"my.*']"));
     assertThat(
@@ -137,52 +54,11 @@ public class SecretScrubberTest {
 
   @Test
   public void testInvalidRegExEnvironmentMasking() {
-    ConfigProperties config =
-        new ConfigProperties() {
-          @Override
-          public String getString(String name) {
-            if (name.equals(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX)) {
-              return "[\"(ad\"]";
-            }
-            return null;
-          }
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("[\"(ad\"]");
 
-          @Override
-          public Boolean getBoolean(String name) {
-            return null;
-          }
-
-          @Override
-          public Integer getInt(String name) {
-            return null;
-          }
-
-          @Override
-          public Long getLong(String name) {
-            return null;
-          }
-
-          @Override
-          public Double getDouble(String name) {
-            return null;
-          }
-
-          @Override
-          public Duration getDuration(String name) {
-            return null;
-          }
-
-          @Override
-          public List<String> getList(String name) {
-            return null;
-          }
-
-          @Override
-          public Map<String, String> getMap(String name) {
-            return null;
-          }
-        };
-    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(config);
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
 
     assertThat(scrubber.regExps, equalTo("[\"(ad\"]"));
     assertThat(

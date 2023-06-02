@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public abstract class SecretScrubber {
-  Logger LOGGER = Logger.getLogger(SecretScrubber.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(SecretScrubber.class.getName());
 
-  JsonFactory JSON_FACTORY = new JsonFactory();
+  protected static final JsonFactory JSON_FACTORY = new JsonFactory();
 
   public static final int DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = 2048;
   public static final String LUMIGO_SECRET_MASKING_REGEX = "lumigo.secret.masking.regex";
@@ -57,7 +57,7 @@ public abstract class SecretScrubber {
     final String sourceEnvVar;
     if (!Strings.isBlank(overrideEnvName) && !Strings.isBlank(config.getString(overrideEnvName))) {
       sourceEnvVar = overrideEnvName;
-    } else if (config.getString(LUMIGO_SECRET_MASKING_REGEX) != null) {
+    } else if (!Strings.isBlank(config.getString(LUMIGO_SECRET_MASKING_REGEX))) {
       sourceEnvVar = LUMIGO_SECRET_MASKING_REGEX;
     } else {
       sourceEnvVar = "";
@@ -73,13 +73,14 @@ public abstract class SecretScrubber {
     if (!Strings.isBlank(regExps)) {
       patterns = new ArrayList<>();
       try (JsonParser parser = JSON_FACTORY.createParser(regExps)) {
-        if (!parser.nextToken().isStructStart()
-            || !JsonToken.START_ARRAY.equals(parser.currentToken())) {
+        if (!JsonToken.START_ARRAY.equals(parser.nextToken())) {
           throw new IllegalArgumentException();
         }
         while (!JsonToken.END_ARRAY.equals(parser.nextToken())) {
           if (parser.currentToken().equals(JsonToken.VALUE_STRING)) {
             patterns.add(Pattern.compile(parser.getText(), Pattern.CASE_INSENSITIVE));
+          } else {
+            throw new IllegalArgumentException();
           }
         }
         return new ParseExpressionResult(sourceEnvVar, regExps, patterns);

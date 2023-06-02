@@ -21,17 +21,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class ParseExpressionResult {
-  private String sourceEnvVar;
-  private String regularExpressions;
-  private List<Pattern> expressionPatterns;
+  private final String sourceEnvVar;
+  private final String regularExpressions;
+  private final List<Pattern> expressionPatterns;
 
   public ParseExpressionResult(List<Pattern> expressionPatterns) {
-    this.expressionPatterns = expressionPatterns;
+    this(null, null, expressionPatterns);
   }
 
   public ParseExpressionResult(String sourceEnvVar, String regularExpressions) {
-    this.sourceEnvVar = sourceEnvVar;
-    this.regularExpressions = regularExpressions;
+    this(sourceEnvVar, regularExpressions, null);
   }
 
   public ParseExpressionResult(
