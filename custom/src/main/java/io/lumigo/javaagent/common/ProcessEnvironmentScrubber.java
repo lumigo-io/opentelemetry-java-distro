@@ -29,7 +29,7 @@ public class ProcessEnvironmentScrubber extends SecretScrubber {
   public static final String LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT =
       "lumigo.secret.masking.regex.environment";
 
-  final String regExps;
+  private final String regExps;
   final List<Pattern> expressionPatterns;
 
   public ProcessEnvironmentScrubber(ConfigProperties config) {

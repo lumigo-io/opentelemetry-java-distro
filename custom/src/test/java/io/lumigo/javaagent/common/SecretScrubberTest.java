@@ -34,7 +34,6 @@ public class SecretScrubberTest {
 
     ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
 
-    assertThat(scrubber.regExps, equalTo("[]"));
     assertThat(scrubber.expressionPatterns.size(), equalTo(0));
   }
 
@@ -46,7 +45,6 @@ public class SecretScrubberTest {
 
     ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
 
-    assertThat(scrubber.regExps, equalTo("['.*\"my.*']"));
     assertThat(
         scrubber.expressionPatterns.size(),
         equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
@@ -60,7 +58,6 @@ public class SecretScrubberTest {
 
     ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
 
-    assertThat(scrubber.regExps, equalTo("[\"(ad\"]"));
     assertThat(
         scrubber.expressionPatterns.size(),
         equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
