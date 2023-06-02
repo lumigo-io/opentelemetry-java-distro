@@ -44,8 +44,8 @@ public class ProcessEnvironmentScrubber extends SecretScrubber {
       return SCRUBBED_VALUE;
     }
 
-    try (StringWriter writer = new StringWriter();
-        JsonGenerator generator = JSON_FACTORY.createGenerator(writer)) {
+    StringWriter writer = new StringWriter();
+    try (JsonGenerator generator = JSON_FACTORY.createGenerator(writer)) {
       generator.writeStartObject();
 
       for (Map.Entry<String, String> entry : content.entrySet()) {
@@ -59,12 +59,12 @@ public class ProcessEnvironmentScrubber extends SecretScrubber {
       }
 
       generator.writeEndObject();
-
-      // Writer returns the JSON as a string, but we need the JSON to be escaped for storing in a
-      // single String.
-      return writer.toString().replaceAll("\"", "\\\\\"");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
+    // Writer returns the JSON as a string, but we need the JSON to be escaped for storing in a
+    // single String.
+    return writer.toString().replaceAll("\"", "\\\\\"");
   }
 }
