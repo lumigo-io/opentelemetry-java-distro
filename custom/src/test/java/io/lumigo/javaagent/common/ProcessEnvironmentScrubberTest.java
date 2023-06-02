@@ -53,7 +53,7 @@ public class ProcessEnvironmentScrubberTest {
 
     String secretValue = null, specialValue = null;
 
-    try (JsonParser parser = JSON_FACTORY.createParser(result.replaceAll("\\\\\"", "\""))) {
+    try (JsonParser parser = JSON_FACTORY.createParser(result)) {
       if (!JsonToken.START_OBJECT.equals(parser.nextToken())) {
         throw new IllegalArgumentException();
       }

@@ -63,8 +63,6 @@ public class ProcessEnvironmentScrubber extends SecretScrubber {
       throw new RuntimeException(e);
     }
 
-    // Writer returns the JSON as a string, but we need the JSON to be escaped for storing in a
-    // single String.
-    return writer.toString().replaceAll("\"", "\\\\\"");
+    return writer.toString();
   }
 }

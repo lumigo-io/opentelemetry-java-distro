@@ -122,9 +122,6 @@ class EnvironmentVariableSmokeTest {
       Assertions.fail();
     }
 
-    // Unescape the result
-    result = result.replaceAll("\\\\\"", "\"");
-
     String secretKeyValue = null, credentialKeyValue = null, myValue = null;
 
     try (JsonParser parser = JSON_FACTORY.createParser(result)) {
