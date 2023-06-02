@@ -40,7 +40,10 @@ public class ProcessEnvironmentScrubberTest {
   private static final String MY_SECRET_KEY = "my.secret.key";
   private static final String MY_SECRET_VALUE = "SECRET_VALUE";
 
-  private void verifyScrubbing(ProcessEnvironmentScrubber scrubber, String expectedSecretValue, String expectedSpecialValue) {
+  private void verifyScrubbing(
+      ProcessEnvironmentScrubber scrubber,
+      String expectedSecretValue,
+      String expectedSpecialValue) {
     Map<String, String> envVars = new HashMap<>();
     envVars.put(MY_SECRET_KEY, MY_SECRET_VALUE);
     envVars.put(SPECIAL_KEY, SPECIAL_VALUE);
