@@ -62,4 +62,56 @@ public class SecretScrubberTest {
         scrubber.expressionPatterns.size(),
         equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
   }
+
+  @Test
+  public void testInvalidJsonNumberArray() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("[42]");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+  }
+
+  @Test
+  public void testInvalidJsonBooleanArray() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("[true]");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+  }
+
+  @Test
+  public void testInvalidJsonPlainString() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("foo");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+  }
+
+  @Test
+  public void testInvalidJsonObject() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(ProcessEnvironmentScrubber.LUMIGO_SECRET_MASKING_REGEX))
+        .thenReturn("{\"foo\": \"bar\"}");
+
+    ProcessEnvironmentScrubber scrubber = new ProcessEnvironmentScrubber(mockConfig);
+
+    assertThat(
+        scrubber.expressionPatterns.size(),
+        equalTo(ProcessEnvironmentScrubber.DEFAULT_REGEX_KEYS.size()));
+  }
 }
