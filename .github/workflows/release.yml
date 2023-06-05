@@ -9,6 +9,7 @@ on:
         required: true
         type: boolean
       no-build-cache:
+        description: Stop Gradle from using its build-cache for repeated builds
         type: boolean
         required: false
 
@@ -23,24 +24,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: bundle channel
-        id: bundle_channel
-        run: |
-          if [ "${{ github.event.inputs.prerelease }}" == "true" ]; then
-            echo "channel=alpha" >> $GITHUB_OUTPUT
-          else
-            echo "channel=stable" >> $GITHUB_OUTPUT
-          fi
-        shell: bash
-      - name: Conventional Changelog Action
-        id: version
-        uses: TriPSs/conventional-changelog-action@v3
-        with:
-          release-count: '1'
-          skip-version-file: 'true'
-          skip-commit: 'true'
-          skip-git-pull: 'true'
-          git-push: 'false'
+
       - name: Set up JDK for running Gradle
         uses: actions/setup-java@v3
         with:
@@ -61,6 +45,16 @@ jobs:
           arguments: check -x spotlessCheck ${{ inputs.no-build-cache && '--no-build-cache' || '' }}
           cache-read-only: ${{ inputs.cache-read-only }}
 
+      - name: Conventional Changelog Action
+        id: version
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          release-count: '1'
+          skip-version-file: 'true'
+          skip-commit: 'true'
+          skip-git-pull: 'true'
+          git-push: 'true'
+
       - name: Assemble
         uses: gradle/gradle-build-action@v2
         with:
@@ -68,38 +62,16 @@ jobs:
           arguments: -Pversion=${{ steps.version.outputs.version }} assemble -x javadoc ${{ inputs.no-build-cache && '--no-build-cache' || '' }}
           cache-read-only: ${{ inputs.cache-read-only }}
 
-
-      - name: Update changelog
-        shell: bash
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-          touch CHANGELOG.md
-          echo -e "${{ steps.version.outputs.changelog }}\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
-
-          git add CHANGELOG.md
-          git commit -m "chore(release): ${{ steps.version.outputs.version }}" CHANGELOG.md
-          git push
-      - name: Tag
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ steps.version.outputs.tag }}',
-              sha: context.sha
-            })
       - name: Prepare jar for upload
         run: |
-          cp agent/build/libs/agent-${{steps.version.outputs.version}}-all.jar lumigo-otel-javaagent.jar
+          cp agent/build/libs/agent-${{steps.version.outputs.version}}-all.jar lumigo-opentelemetry-${{steps.version.outputs.version}}.jar
+
       - name: Release on GitHub
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           files: |
-            lumigo-otel-javaagent.jar
+            lumigo-opentelemetry-${{steps.version.outputs.version}}.jar
           body: |
             ${{ steps.version.outputs.clean_changelog }}
           prerelease: ${{ inputs.prerelease }}
