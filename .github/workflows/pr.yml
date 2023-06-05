@@ -145,6 +145,10 @@ jobs:
           if-no-files-found: error
 
   ecs-e2e:
+    # Needed by aws-actions/configure-aws-credentials
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Clone the code
