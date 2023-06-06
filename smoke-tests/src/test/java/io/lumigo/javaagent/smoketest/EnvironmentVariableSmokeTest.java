@@ -177,9 +177,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
-        (traceNodes) -> {
-          assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
-        });
+        (traceNodes) -> assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE));
   }
 
   @Test
@@ -199,7 +197,8 @@ class EnvironmentVariableSmokeTest {
         client,
         (traceNodes) -> {
           assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
-          // TODO Add check for warning about mask being invalid in log
+
+          assertThat(target.getLogs(), containsString("Failed to parse the masking regex:"));
         });
   }
 
@@ -220,7 +219,8 @@ class EnvironmentVariableSmokeTest {
         client,
         (traceNodes) -> {
           assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
-          // TODO Add check for warning about mask being invalid in log
+
+          assertThat(target.getLogs(), containsString("Failed to parse the masking regex:"));
         });
   }
 
@@ -240,9 +240,8 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
-        (traceNodes) -> {
-          assertTestResults(traceNodes, SECRET_VALUE, CREDENTIAL_VALUE, SCRUBBED_VALUE);
-        });
+        (traceNodes) ->
+            assertTestResults(traceNodes, SECRET_VALUE, CREDENTIAL_VALUE, SCRUBBED_VALUE));
   }
 
   @Test
@@ -260,9 +259,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
-        (traceNodes) -> {
-          assertTestResults(traceNodes, SECRET_VALUE, CREDENTIAL_VALUE, MY_VALUE);
-        });
+        (traceNodes) -> assertTestResults(traceNodes, SECRET_VALUE, CREDENTIAL_VALUE, MY_VALUE));
   }
 
   @Test
