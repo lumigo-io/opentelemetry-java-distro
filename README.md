@@ -88,6 +88,30 @@ The Lumigo OpenTelemetry Distro for Java additionally supports the following con
 
 For more configuration options, see the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
 
+
+### Programmatic Errors
+
+[Programmatic Errors](https://docs.lumigo.io/docs/programmatic-errors) allow you to customize errors, monitor and troubleshoot issues that should not necessarily interfere with the service.
+For example, an application tries to remove a user who doesn't exist. These custom errors can be captured by adding just a few lines of additional code to your application.
+
+Programmatic Errors indicating that a non-fatal error occurred, such as an application error. You can log programmatic errors, track custom error issues, and trigger [Alerts](https://docs.lumigo.io/docs/event-alert).
+
+
+#### Creating a Programmatic Error
+
+Programmatic errors are created by adding [span events](https://opentelemetry.io/docs/instrumentation/java/manual/#create-spans-with-events) with a custom attribute being set with the key name `lumigo.type`.
+
+For example, you could add a programmatic error as follows:
+
+```java
+Attributes eventAttributes = Attributes.of(
+    AttributeKey.stringKey("lumigo.type"), "<error-type>"
+);
+
+Span.current().addEvent("<error-message>", eventAttributes);
+```
+
+
 ## Baseline setup
 
 The Lumigo OpenTelemetry Distro will automatically create the following OpenTelemetry constructs provided to a `TraceProvider`.
