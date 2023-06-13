@@ -30,6 +30,7 @@ dependencies {
   bootstrapLibs(project(":bootstrap"))
 
   javaagentLibs(project(":custom"))
+  javaagentLibs(project(":instrumentation:apache-httpclient:apache-httpclient-5.0"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
