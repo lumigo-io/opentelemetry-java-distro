@@ -11,13 +11,10 @@ muzzle {
 dependencies {
   compileOnly project(":bootstrap")
   compileOnly("org.apache.httpcomponents.client5:httpclient5:5.0")
-
-  compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure")
   compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
-  compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
+}
 
-  // Needs to be "implementation" for ByteBuddy to find a class we instrument
-  implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-apache-httpclient-5.0:${versions.opentelemetryJavaagentAlpha}")
-
-  testInstrumentation "io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-apache-httpclient-5.0:${versions.opentelemetryJavaagentAlpha}"
+// Disable spotless as the files don't conform to our license header
+spotless {
+  enforceCheck false
 }
