@@ -1,20 +1,8 @@
 /*
- * Copyright 2023 Lumigo LTD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
  */
+
 package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v5_0;
 
 import io.lumigo.instrumentation.apachehttpclient.HttpPayloadExtractor;
@@ -29,7 +17,9 @@ import io.opentelemetry.javaagent.bootstrap.internal.CommonConfig;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 
-public final class ApacheHttpClientInstrumenter {
+public final class ApacheHttpClientSingletons {
+  private static final String INSTRUMENTATION_NAME = "io.opentelemetry.apache-httpclient-5.0";
+
   private static final Instrumenter<HttpRequest, HttpResponse> INSTRUMENTER;
 
   static {
@@ -37,10 +27,11 @@ public final class ApacheHttpClientInstrumenter {
         new ApacheHttpClientHttpAttributesGetter();
     ApacheHttpClientNetAttributesGetter netAttributesGetter =
         new ApacheHttpClientNetAttributesGetter();
+
     INSTRUMENTER =
         Instrumenter.<HttpRequest, HttpResponse>builder(
                 GlobalOpenTelemetry.get(),
-                "io.opentelemetry.apache-httpclient-5.0",
+                INSTRUMENTATION_NAME,
                 HttpSpanNameExtractor.create(httpAttributesGetter))
             .setSpanStatusExtractor(HttpSpanStatusExtractor.create(httpAttributesGetter))
             .addAttributesExtractor(
@@ -61,5 +52,5 @@ public final class ApacheHttpClientInstrumenter {
     return INSTRUMENTER;
   }
 
-  private ApacheHttpClientInstrumenter() {}
+  private ApacheHttpClientSingletons() {}
 }
