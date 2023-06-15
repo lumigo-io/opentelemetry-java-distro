@@ -24,6 +24,11 @@ configurations {
     canBeResolved = true
     canBeConsumed = false
   }
+  // this configuration stores the upstream agent as exploded directory
+  upstreamAgentExploded {
+    canBeResolved = true
+    canBeConsumed = false
+  }
 }
 
 dependencies {
@@ -33,6 +38,8 @@ dependencies {
   javaagentLibs(project(":instrumentation:apache-httpclient:apache-httpclient-5.0"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
+
+  upstreamAgentExploded files("$buildDir/libs/opentelemetry-javaagent")
 }
 
 CopySpec isolateClasses(Iterable<File> jars) {
@@ -54,6 +61,12 @@ CopySpec isolateClasses(Iterable<File> jars) {
 tasks {
   jar {
     enabled = false
+  }
+
+  task unzipUpstreamAgent(type: Copy) {
+    from zipTree(project.configurations.upstreamAgent.singleFile)
+    into ("$buildDir/libs/opentelemetry-javaagent")
+    exclude "**/apachehttpclient/v5_0/**"
   }
 
   // building the final javaagent jar is done in 3 steps:
@@ -104,7 +117,9 @@ tasks {
   // 3. the relocated and isolated javaagent libs are merged together with the bootstrap libs (which undergo relocation
   // in this task) and the upstream javaagent jar; duplicates are removed
   shadowJar {
-    configurations = [project.configurations.bootstrapLibs, project.configurations.upstreamAgent]
+    configurations = [project.configurations.bootstrapLibs, project.configurations.upstreamAgentExploded]
+
+    dependsOn(tasks.unzipUpstreamAgent)
 
     dependsOn(tasks.isolateJavaagentLibs)
     from(tasks.isolateJavaagentLibs.outputs)
