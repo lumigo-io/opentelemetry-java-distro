@@ -5,12 +5,14 @@ muzzle {
     group.set("org.apache.httpcomponents.client5")
     module.set("httpclient5")
     versions.set("[5.0,)")
+    assertInverse.set(true)
   }
 }
 
 dependencies {
   compileOnly project(":bootstrap")
   compileOnly("org.apache.httpcomponents.client5:httpclient5:5.0")
+
   compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
 }
 

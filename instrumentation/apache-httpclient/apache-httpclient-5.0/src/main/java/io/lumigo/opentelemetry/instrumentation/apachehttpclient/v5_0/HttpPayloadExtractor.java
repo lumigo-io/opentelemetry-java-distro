@@ -15,7 +15,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.instrumentation.apachehttpclient;
+package io.lumigo.opentelemetry.instrumentation.apachehttpclient.v5_0;
 
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
@@ -29,6 +29,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 
 public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, HttpResponse> {
   private static final String HTTP_REQUEST_BODY_KEY = "http.request.body";
@@ -46,7 +47,9 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
     }
 
     HttpEntity entity = classicHttpRequest.getEntity();
-    if (entity.isRepeatable()) {
+    if (entity == null) {
+      attributes.put(HTTP_REQUEST_BODY_KEY, "null");
+    } else if (entity.isRepeatable()) {
       try {
         String requestBody =
             new BufferedReader(new InputStreamReader(entity.getContent()))
@@ -77,10 +80,13 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
     }
 
     HttpEntity entity = classicHttpResponse.getEntity();
-    if (entity.isRepeatable()) {
+    if (entity != null) {
       try {
+        BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(entity);
+        classicHttpResponse.setEntity(bufferedHttpEntity);
+
         String responseBody =
-            new BufferedReader(new InputStreamReader(entity.getContent()))
+            new BufferedReader(new InputStreamReader(bufferedHttpEntity.getContent()))
                 .lines()
                 .collect(Collectors.joining("\n"));
         attributes.put(HTTP_RESPONSE_BODY_KEY, responseBody);
@@ -88,7 +94,7 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
         // TODO Log error
       }
     } else {
-      // TODO Handle non repeatable entity
+      attributes.put(HTTP_RESPONSE_BODY_KEY, "null");
     }
   }
 }
