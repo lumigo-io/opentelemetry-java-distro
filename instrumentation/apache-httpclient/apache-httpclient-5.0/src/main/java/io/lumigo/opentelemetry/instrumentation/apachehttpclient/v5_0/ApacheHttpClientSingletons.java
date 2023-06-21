@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v5_0;
+package io.lumigo.opentelemetry.instrumentation.apachehttpclient.v5_0;
 
-import io.lumigo.instrumentation.apachehttpclient.HttpPayloadExtractor;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesExtractor;
@@ -18,7 +17,7 @@ import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 
 public final class ApacheHttpClientSingletons {
-  private static final String INSTRUMENTATION_NAME = "io.opentelemetry.apache-httpclient-5.0";
+  private static final String INSTRUMENTATION_NAME = "io.opentelemetry.lumigo-apache-httpclient-5.0";
 
   private static final Instrumenter<HttpRequest, HttpResponse> INSTRUMENTER;
 
@@ -27,6 +26,7 @@ public final class ApacheHttpClientSingletons {
         new ApacheHttpClientHttpAttributesGetter();
     ApacheHttpClientNetAttributesGetter netAttributesGetter =
         new ApacheHttpClientNetAttributesGetter();
+    HttpPayloadExtractor payloadExtractor = new HttpPayloadExtractor();
 
     INSTRUMENTER =
         Instrumenter.<HttpRequest, HttpResponse>builder(
@@ -43,7 +43,7 @@ public final class ApacheHttpClientSingletons {
                 PeerServiceAttributesExtractor.create(
                     netAttributesGetter, CommonConfig.get().getPeerServiceMapping()))
             // Custom HTTP payload extractor
-            .addAttributesExtractor(new HttpPayloadExtractor())
+            .addAttributesExtractor(payloadExtractor)
             .addOperationMetrics(HttpClientMetrics.get())
             .buildClientInstrumenter(HttpHeaderSetter.INSTANCE);
   }
