@@ -18,6 +18,7 @@
 package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
+import io.lumigo.javaagent.utils.Strings;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;

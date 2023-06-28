@@ -17,23 +17,28 @@
  */
 package io.lumigo.opentelemetry.instrumentation.apachehttpclient.v5_0;
 
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 
 public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, HttpResponse> {
+  private static final Logger LOGGER = Logger.getLogger(HttpPayloadExtractor.class.getName());
+
   private static final String HTTP_REQUEST_BODY_KEY = "http.request.body";
-  private static final String HTTP_RESPONSE_BODY_KEY = "http.response.body";
+  static final String HTTP_RESPONSE_BODY_KEY = "http.response.body";
 
   @Override
   public void onStart(
@@ -42,25 +47,27 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
     if (httpRequest instanceof ClassicHttpRequest) {
       classicHttpRequest = (ClassicHttpRequest) httpRequest;
     } else {
-      // TODO Log error
+      LOGGER.warning("Instance of `ClassicHttpRequest` not found, unable to capture request payload");
       return;
     }
 
     HttpEntity entity = classicHttpRequest.getEntity();
-    if (entity == null) {
-      attributes.put(HTTP_REQUEST_BODY_KEY, "null");
-    } else if (entity.isRepeatable()) {
+    if (entity != null) {
+      BufferedHttpEntity bufferedHttpEntity;
       try {
+        bufferedHttpEntity = new BufferedHttpEntity(entity);
+        classicHttpRequest.setEntity(bufferedHttpEntity);
+
         String requestBody =
-            new BufferedReader(new InputStreamReader(entity.getContent()))
+            new BufferedReader(new InputStreamReader(bufferedHttpEntity.getContent()))
                 .lines()
                 .collect(Collectors.joining("\n"));
         attributes.put(HTTP_REQUEST_BODY_KEY, requestBody);
       } catch (IOException e) {
-        // TODO Log error
+        LOGGER.log(Level.SEVERE, "Failed to capture HTTP Request payload", e);
       }
     } else {
-      // TODO Handle non repeatable entity
+      attributes.put(HTTP_REQUEST_BODY_KEY, "null");
     }
   }
 
@@ -71,30 +78,16 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
       HttpRequest httpRequest,
       HttpResponse httpResponse,
       Throwable error) {
-    ClassicHttpResponse classicHttpResponse;
-    if (httpResponse instanceof ClassicHttpResponse) {
-      classicHttpResponse = (ClassicHttpResponse) httpResponse;
-    } else {
-      // TODO Log error
-      return;
+    Span currentSpan = Span.current();
+
+    // Set the Content-Encoding header attribute as it's removed from the Response
+    // by the Apache Http Client when it decompresses the payload
+    if (ResponsePayloadBridge.isGzipped(context)) {
+      currentSpan.setAttribute(AttributeKey.stringKey("http.response.header.content_encoding"), "gzip");
     }
 
-    HttpEntity entity = classicHttpResponse.getEntity();
-    if (entity != null) {
-      try {
-        BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(entity);
-        classicHttpResponse.setEntity(bufferedHttpEntity);
-
-        String responseBody =
-            new BufferedReader(new InputStreamReader(bufferedHttpEntity.getContent()))
-                .lines()
-                .collect(Collectors.joining("\n"));
-        attributes.put(HTTP_RESPONSE_BODY_KEY, responseBody);
-      } catch (IOException e) {
-        // TODO Log error
-      }
-    } else {
-      attributes.put(HTTP_RESPONSE_BODY_KEY, "null");
-    }
+    // Set the captured response payload onto a Span attribute
+    currentSpan.setAttribute(HttpPayloadExtractor.HTTP_RESPONSE_BODY_KEY,
+        ResponsePayloadBridge.getPayload(context));
   }
 }

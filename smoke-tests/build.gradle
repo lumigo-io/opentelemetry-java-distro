@@ -13,7 +13,6 @@ dependencies {
   testImplementation("io.opentelemetry.proto:opentelemetry-proto:0.20.0-alpha")
   testImplementation("io.opentelemetry:opentelemetry-sdk:${versions.opentelemetry}")
   testImplementation("io.opentelemetry:opentelemetry-sdk-trace:${versions.opentelemetry}")
-  testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
 tasks.test {
