@@ -20,7 +20,7 @@ package io.lumigo.javaagent.common;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import io.lumigo.javaagent.Strings;
+import io.lumigo.javaagent.utils.Strings;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import java.util.ArrayList;
 import java.util.Arrays;

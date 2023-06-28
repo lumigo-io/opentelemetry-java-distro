@@ -21,7 +21,8 @@ public class ApacheHttpClientInstrumentationModule extends InstrumentationModule
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
     return Arrays.asList(
-        new ApacheHttpClientInstrumentation(), new ApacheHttpAsyncClientInstrumentation());
+        new ApacheHttpClientInstrumentation(), new ApacheHttpAsyncClientInstrumentation(),
+        new SessionInputBufferInstrumentation(), new HttpMessageParserInstrumentation());
   }
 
   @Override

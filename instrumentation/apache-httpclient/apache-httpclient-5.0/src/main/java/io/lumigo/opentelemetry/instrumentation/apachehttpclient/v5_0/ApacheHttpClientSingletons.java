@@ -44,6 +44,8 @@ public final class ApacheHttpClientSingletons {
                     netAttributesGetter, CommonConfig.get().getPeerServiceMapping()))
             // Custom HTTP payload extractor
             .addAttributesExtractor(payloadExtractor)
+            // Custom Context customizer for holding response payload
+            .addContextCustomizer((context, request, attributes) -> new ResponsePayloadBridge.Builder().init(context))
             .addOperationMetrics(HttpClientMetrics.get())
             .buildClientInstrumenter(HttpHeaderSetter.INSTANCE);
   }

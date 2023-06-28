@@ -15,7 +15,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent;
+package io.lumigo.javaagent.utils;
 
 public class Strings {
 
@@ -25,7 +25,7 @@ public class Strings {
       return true;
     }
     for (int i = 0; i < strLen; i++) {
-      if ((Character.isWhitespace(s.charAt(i)) == false)) {
+      if ((!Character.isWhitespace(s.charAt(i)))) {
         return false;
       }
     }
