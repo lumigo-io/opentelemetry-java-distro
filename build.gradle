@@ -11,9 +11,9 @@ buildscript {
     }
   }
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.15.0"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.19.0"
     classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-    classpath "io.opentelemetry.instrumentation:gradle-plugins:1.23.0-alpha-SNAPSHOT"
+    classpath "io.opentelemetry.instrumentation:gradle-plugins:1.27.0-alpha"
   }
 }
 
@@ -25,16 +25,18 @@ subprojects {
 
   ext {
     versions = [
-      opentelemetrySdk           : "1.24.0",
-      opentelemetryContrib       : "1.24.0-alpha",
-      opentelemetryJavaagent     : "1.24.0",
-      opentelemetryJavaagentAlpha: "1.24.0-alpha-SNAPSHOT",
+      opentelemetrySdk           : "1.27.0",
+      opentelemetryContrib       : "1.27.0-alpha",
+      opentelemetryJavaagent     : "1.27.0",
+      opentelemetryJavaagentAlpha: "1.27.0-alpha",
 
-      jackson                    : "2.14.2",
-      bytebuddy                  : "1.13.0",
-      autoservice                : "1.0.1",
+      jackson                    : "2.15.2",
+      bytebuddy                  : "1.14.5",
+      autoservice                : "1.1.1",
       autovalue                  : "1.10.1",
-      junit                      : "5.9.2"
+      junit                      : "5.9.3",
+      mockito                    : "5.4.0",
+      hamcrest                   : "2.2"
     ]
 
     deps = [
@@ -70,7 +72,7 @@ subprojects {
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:${versions.opentelemetryJavaagent}"))
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${versions.opentelemetryJavaagentAlpha}"))
 
-    testImplementation("org.mockito:mockito-core:5.1.1")
+    testImplementation("org.mockito:mockito-core:${versions.mockito}")
     testImplementation(enforcedPlatform("org.junit:junit-bom:${versions.junit}"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

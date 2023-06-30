@@ -25,7 +25,7 @@ dependencies {
   testImplementation(project(":test-utils"))
   testImplementation("io.opentelemetry:opentelemetry-sdk")
   testImplementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
-  testImplementation("org.hamcrest:hamcrest:2.2")
-  testImplementation("org.mockito:mockito-core:5.3.1")
+  testImplementation("org.hamcrest:hamcrest:${versions.hamcrest}")
+  testImplementation("org.mockito:mockito-core:${versions.mockito}")
   testImplementation("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")
 }

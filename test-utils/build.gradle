@@ -6,15 +6,15 @@ dependencies {
   implementation("com.fasterxml.jackson.core:jackson-core:${versions.jackson}")
   implementation("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")
   implementation("com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}")
-  implementation("com.squareup.okhttp3:okhttp:4.10.0")
+  implementation("com.squareup.okhttp3:okhttp:4.11.0")
   implementation("io.opentelemetry:opentelemetry-sdk")
-  implementation("org.hamcrest:hamcrest:2.2")
+  implementation("org.hamcrest:hamcrest:${versions.hamcrest}")
   implementation("org.testcontainers:testcontainers:1.17.6")
 
   annotationProcessor("com.google.auto.value:auto-value:${versions.autovalue}")
   compileOnly("com.google.auto.value:auto-value-annotations:${versions.autovalue}")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
-  compileOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+  compileOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
 }
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
