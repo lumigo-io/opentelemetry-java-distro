@@ -11,3 +11,5 @@ dependencies {
   testImplementation(project(":instrumentation:apache-httpclient:apache-httpclient-5.0"))
   testImplementation("org.apache.httpcomponents.client5:httpclient5:5.0")
 }
+
+compileTestJava.dependsOn(":instrumentation:apache-httpclient:apache-httpclient-5.0:byteBuddyJava")
