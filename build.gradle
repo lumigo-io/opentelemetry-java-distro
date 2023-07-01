@@ -21,7 +21,18 @@ subprojects {
   version = rootProject.version
 
   apply plugin: "java"
-  apply plugin: "com.diffplug.spotless"
+  // Exclude OTeL instrumentation override sub projects
+  if (!it.name.equals("apache-httpclient-5.0")) {
+    apply plugin: "com.diffplug.spotless"
+
+    spotless {
+      java {
+        googleJavaFormat()
+        licenseHeaderFile(rootProject.file("./gradle/spotless.license.java"), "(package|import|public)")
+        target("src/**/*.java")
+      }
+    }
+  }
 
   ext {
     versions = [
@@ -53,14 +64,6 @@ subprojects {
     maven {
       name = "sonatype"
       url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }
-  }
-
-  spotless {
-    java {
-      googleJavaFormat()
-      licenseHeaderFile(rootProject.file("./gradle/spotless.license.java"), "(package|import|public)")
-      target("src/**/*.java")
     }
   }
 

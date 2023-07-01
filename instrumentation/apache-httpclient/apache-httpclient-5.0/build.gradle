@@ -19,8 +19,3 @@ dependencies {
   testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
   testImplementation("org.apache.httpcomponents.client5:httpclient5:5.0")
 }
-
-// Disable spotless as the files don't conform to our license header
-spotless {
-  enforceCheck false
-}
