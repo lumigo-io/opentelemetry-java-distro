@@ -65,19 +65,6 @@ public class SessionInputBufferInstrumentation implements TypeInstrumentation {
         @Advice.FieldValue(value = "bufferPos") int bufferPos,
         @Advice.FieldValue(value = "bufferLen") int bufferLen) {
 
-      int len = bufferLen;
-      if (len > 0) {
-        // Discard LF if found
-        if (buffer[len - 1] == '\n') {
-          len--;
-        }
-
-        // Discard CR if found
-        if (len > 0 && buffer[len - 1] == '\r') {
-          len--;
-        }
-      }
-
       int bodyStartPos = -1;
       // The HTTP body begins after the first two consecutive set of '\r\n' characters in the request
       // We scan then two-by-two to reduce iterations. The body may start on an odd or
@@ -87,7 +74,7 @@ public class SessionInputBufferInstrumentation implements TypeInstrumentation {
           int i = bufferPos;
           // We check only if we have at least two characters left, otherwise there is not
           // enough data in the buffer to contain an HTTP body anyhow.
-          i < len - 1;
+          i < bufferLen - 1;
           // We manually increment the position in the loop, as increments could be by
           // one or by two depending on what we find.
         ) {
@@ -116,7 +103,7 @@ public class SessionInputBufferInstrumentation implements TypeInstrumentation {
       // Append the payload to the object on the Context which can be accessed by HttpPayloadExtractor
       // We always call this and delegate to appendPayload whether the body start was found,
       // because the second part of a chunked response will not have a body start to be found.
-      ResponsePayloadBridge.appendPayload(context, buffer, bodyStartPos, len);
+      ResponsePayloadBridge.appendPayload(context, buffer, bodyStartPos, bufferLen);
     }
   }
 }
