@@ -1,0 +1,23 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    coreJdk()
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+  compileOnly project(":utils")
+
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+
+  implementation("io.opentelemetry.instrumentation:opentelemetry-java-http-client")
+
+  testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
+}
+
+// TODO: This doesn't work for ByteBuddy!
+tasks.withType(JavaCompile).configureEach {
+  options.release.set(11)
+}
