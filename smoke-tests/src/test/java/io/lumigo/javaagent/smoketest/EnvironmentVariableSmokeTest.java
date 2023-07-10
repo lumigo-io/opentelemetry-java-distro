@@ -90,12 +90,18 @@ class EnvironmentVariableSmokeTest {
         .untilAsserted(
             () -> {
               List<JsonNode> traceData = target.getTraces();
+
               // Verify environment variables are masked
               assertions.accept(traceData);
             });
   }
 
   protected String getProcessEnvironment(List<JsonNode> traceData) {
+    if (traceData.size() == 0) {
+      // No traces found
+      return null;
+    }
+
     JsonNode jsonNode =
         traceData.get(0).get("resourceSpans").get(0).get("resource").get("attributes");
     if (jsonNode.isArray()) {
@@ -173,7 +179,6 @@ class EnvironmentVariableSmokeTest {
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
-    System.out.println("TEST START: testDefaultScrubbing");
     executeTest(
         target,
         client,
@@ -191,7 +196,6 @@ class EnvironmentVariableSmokeTest {
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
-    System.out.println("TEST START: testDefaultScrubbingWithInvalidJson");
     executeTest(
         target,
         client,
@@ -213,7 +217,6 @@ class EnvironmentVariableSmokeTest {
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
-    System.out.println("TEST START: testDefaultScrubbingWithInvalidRegexp");
     executeTest(
         target,
         client,
@@ -236,7 +239,6 @@ class EnvironmentVariableSmokeTest {
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
-    System.out.println("TEST START: testEnvironmentSpecificRegexAndNotGeneralRegexScrubbing");
     executeTest(
         target,
         client,
@@ -255,7 +257,6 @@ class EnvironmentVariableSmokeTest {
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
-    System.out.println("TEST START: testEmptyEnvironmentSpecificRegexScrubbing");
     executeTest(
         target,
         client,
@@ -275,7 +276,6 @@ class EnvironmentVariableSmokeTest {
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
-    System.out.println("TEST START: testAllMagicScrubbing");
     executeTest(
         target,
         client,

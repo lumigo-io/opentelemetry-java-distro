@@ -30,7 +30,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -52,7 +51,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.MountableFile;
 
 public class TestAppExtension
@@ -114,7 +112,7 @@ public class TestAppExtension
 
     List<SpanDumpEntry> getSpanDump() throws IOException;
 
-    List<JsonNode> getTraces() throws IOException;
+    List<JsonNode> getTraces() throws IOException, InterruptedException;
 
     int getMappedPort(int originalPort);
   }
@@ -263,33 +261,39 @@ public class TestAppExtension
       }
 
       @Override
-      public List<JsonNode> getTraces() throws IOException {
-        AtomicReference<String> content = new AtomicReference<>();
-        Awaitility.await()
-            .atMost(Duration.ofSeconds(15))
-            .until(
-                () -> {
-                  content.set(getContent());
-                  return !content.get().isEmpty() && content.get().length() > 0;
-                });
+      public List<JsonNode> getTraces() throws IOException, InterruptedException {
+        String content = waitForContent();
 
         return StreamSupport.stream(
-                SpanDumpMixIn.OBJECT_MAPPER.readTree(content.get()).spliterator(), false)
+                SpanDumpMixIn.OBJECT_MAPPER.readTree(content).spliterator(), false)
             .collect(Collectors.toList());
       }
 
-      private String getContent() throws IOException {
-        final Request request =
-            new Request.Builder()
-                .url(String.format("http://localhost:%d/get-traces", backend.getMappedPort(8080)))
-                .addHeader("Accepts", "application/json")
-                .get()
-                .build();
+      private String waitForContent() throws IOException, InterruptedException {
+        long previousSize = 0;
+        long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+        String content = "[]";
+        while (System.currentTimeMillis() < deadline) {
+          Request request =
+              new Request.Builder()
+                  .url(String.format("http://localhost:%d/get-traces", backend.getMappedPort(8080)))
+                  .build();
 
-        try (final Response response = client.newCall(request).execute()) {
-          ResponseBody body = response.body();
-          return body.string();
+          try (Response response = client.newCall(request).execute()) {
+            ResponseBody body = response.body();
+            if (body != null) {
+              content = body.string();
+            }
+          }
+
+          if (content.length() > 2 && content.length() == previousSize) {
+            break;
+          }
+          previousSize = content.length();
+          TimeUnit.MILLISECONDS.sleep(500);
         }
+
+        return content;
       }
 
       @Override
