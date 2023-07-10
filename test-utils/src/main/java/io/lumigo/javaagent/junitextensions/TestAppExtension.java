@@ -220,7 +220,6 @@ public class TestAppExtension
               }
             });
 
-    this.testApp.setWaitStrategy(Wait.forHttp("/greeting").forStatusCode(200));
     this.testApp.start();
 
     return new TestApplication() {
