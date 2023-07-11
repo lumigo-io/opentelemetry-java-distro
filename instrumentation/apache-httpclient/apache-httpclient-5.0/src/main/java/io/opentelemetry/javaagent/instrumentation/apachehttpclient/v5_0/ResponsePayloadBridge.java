@@ -88,6 +88,11 @@ public class ResponsePayloadBridge {
         }
 
         if (payloadStart > -1) {
+          if (bridge.payloadBufferLength < chunkSize) {
+            // We haven't appended enough data to return anything
+            return null;
+          }
+
           if (bridge.isGzipped) {
             // Return the payload chunk only, encoded as Base64
             return Base64.getEncoder().encodeToString(

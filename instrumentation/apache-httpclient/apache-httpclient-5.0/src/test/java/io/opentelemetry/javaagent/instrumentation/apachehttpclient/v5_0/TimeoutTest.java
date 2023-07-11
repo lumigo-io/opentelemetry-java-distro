@@ -20,6 +20,7 @@ package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v5_0;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static io.opentelemetry.sdk.testing.assertj.TracesAssert.assertThat;
 
+import com.github.tomakehurst.wiremock.core.Options;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
@@ -41,7 +42,9 @@ public class TimeoutTest {
 
   @RegisterExtension
   static final WireMockExtension mockServer = WireMockExtension.newInstance()
-      .options(wireMockConfig().dynamicPort().gzipDisabled(true))
+      .options(wireMockConfig().dynamicPort()
+          .gzipDisabled(true)
+          .useChunkedTransferEncoding(Options.ChunkedEncodingPolicy.NEVER))
       .build();
 
   @Test
