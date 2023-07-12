@@ -26,6 +26,7 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.trace.data.StatusData;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -71,7 +72,7 @@ public class TimeoutTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                             .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                                 List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")

@@ -133,18 +133,18 @@ public class ResponsePayloadBridge {
 
   private static void checkForGzip(ResponsePayloadBridge bridge) {
     Optional<Header> contentEncodingHeader = Arrays.stream(bridge.headers)
-        .filter(header -> header.getName().equals("Content-Encoding"))
+        .filter(header -> header.getName().equalsIgnoreCase("content-encoding"))
         .findFirst();
-    if (contentEncodingHeader.isPresent() && contentEncodingHeader.get().getValue().equals("gzip")) {
+    if (contentEncodingHeader.isPresent() && "gzip".equalsIgnoreCase(contentEncodingHeader.get().getValue())) {
       bridge.isGzipped = true;
     }
   }
 
   private static void checkForChunked(ResponsePayloadBridge bridge) {
     Optional<Header> transferEncodingHeader = Arrays.stream(bridge.headers)
-        .filter(header -> header.getName().equals("Transfer-Encoding"))
+        .filter(header -> header.getName().equalsIgnoreCase("transfer-encoding"))
         .findFirst();
-    if (transferEncodingHeader.isPresent() && transferEncodingHeader.get().getValue().equals("chunked")) {
+    if (transferEncodingHeader.isPresent() && "chunked".equalsIgnoreCase(transferEncodingHeader.get().getValue())) {
       bridge.isChunked = true;
     }
   }

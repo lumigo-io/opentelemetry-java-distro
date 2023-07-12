@@ -23,15 +23,20 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.trace.data.StatusData;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.MalformedChunkCodingException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -75,7 +80,7 @@ public class ConnectionTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                          .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                           .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                               List.of("application/json"))
                           .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
@@ -114,14 +119,14 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                             .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                                 List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
                             .hasAttribute(AttributeKey.stringKey("http.response.body"), "")
                             .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
                                 List.of("chunked"))
-                            .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
+                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
                             .hasStatus(StatusData.unset())
                     ));
   }
@@ -154,7 +159,7 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                             .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                                 List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
@@ -191,13 +196,61 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                             .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                                 List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                            .hasAttribute(AttributeKey.stringKey("http.response.body"), "")
-                            .hasAttribute(AttributeKey.longKey("http.status_code"), 500L)
+                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500L)
                             .hasStatus(StatusData.error())
                     ));
+  }
+
+  @Test
+  void testNullResponse() {
+    final String jsonBody = "\"null\"";
+    final String urlPath = "/response";
+
+    mockServer.stubFor(get(urlPathEqualTo(urlPath))
+        .willReturn(aResponse()
+            .withHeader("Content-Type", "application/text")
+            .withBody(jsonBody)
+        )
+    );
+
+    AtomicReference<String> responsePayload = new AtomicReference<>();
+
+    try (CloseableHttpClient client = HttpClients.createDefault()) {
+      final ClassicHttpRequest httpGet = ClassicRequestBuilder.get(mockServer.url(urlPath)).addHeader("Content-Type", "application/text").build();
+      client.execute(httpGet, response -> {
+        final HttpEntity entity1 = response.getEntity();
+        responsePayload.set(EntityUtils.toString(entity1));
+        return null;
+      });
+    }
+    catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    assertThat(instrumentation.waitForTraces(1))
+        .hasSize(1)
+        .hasTracesSatisfyingExactly(
+            trace ->
+                trace
+                    .hasSize(1)
+                    .hasSpansSatisfyingExactly(
+                        span -> span
+                            .hasName("GET")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
+                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
+                                List.of("application/text"))
+                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
+                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
+                                List.of("application/text"))
+                            .hasAttribute(AttributeKey.stringKey("http.response.body"), jsonBody)
+                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
+                    ));
+
+    Assertions.assertThat(responsePayload.get()).isEqualTo(jsonBody);
   }
 }

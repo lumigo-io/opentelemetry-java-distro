@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -83,7 +84,7 @@ public class JsonChunkedContentTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                          .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                           .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                               List.of("application/json"))
                           .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
@@ -94,7 +95,7 @@ public class JsonChunkedContentTest {
                           // Buffer size differences between local and GH Actions prevent us from
                           // using this assertion as response content differs
                           // .hasAttribute(AttributeKey.stringKey("http.response.body"), jsonBody)
-                          .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
+                          .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
                   ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(jsonBody);
@@ -144,7 +145,7 @@ public class JsonChunkedContentTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
+                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
                             .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
                                 List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), requestBody)
@@ -155,7 +156,7 @@ public class JsonChunkedContentTest {
                             // Buffer size differences between local and GH Actions prevent us from
                             // using this assertion as response content differs
                             // .hasAttribute(AttributeKey.stringKey("http.response.body"), responseBody)
-                            .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
+                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
                     ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(responseBody);

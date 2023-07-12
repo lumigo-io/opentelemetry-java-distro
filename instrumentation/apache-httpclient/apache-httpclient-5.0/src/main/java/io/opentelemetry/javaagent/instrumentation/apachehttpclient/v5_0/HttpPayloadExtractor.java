@@ -19,12 +19,12 @@ package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v5_0;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.AttributesBuilder;
-import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -78,16 +78,15 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
       HttpRequest httpRequest,
       HttpResponse httpResponse,
       Throwable error) {
-    Span currentSpan = Span.current();
-
     // Set the Content-Encoding header attribute as it's removed from the Response
     // by the Apache Http Client when it decompresses the payload
     if (ResponsePayloadBridge.isGzipped(context)) {
-      currentSpan.setAttribute(AttributeKey.stringKey("http.response.header.content_encoding"), "gzip");
+      attributes.put(AttributeKey.stringKey("http.response.header.content_encoding"), "gzip");
     }
 
     // Set the captured response payload onto a Span attribute
-    currentSpan.setAttribute(HttpPayloadExtractor.HTTP_RESPONSE_BODY_KEY,
-        ResponsePayloadBridge.getPayload(context));
+    if (null != httpResponse && httpResponse.getCode() == 200) {
+      attributes.put(HTTP_RESPONSE_BODY_KEY, ResponsePayloadBridge.getPayload(context));
+    }
   }
 }

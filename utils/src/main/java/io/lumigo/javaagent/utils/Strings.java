@@ -25,7 +25,7 @@ public class Strings {
       return true;
     }
     for (int i = 0; i < strLen; i++) {
-      if ((!Character.isWhitespace(s.charAt(i)))) {
+      if (!Character.isWhitespace(s.charAt(i))) {
         return false;
       }
     }
