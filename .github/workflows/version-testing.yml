@@ -57,7 +57,7 @@ jobs:
       - run: rm -rf versions_artifacts  # the artifacts shouldn't be committed
       - run: echo "::set-output name=branch_name::$(date +version-testing-%Y%m%d)"
         id: branch_name
-      - run: python3 -m pip install -r ./requirements-ci.txt
+      - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: |  # update 'Supported packages' section in README.md
           PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m update_supported_packages_documentation
       - run: |  # need to set an env var in order to support multi-lines output https://trstringer.com/github-actions-multiline-strings/
