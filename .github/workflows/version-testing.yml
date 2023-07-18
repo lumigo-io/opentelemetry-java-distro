@@ -60,6 +60,8 @@ jobs:
       - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: |  # update 'Supported packages' section in README.md
           PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m update_supported_packages_documentation
+          find . -type f -name "*.py[co]" -delete
+          find . -type d -name "__pycache__" -delete
       - run: |  # need to set an env var in order to support multi-lines output https://trstringer.com/github-actions-multiline-strings/
           new_versions="$(.github/describe_supported_versions_diff.sh)"
           echo "new_versions<<EOF" >> $GITHUB_ENV
