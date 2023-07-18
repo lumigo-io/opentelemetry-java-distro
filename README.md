@@ -185,6 +185,14 @@ Attributes eventAttributes = Attributes.of(
 Span.current().addEvent("<error-message>", eventAttributes);
 ```
 
+## Supported runtimes
+
+* JDK: 11.x, 17.x
+
+## Supported packages
+
+| Instrumentation | Package | Supported Versions |
+| --- | --- | --- |
 
 ## Baseline setup
 
