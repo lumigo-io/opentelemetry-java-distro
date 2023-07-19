@@ -30,7 +30,7 @@ jobs:
               cp "$path" versions_artifact;
             fi
           done
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.jdk_version }}
           path: versions_artifact
@@ -42,12 +42,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: mkdir versions_artifacts
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         continue-on-error: true  # when there aren't changes the artifact won't be uploaded and this step will fail
         with:
           name: 11
           path: versions_artifacts/11
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         continue-on-error: true
         with:
           name: 17
@@ -60,8 +60,6 @@ jobs:
       - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: |  # update 'Supported packages' section in README.md
           PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m update_supported_packages_documentation
-          find . -type f -name "*.py[co]" -delete
-          find . -type d -name "__pycache__" -delete
       - run: |  # need to set an env var in order to support multi-lines output https://trstringer.com/github-actions-multiline-strings/
           new_versions="$(.github/describe_supported_versions_diff.sh)"
           echo "new_versions<<EOF" >> $GITHUB_ENV

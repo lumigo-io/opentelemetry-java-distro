@@ -318,8 +318,12 @@ def _generate_support_matrix_markdown_row(
             )
         )
 
+        dependency = _get_build_gradle_dependency_line(
+          tested_versions_directory, package
+        )
+
         res.append(
-            f"| {instrumentation} | [{package}]({package_url_template.format(package)}) | {supported_version_ranges[0]} |"
+            f"| {instrumentation} | [{package}]({package_url_template.format(dependency.split(':')[0], dependency.split(':')[1])}) | {supported_version_ranges[0]} |"
         )
         for supported_version_range in supported_version_ranges[1:]:
             res.append(f"| | | {supported_version_range} |")
@@ -351,6 +355,25 @@ def _generate_support_matrix_markdown_row(
                 res.append(f"| | | {supported_version_range} |")
 
     return res
+
+
+def _get_build_gradle_dependency_line(
+    tested_versions_directory, package
+) -> str:
+    instr_parts = package.split('-')
+    search_regex = '|'.join(instr_parts)
+
+    with open(os.path.join(tested_versions_directory, '..', '..', '..', "build.gradle")) as file:
+        file_contents = file.read()
+
+    matches = re.findall(r'compileOnly.*', file_contents, re.IGNORECASE)
+    dependency = None
+
+    for match in matches:
+        if re.search(search_regex, match, re.IGNORECASE):
+            dependency = re.search(r'".*"', match).group(0)
+            break
+    return dependency
 
 
 def _get_supported_version_ranges(tested_versions: TestedVersions) -> List[str]:

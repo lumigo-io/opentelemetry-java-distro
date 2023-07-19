@@ -67,20 +67,15 @@ jobs:
 
   smoke-tests:
     runs-on: ubuntu-latest
-    name: 'JDK ${{ matrix.jdk_version }} smoke tests'
-    strategy:
-      fail-fast: false
-      matrix:
-        jdk_version: [ 11, 17 ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK ${{ matrix.jdk_version }}
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: ${{ matrix.jdk_version }}
+          java-version: 17
 
       - name: Tests
         uses: gradle/gradle-build-action@v2
@@ -93,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: 'JDK ${{ matrix.jdk_version }} smoke test reports'
+          name: 'Smoke test reports'
           path: |
             **/build/reports/
             **/build/test-results/
@@ -245,7 +240,7 @@ jobs:
       instrumentations: ${{ steps.list_instrumentations.outputs.instrumentations }}
 
   supported-java-versions-testing:
-    name: 'JDK ${{ matrix.jdk_version }} ${{ matrix.instrumentations_to_test }} tests'
+    name: 'JDK ${{ matrix.jdk_version }} ${{ matrix.instrumentation_to_test }} tests'
     runs-on: ubuntu-latest
     needs: [instrumentations-to-test]
     strategy:
