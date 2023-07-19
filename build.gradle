@@ -49,6 +49,9 @@ subprojects {
       opentelemetryJavaagent     : "1.27.0",
       opentelemetryJavaagentAlpha: "1.27.0-alpha",
 
+      // Instrumentation versions
+      apachehttpclient50         : "5.0",
+
       jackson                    : "2.15.2",
       bytebuddy                  : "1.14.5",
       autoservice                : "1.1.1",
