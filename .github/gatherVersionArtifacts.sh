@@ -68,7 +68,6 @@ handle_dependency() {
     declare -A runtime_to_tested_versions=()
     calculate_runtime_to_tested_versions "$instrumentation_name" "${runtimes[@]}"
 
-# TODO This next section is not working!!
     reference_lines=(${runtime_to_tested_versions[${runtimes[0]}]})
 
     for ((i = 0; i < ${#reference_lines[@]}; i++)); do
