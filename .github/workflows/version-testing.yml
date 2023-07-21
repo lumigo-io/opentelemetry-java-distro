@@ -57,7 +57,7 @@ jobs:
           name: 17
           path: versions_artifacts/17
       - run: python3 -m pip install -r .github/requirements-ci.txt
-      - run: PYTHONPATH=${PYTHONPATH}:$(pwd)/scripts python3 -m gather_version_artifacts
+      - run: PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m gather_version_artifacts
       - run: git --no-pager diff
       - run: rm -rf versions_artifacts  # the artifacts shouldn't be committed
       - run: echo "branch_name=$(date +version-testing-%Y%m%d)" >>$GITHUB_OUTPUT
