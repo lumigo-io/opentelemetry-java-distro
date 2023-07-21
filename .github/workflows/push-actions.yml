@@ -1,6 +1,5 @@
-name: Code quality checks
+name: Tracer Testing
 
-# Trigger the workflow on pull requests and direct pushes to any branch
 on:
   push:
     branches: [ main ]
@@ -19,6 +18,7 @@ jobs:
     permissions:
       contents: write
       issues: write
+      pull-requests: write
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         if: github.event_name == 'pull_request'
@@ -71,7 +71,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK for running Gradle
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: temurin
@@ -88,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: smoke-test-reports
+          name: 'Smoke test reports'
           path: |
             **/build/reports/
             **/build/test-results/
@@ -225,15 +225,49 @@ jobs:
         env:
           DEPLOYMENT_SUFFIX: ${{ steps.deployment-suffix.outputs.DEPLOYMENT_SUFFIX }}
 
+  instrumentations-to-test:
+    name: List instrumentations to test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: list_instrumentations
+        run: |
+          instrumentationFolders=$(find instrumentation -type d -name "tested_versions" -not -path "*/build/*" | sed 's/instrumentation\///g' | sed 's/\/src\/main\/resources\/tested_versions//' | sort)
+          instrumentations_as_json_list=$(echo "$instrumentationFolders" | jq --raw-input --slurp 'split("\n") | map(select(. != ""))' | jq -r tostring)
+          echo "instrumentations=${instrumentations_as_json_list}" >> "${GITHUB_OUTPUT}"
+          echo "instrumentations=${instrumentations_as_json_list}"
+    outputs:
+      instrumentations: ${{ steps.list_instrumentations.outputs.instrumentations }}
+
+  supported-java-versions-testing:
+    name: 'JDK ${{ matrix.jdk_version }} ${{ matrix.instrumentation_to_test }} tests'
+    runs-on: ubuntu-latest
+    needs: [instrumentations-to-test]
+    strategy:
+      fail-fast: false # We want to see all tests being tried, rather than stop when the first fails
+      matrix:
+        jdk_version: [ 11, 17 ]
+        instrumentation_to_test: ${{ fromJson(needs.instrumentations-to-test.outputs.instrumentations) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.jdk_version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.jdk_version }}
+      - run: ./gradlew clean
+      - run: ./gradlew build -x test
+      - run: .github/testComponentVersions.sh ${{ matrix.instrumentation_to_test }}
+
   checks:
     permissions:
       contents: write
       issues: write
     runs-on: ubuntu-latest
-    needs: [ pr-labeling, spotless, smoke-tests, k8s-e2e, ecs-e2e ]
+    needs: [ pr-labeling, spotless, smoke-tests, k8s-e2e, ecs-e2e, instrumentations-to-test, supported-java-versions-testing ]
     steps:
       - name: Report failure
-        if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: ${{job.status == 'failure' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'create-issue'
