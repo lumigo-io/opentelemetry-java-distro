@@ -1,6 +1,9 @@
 name: Version Testing
 on:
   push:
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
   schedule:
     - cron: '0 7 * * *'
 jobs:
