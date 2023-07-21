@@ -41,6 +41,10 @@ jobs:
     needs: check-new-versions-of-instrumented-packages
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.7
       - run: mkdir versions_artifacts
       - uses: actions/download-artifact@v3
         continue-on-error: true  # when there aren't changes the artifact won't be uploaded and this step will fail
@@ -52,12 +56,12 @@ jobs:
         with:
           name: 17
           path: versions_artifacts/17
+      - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: .github/gatherVersionArtifacts.sh
       - run: git --no-pager diff
       - run: rm -rf versions_artifacts  # the artifacts shouldn't be committed
       - run: echo "::set-output name=branch_name::$(date +version-testing-%Y%m%d)"
         id: branch_name
-      - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: |  # update 'Supported packages' section in README.md
           PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m update_supported_packages_documentation
       - run: |  # need to set an env var in order to support multi-lines output https://trstringer.com/github-actions-multiline-strings/
@@ -66,7 +70,7 @@ jobs:
           echo "$new_versions" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           title: ${{steps.branch_name.outputs.branch_name}}
