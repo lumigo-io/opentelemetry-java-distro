@@ -98,16 +98,22 @@ class SemanticVersion:
         if self.major > other.major:
             return False
 
-        if self.minor < other.minor:
+        # Fill in missing parts with zeros when needed
+        self_minor = self.minor if hasattr(self, 'minor') else 0
+        other_minor = other.minor if hasattr(other, 'minor') else 0
+        self_patch = self.patch if hasattr(self, 'patch') else 0
+        other_patch = other.patch if hasattr(other, 'patch') else 0
+
+        if self_minor < other_minor:
             return True
 
-        if self.minor > other.minor:
+        if self_minor > other_minor:
             return False
 
-        if self.patch < other.patch:
+        if self_patch < other_patch:
             return True
 
-        if self.patch > other.patch:
+        if self_patch > other_patch:
             return False
 
         if not self.suffix and other.suffix:
