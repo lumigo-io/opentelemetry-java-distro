@@ -21,7 +21,26 @@ subprojects {
   version = rootProject.version
 
   apply plugin: "java"
-  apply plugin: "com.diffplug.spotless"
+  // Exclude OTeL instrumentation override sub projects
+  if (!it.name.equals("apache-httpclient-5.0")) {
+    apply plugin: "com.diffplug.spotless"
+
+    spotless {
+      java {
+        googleJavaFormat()
+        licenseHeaderFile(rootProject.file("./gradle/spotless.license.java"), "(package|import|public)")
+        target("src/**/*.java")
+      }
+    }
+  }
+
+  tasks.withType(Test) {
+    testLogging {
+      exceptionFormat "full"
+      events "started", "skipped", "passed", "failed"
+      showStandardStreams true
+    }
+  }
 
   ext {
     versions = [
@@ -29,6 +48,9 @@ subprojects {
       opentelemetryContrib       : "1.27.0-alpha",
       opentelemetryJavaagent     : "1.27.0",
       opentelemetryJavaagentAlpha: "1.27.0-alpha",
+
+      // Instrumentation versions
+      apachehttpclient50         : "5.0",
 
       jackson                    : "2.15.2",
       bytebuddy                  : "1.14.5",
@@ -56,14 +78,6 @@ subprojects {
     }
   }
 
-  spotless {
-    java {
-      googleJavaFormat()
-      licenseHeaderFile(rootProject.file("./gradle/spotless.license.java"), "(package|import|public)")
-      target("src/**/*.java")
-    }
-  }
-
   dependencies {
     // otel BOM
     implementation(platform("io.opentelemetry:opentelemetry-bom:${versions.opentelemetrySdk}"))
@@ -73,6 +87,8 @@ subprojects {
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${versions.opentelemetryJavaagentAlpha}"))
 
     testImplementation("org.mockito:mockito-core:${versions.mockito}")
+    testImplementation("org.mockito:mockito-junit-jupiter:${versions.mockito}")
+    testImplementation("org.awaitility:awaitility:4.2.0")
     testImplementation(enforcedPlatform("org.junit:junit-bom:${versions.junit}"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

@@ -28,6 +28,8 @@ configurations {
 
 dependencies {
   bootstrapLibs(project(":bootstrap"))
+  javaagentLibs(project(":utils"))
+
   // and finally include everything from otel agent for testing
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-agent-for-testing:${versions.opentelemetryJavaagentAlpha}")
 }

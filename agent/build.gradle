@@ -30,6 +30,7 @@ dependencies {
   bootstrapLibs(project(":bootstrap"))
 
   javaagentLibs(project(":custom"))
+  javaagentLibs(project(":instrumentation:apache-httpclient:apache-httpclient-5.0"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
@@ -76,6 +77,8 @@ tasks {
       exclude("io.opentelemetry:opentelemetry-api-logs")
       exclude("io.opentelemetry:opentelemetry-context")
       exclude("io.opentelemetry:opentelemetry-semconv")
+      // metrics advice API
+      exclude("io.opentelemetry:opentelemetry-extension-incubator")
     }
   }
 
