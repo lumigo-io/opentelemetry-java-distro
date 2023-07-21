@@ -6,6 +6,7 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import List, Optional, Union, cast
+from pathlib import Path
 
 # This regexp splits the version line across three capture groups:
 # `(!)?` captures whether or not the version is supported (if supported, the `!` character is missing)
@@ -301,11 +302,9 @@ def _generate_support_matrix_markdown_row(
 ) -> List[str]:
     """Generate the markdown row for an instrumentation"""
 
-    # The package name is the name of the parent of the 'tested_versions' directory
-    # But there are cases, like FastAPI, where we actually test multiple packages,
-    # like fastapi and uvicorn
-    instrumentation = os.path.basename(os.path.dirname(tested_versions_directory))
-
+    # The package name is the name of the parent 3 levels up from the 'tested_versions' directory
+    package_root = Path(tested_versions_directory).parents[3]
+    instrumentation = os.path.basename(package_root)
     packages = sorted(os.listdir(tested_versions_directory))
 
     res = []
@@ -319,7 +318,7 @@ def _generate_support_matrix_markdown_row(
         )
 
         dependency = _get_build_gradle_dependency_line(
-          tested_versions_directory, package
+          package_root, package
         )
 
         res.append(
@@ -329,14 +328,20 @@ def _generate_support_matrix_markdown_row(
             res.append(f"| | | {supported_version_range} |")
     else:
         first_package = packages[0]
+        print(tested_versions_directory)
+        print(first_package)
         supported_version_ranges_first_package = _get_supported_version_ranges(
             TestedVersions.from_file(
                 os.path.join(tested_versions_directory, first_package)
             )
         )
 
+        dependency = _get_build_gradle_dependency_line(
+          package_root, first_package
+        )
+
         res.append(
-            f"| {instrumentation} | [{first_package}]({package_url_template.format(first_package)}) | {supported_version_ranges_first_package[0]} |"
+            f"| {instrumentation} | [{first_package}]({package_url_template.format(dependency.split(':')[0], dependency.split(':')[1])}) | {supported_version_ranges_first_package[0]} |"
         )
         for supported_version_range in supported_version_ranges_first_package[1:]:
             res.append(f"| | | {supported_version_range} |")
@@ -363,7 +368,7 @@ def _get_build_gradle_dependency_line(
     instr_parts = package.split('-')
     search_regex = '|'.join(instr_parts)
 
-    with open(os.path.join(tested_versions_directory, '..', '..', '..', "build.gradle")) as file:
+    with open(os.path.join(tested_versions_directory, "build.gradle")) as file:
         file_contents = file.read()
 
     matches = re.findall(r'compileOnly.*', file_contents, re.IGNORECASE)
@@ -372,6 +377,7 @@ def _get_build_gradle_dependency_line(
     for match in matches:
         if re.search(search_regex, match, re.IGNORECASE):
             dependency = re.search(r'".*"', match).group(0)
+            dependency = dependency[1:]
             break
     return dependency
 
