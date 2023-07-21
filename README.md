@@ -193,6 +193,23 @@ Span.current().addEvent("<error-message>", eventAttributes);
 
 | Instrumentation | Package | Supported Versions |
 | --- | --- | --- |
+| apache-httpclient-5.0 | [apache-httpclient-5.0](https://central.sonatype.com/artifact/org.apache.httpcomponents.client5/httpclient5) | 5.0.1~5.2.1 |
+| | | 5.0 |
+| | | 5.0-alpha1 |
+| | | 5.0-alpha2 |
+| | | 5.0-alpha3 |
+| | | 5.0-beta1 |
+| | | 5.0-beta2 |
+| | | 5.0-beta3 |
+| | | 5.0-beta4 |
+| | | 5.0-beta5 |
+| | | 5.0-beta6 |
+| | | 5.0-beta7 |
+| | | 5.1 |
+| | | 5.1-beta1 |
+| | | 5.2 |
+| | | 5.2-alpha1 |
+| | | 5.2-beta1 |
 
 ## Baseline setup
 
