@@ -42,7 +42,8 @@ def main() -> None:
   if any([files != files_names for files in runtime_to_files.values()]):
     raise Exception("Got different files from different runtimes")
   origin_tested_files = glob(
-    "src/instrumentations/*/tested_versions/*"
+    "instrumentation/**/tested_versions/*",
+    recursive=True
   )
   for instrumentation_name in files_names:
     handle_dependency(
