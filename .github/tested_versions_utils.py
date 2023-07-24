@@ -323,12 +323,10 @@ def _generate_support_matrix_markdown_row(
             )
         )
 
-        dependency = _get_build_gradle_dependency_line(
-          package_root, package
-        )
+        package_url = _get_package_url(package_root, package, package_url_template)
 
         res.append(
-            f"| {instrumentation} | [{package}]({package_url_template.format(dependency.split(':')[0], dependency.split(':')[1])}) | {supported_version_ranges[0]} |"
+            f"| {instrumentation} | [{package}]({package_url}) | {supported_version_ranges[0]} |"
         )
         for supported_version_range in supported_version_ranges[1:]:
             res.append(f"| | | {supported_version_range} |")
@@ -342,12 +340,10 @@ def _generate_support_matrix_markdown_row(
             )
         )
 
-        dependency = _get_build_gradle_dependency_line(
-          package_root, first_package
-        )
+        package_url = _get_package_url(package_root, package, package_url_template)
 
         res.append(
-            f"| {instrumentation} | [{first_package}]({package_url_template.format(dependency.split(':')[0], dependency.split(':')[1])}) | {supported_version_ranges_first_package[0]} |"
+            f"| {instrumentation} | [{first_package}]({package_url}) | {supported_version_ranges_first_package[0]} |"
         )
         for supported_version_range in supported_version_ranges_first_package[1:]:
             res.append(f"| | | {supported_version_range} |")
@@ -366,6 +362,19 @@ def _generate_support_matrix_markdown_row(
                 res.append(f"| | | {supported_version_range} |")
 
     return res
+
+
+def _get_package_url(package_root, package, package_url_template) -> str:
+    dependency = _get_build_gradle_dependency_line(
+      package_root, package
+    )
+
+    if dependency is None:
+        # The only ill-formed instrumentation package is the Java 11 HTTP Client from the JDK
+        return "https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http" \
+               "/HttpClient.html"
+
+    return package_url_template.format(dependency.split(':')[0], dependency.split(':')[1])
 
 
 def _get_build_gradle_dependency_line(
