@@ -364,7 +364,7 @@ def _generate_support_matrix_markdown_row(
     return res
 
 
-def _get_package_url(package_root, package, package_url_template) -> str:
+def _get_package_url(package_root: str, package: str, package_url_template: str) -> str:
     dependency = _get_build_gradle_dependency_line(
       package_root, package
     )
@@ -379,7 +379,7 @@ def _get_package_url(package_root, package, package_url_template) -> str:
 
 def _get_build_gradle_dependency_line(
     tested_versions_directory, package
-) -> str:
+) -> Optional[str]:
     instr_parts = package.split('-')
     search_regex = '|'.join(instr_parts)
 
