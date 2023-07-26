@@ -1,0 +1,27 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    coreJdk()
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+  compileOnly project(":utils")
+
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+
+  implementation project(":instrumentation:java11-http-client:java-http-client-config")
+
+  // Not needed as we've directly included the contents of the instrumentation library
+  // implementation("io.opentelemetry.instrumentation:opentelemetry-java-http-client")
+
+  testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
+}
+
+tasks {
+  compileJava {
+    options.release.set(11)
+  }
+}
