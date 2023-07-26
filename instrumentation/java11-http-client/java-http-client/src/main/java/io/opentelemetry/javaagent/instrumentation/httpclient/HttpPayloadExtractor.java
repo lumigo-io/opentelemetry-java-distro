@@ -59,7 +59,7 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
       Throwable error) {
 
     // Set the captured response payload onto a Span attribute
-    if (null != httpResponse && httpResponse.statusCode() == 200) {
+    if (null != httpResponse) {
       final String content = ResponsePayloadBridge.getPayload(context);
       if (null != content) {
         attributes.put(HTTP_RESPONSE_BODY_KEY, content);
