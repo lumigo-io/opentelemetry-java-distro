@@ -210,6 +210,8 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.2 |
 | | | 5.2-alpha1 |
 | | | 5.2-beta1 |
+| java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpClient.html) | 11 |
+| | | 17 |
 
 ## Baseline setup
 
