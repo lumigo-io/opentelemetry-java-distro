@@ -1,0 +1,11 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+dependencies {
+  implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:${versions.opentelemetryContrib}")
+
+  compileOnly("software.amazon.awssdk:aws-core:${versions.awssdk22}")
+  compileOnly("software.amazon.awssdk:aws-json-protocol:${versions.awssdk22}")
+  compileOnly("software.amazon.awssdk:sqs:${versions.awssdk22}")
+
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+}
