@@ -104,8 +104,4 @@ subprojects {
       options.release.set(8)
     }
   }
-
-  java {
-    disableAutoTargetJvm()
-  }
 }

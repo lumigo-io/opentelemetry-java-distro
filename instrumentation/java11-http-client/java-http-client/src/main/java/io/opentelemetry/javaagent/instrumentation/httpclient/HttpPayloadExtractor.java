@@ -55,7 +55,7 @@ public class HttpPayloadExtractor implements AttributesExtractor<HttpRequest, Ht
       AttributesBuilder attributes,
       Context context,
       HttpRequest httpRequest,
-      HttpResponse httpResponse,
+      HttpResponse<?> httpResponse,
       Throwable error) {
 
     // Set the captured response payload onto a Span attribute

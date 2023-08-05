@@ -58,7 +58,7 @@ public class TracingExecutionInterceptor implements ExecutionInterceptor {
       AwsSdkTelemetry.builder(GlobalOpenTelemetry.get())
           .setCaptureExperimentalSpanAttributes(CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES)
           .setUseConfiguredPropagatorForMessaging(USE_MESSAGING_PROPAGATOR)
-//          .setContextCustomizer(context -> new PayloadBridge.Builder().init(context))
+          .setContextCustomizer(context -> new PayloadBridge.Builder().init(context))
           .build()
           .newExecutionInterceptor();
 

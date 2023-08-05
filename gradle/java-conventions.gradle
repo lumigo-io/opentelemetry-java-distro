@@ -1,0 +1,87 @@
+java {
+  disableAutoTargetJvm()
+}
+
+tasks.withType(JavaCompile).configureEach {
+  if (name != "jmhCompileGeneratedClasses") {
+    options.compilerArgs.addAll(
+            "-Xlint:all",
+            // We suppress the "try" warning because it disallows managing an auto-closeable with
+            // try-with-resources without referencing the auto-closeable within the try block.
+            "-Xlint:-try",
+            // We suppress the "processing" warning as suggested in
+            // https://groups.google.com/forum/#!topic/bazel-discuss/_R3A9TJSoPM
+            "-Xlint:-processing",
+            // We suppress the "options" warning because it prevents compilation on modern JDKs
+            "-Xlint:-options",
+
+            // Fail build on any warning
+            "-Werror"
+    )
+  }
+
+  options.encoding = "UTF-8"
+
+  if (name.contains("Test")) {
+    // serialVersionUID is basically guaranteed to be useless in tests
+    options.compilerArgs.add("-Xlint:-serial")
+  }
+}
+
+tasks {
+  jar {
+    // By default Gradle Jar task can put multiple files with the same name
+    // into a Jar. This may lead to confusion. For example if auto-service
+    // annotation processing creates files with same name in `scala` and
+    // `java` directory this would result in Jar having two files with the
+    // same name in it. Which in turn would result in only one of those
+    // files being actually considered when that Jar is used leading to very
+    // confusing failures. Instead we should 'fail early' and avoid building such Jars.
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+
+    manifest {
+      attributes(
+          "Implementation-Title": project.name,
+          "Implementation-Version": project.version,
+          "Implementation-Vendor": "Lumigo",
+          "Implementation-URL": "https://github.com/lumigo-io/opentelemetry-java-distro"
+      )
+    }
+  }
+}
+
+def resourceNames = ["Host", "Os", "Process", "ProcessRuntime"]
+def resourceClassesCsv = String.join(",", Arrays.stream(resourceNames)
+    .map(name -> "io.opentelemetry.sdk.extension.resources." + name + "ResourceProvider")
+    .toArray(String[]::new))
+
+tasks.withType(Test).configureEach {
+  useJUnitPlatform()
+
+  // There's no real harm in setting this for all tests even if any happen to not be using context
+  // propagation.
+  jvmArgs("-Dio.opentelemetry.context.enableStrictContext=${rootProject.findProperty("enableStrictContext") ?: true}")
+  jvmArgs("-Dio.opentelemetry.javaagent.shaded.io.opentelemetry.context.enableStrictContext=${rootProject.findProperty("enableStrictContext") ?: true}")
+
+  // Disable default resource providers since they cause lots of output we don't need.
+  jvmArgs("-Dotel.java.disabled.resource.providers=$resourceClassesCsv")
+
+  reports {
+    junitXml {
+      outputPerTestCase = true
+    }
+  }
+
+  testLogging {
+    exceptionFormat = "full"
+    showStandardStreams = true
+  }
+}
+
+normalization {
+  runtimeClasspath {
+    metaInf {
+      ignoreAttribute("Implementation-Version")
+    }
+  }
+}

@@ -86,7 +86,7 @@ public class Aws2SqsTracingTest {
     }
   }
 
-  //  @Test
+  @Test
   void testSqsProducerConsumerService() {
     String queueName = "testQueue";
     String messageBody = "{\"type\": \"hello\"}";
