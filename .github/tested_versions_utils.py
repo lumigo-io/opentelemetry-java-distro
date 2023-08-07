@@ -311,6 +311,9 @@ def _generate_support_matrix_markdown_row(
     # The package name is the name of the parent 3 levels up from the 'tested_versions' directory
     package_root = Path(tested_versions_directory).parents[3]
     instrumentation = os.path.basename(package_root)
+    if instrumentation == "javaagent":
+        instrumentation = os.path.basename(os.path.dirname(package_root))
+
     packages = sorted(os.listdir(tested_versions_directory))
 
     res = []
@@ -340,7 +343,7 @@ def _generate_support_matrix_markdown_row(
             )
         )
 
-        package_url = _get_package_url(package_root, package, package_url_template)
+        package_url = _get_package_url(package_root, first_package, package_url_template)
 
         res.append(
             f"| {instrumentation} | [{first_package}]({package_url}) | {supported_version_ranges_first_package[0]} |"
