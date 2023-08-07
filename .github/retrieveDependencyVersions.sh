@@ -25,6 +25,11 @@ for instrumentationFolder in $instrumentationFolders; do
   # If the instrumentation folder has many levels, remove all but the last one
   instrumentation=$(basename "$instrumentationFolder")
 
+  if [ "$instrumentation" == "javaagent" ]; then
+    # Find next directory up
+    instrumentation=$(basename "$(dirname "$instrumentationFolder")")
+  fi
+
   echo "Discovering untested versions of ${instrumentation} ..."
 
   # Read the list of existing versions from the file in tested_versions
