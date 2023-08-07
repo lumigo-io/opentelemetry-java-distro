@@ -10,8 +10,6 @@ dependencies {
   compileOnly project(":bootstrap")
   compileOnly project(":utils")
 
-  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
-
   implementation project(":instrumentation:java11-http-client:java-http-client-config")
 
   // Not needed as we've directly included the contents of the instrumentation library

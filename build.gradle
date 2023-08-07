@@ -22,7 +22,7 @@ subprojects {
 
   apply plugin: "java"
   // Exclude OTeL instrumentation override sub projects
-  if (it.name != "apache-httpclient-5.0" && it.name != "java-http-client") {
+  if (it.name != "apache-httpclient-5.0" && it.name != "java-http-client" && it.name != "library") {
     apply plugin: "com.diffplug.spotless"
 
     spotless {
@@ -51,6 +51,7 @@ subprojects {
 
       // Instrumentation versions
       apachehttpclient50         : "5.0",
+      awssdk22                   : "2.2.0",
 
       jackson                    : "2.15.2",
       bytebuddy                  : "1.14.5",
@@ -102,9 +103,5 @@ subprojects {
     compileJava {
       options.release.set(8)
     }
-  }
-
-  java {
-    disableAutoTargetJvm()
   }
 }

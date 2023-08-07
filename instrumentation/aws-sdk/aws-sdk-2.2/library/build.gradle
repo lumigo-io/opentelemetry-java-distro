@@ -1,0 +1,12 @@
+apply from: "$rootDir/gradle/library-instrumentation.gradle"
+
+dependencies {
+  implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:${versions.opentelemetryContrib}") {
+    exclude group: "io.opentelemetry", module: "opentelemetry-api"
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure-spi"
+  }
+
+  compileOnly("software.amazon.awssdk:aws-core:${versions.awssdk22}")
+  compileOnly("software.amazon.awssdk:aws-json-protocol:${versions.awssdk22}")
+  compileOnly("software.amazon.awssdk:sqs:${versions.awssdk22}")
+}

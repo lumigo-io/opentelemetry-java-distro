@@ -1,0 +1,2 @@
+apply from: "$rootDir/gradle/instrumentation-shared.gradle"
+apply from: "$rootDir/gradle/java-conventions.gradle"

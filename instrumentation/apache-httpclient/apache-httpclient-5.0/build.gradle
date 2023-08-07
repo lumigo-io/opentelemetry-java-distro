@@ -14,7 +14,6 @@ dependencies {
   compileOnly project(":utils")
 
   compileOnly("org.apache.httpcomponents.client5:httpclient5:${versions.apachehttpclient50}")
-  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
 
   testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
   testImplementation("org.apache.httpcomponents.client5:httpclient5:5.0")
