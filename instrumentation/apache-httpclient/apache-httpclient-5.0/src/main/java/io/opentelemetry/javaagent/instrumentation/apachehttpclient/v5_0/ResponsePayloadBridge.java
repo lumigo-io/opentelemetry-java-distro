@@ -68,7 +68,7 @@ public class ResponsePayloadBridge {
       // If chunked response, ensure we strip the chunk header/trailer from the payload
       if (bridge.isChunked) {
         // Capture chunk header indicating size of chunk
-        byte[] chunkHeaderBytes = new byte[15];
+        byte[] chunkHeaderBytes = new byte[30];
         int payloadStart = -1;
         int chunkSize = 0;
         for (int i = 0; i < bridge.payloadBuffer.length; i++) {

@@ -277,9 +277,12 @@ jobs:
       issues: write
     runs-on: ubuntu-latest
     needs: [ pr-labeling, spotless, smoke-tests, k8s-e2e, ecs-e2e, instrumentations-to-test, supported-java-versions-testing ]
+    # Force this job to run even if the previous jobs failed
+    if: ${{ always() }}
     steps:
       - name: Report failure
-        if: ${{job.status == 'failure' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        # Only create an issue if a previous job failed and this is a push to main
+        if: ${{contains(needs.*.result, 'failure') && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         uses: actions-cool/issues-helper@v3
         with:
           actions: 'create-issue'
