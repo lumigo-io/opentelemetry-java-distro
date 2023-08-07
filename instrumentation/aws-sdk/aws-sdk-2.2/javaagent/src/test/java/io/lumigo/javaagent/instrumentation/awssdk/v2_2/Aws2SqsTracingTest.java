@@ -52,15 +52,14 @@ public class Aws2SqsTracingTest {
   private static SqsClient client;
 
   private static final String createQueueResponse =
-      """
-          <CreateQueueResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
-                            <CreateQueueResult>
-                              <QueueUrl>http://localhost:11001/queue/testQueue</QueueUrl>
-                            </CreateQueueResult>
-                            <ResponseMetadata>
-                              <RequestId>00000000-0000-0000-0000-000000000000</RequestId>
-                            </ResponseMetadata>
-                          </CreateQueueResponse>""";
+      "<CreateQueueResponse xmlns=\"http://queue.amazonaws.com/doc/2012-11-05/\">\n"
+          + "                  <CreateQueueResult>\n"
+          + "                    <QueueUrl>http://localhost:11001/queue/testQueue</QueueUrl>\n"
+          + "                  </CreateQueueResult>\n"
+          + "                  <ResponseMetadata>\n"
+          + "                    <RequestId>00000000-0000-0000-0000-000000000000</RequestId>\n"
+          + "                  </ResponseMetadata>\n"
+          + "                </CreateQueueResponse>";
 
   private static final String sendMessageRequest =
       "Action=SendMessage&Version=2012-11-05&QueueUrl=http%3A%2F%2Flocalhost%3A11001%2F000000000000%2FtestQueue&MessageBody=%7B%22type%22%3A+%22hello%22%7D";
