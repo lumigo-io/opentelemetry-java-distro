@@ -210,7 +210,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.2 |
 | | | 5.2-alpha1 |
 | | | 5.2-beta1 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.20.124 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.20.125 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpClient.html) | 11 |
 | | | 17 |
 
