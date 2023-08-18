@@ -7,6 +7,8 @@ apply from: "$rootDir/gradle/shadow.gradle"
 apply from: "$rootDir/gradle/instrumentation-shared.gradle"
 apply from: "$rootDir/gradle/java-conventions.gradle"
 
+base.archivesName.set(projectDir.parentFile.name + "-" + project.name)
+
 def relocatePackages = ext.relocatePackages
 
 configurations {

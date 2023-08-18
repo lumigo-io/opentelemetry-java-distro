@@ -373,9 +373,14 @@ def _get_package_url(package_root: str, package: str, package_url_template: str)
     )
 
     if dependency is None:
-        # The only ill-formed instrumentation package is the Java 11 HTTP Client from the JDK
-        return "https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http" \
-               "/HttpClient.html"
+        if package == "java-http-client":
+            return "https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/" \
+                   "http/package-summary.html"
+        elif package == "jdbc":
+            return "https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/" \
+                   "package-summary.html"
+        else:
+            return "UNKNOWN"
 
     return package_url_template.format(dependency.split(':')[0], dependency.split(':')[1])
 
