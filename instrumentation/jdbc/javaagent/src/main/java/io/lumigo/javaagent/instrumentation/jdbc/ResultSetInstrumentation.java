@@ -33,6 +33,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.instrumentation.api.util.VirtualField;
+import io.opentelemetry.javaagent.bootstrap.CallDepth;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import java.sql.ResultSet;
@@ -80,8 +81,19 @@ public class ResultSetInstrumentation implements TypeInstrumentation {
 
   @SuppressWarnings("unused")
   public static class ResultSetNextAdvice {
+    @Advice.OnMethodEnter(suppress = Throwable.class)
+    public static void onEnter(@Advice.Local("otelCallDepth") CallDepth callDepth) {
+      callDepth = CallDepth.forClass(ResultSet.class);
+      callDepth.getAndIncrement();
+    }
+
     @Advice.OnMethodExit(suppress = Throwable.class)
-    public static void onExit(@Advice.This ResultSet thiz) {
+    public static void onExit(
+        @Advice.This ResultSet thiz, @Advice.Local("otelCallDepth") CallDepth callDepth) {
+      if (callDepth.decrementAndGet() > 0) {
+        return;
+      }
+
       VirtualField<ResultSet, Context> virtualField =
           VirtualField.find(ResultSet.class, Context.class);
       final Context parentContext = virtualField.get(thiz);
