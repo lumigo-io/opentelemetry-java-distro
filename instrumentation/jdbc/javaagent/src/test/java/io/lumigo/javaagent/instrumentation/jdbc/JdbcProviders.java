@@ -70,12 +70,16 @@ final class JdbcProviders {
 
   private static DataSource createDatasource(String poolName, String dbType, String jdbcUrl)
       throws PropertyVetoException {
-    return switch (poolName) {
-      case "hikari" -> createHikariDatasource(dbType, jdbcUrl);
-      case "tomcat" -> createTomcatDatasource(dbType, jdbcUrl);
-      case "c3p0" -> createC3p0Datasource(dbType, jdbcUrl);
-      default -> throw new IllegalArgumentException("Unknown pool name: " + poolName);
-    };
+    switch (poolName) {
+      case "hikari":
+        return createHikariDatasource(dbType, jdbcUrl);
+      case "tomcat":
+        return createTomcatDatasource(dbType, jdbcUrl);
+      case "c3p0":
+        return createC3p0Datasource(dbType, jdbcUrl);
+      default:
+        throw new IllegalArgumentException("Unknown pool name: " + poolName);
+    }
   }
 
   private static DataSource createC3p0Datasource(String dbType, String jdbcUrl)
