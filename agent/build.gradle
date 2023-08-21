@@ -33,6 +33,7 @@ dependencies {
   javaagentLibs(project(":instrumentation:apache-httpclient:apache-httpclient-5.0"))
   javaagentLibs(project(":instrumentation:aws-sdk:aws-sdk-2.2:javaagent"))
   javaagentLibs(project(":instrumentation:java11-http-client:java-http-client"))
+  javaagentLibs(project(":instrumentation:jdbc:javaagent"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
