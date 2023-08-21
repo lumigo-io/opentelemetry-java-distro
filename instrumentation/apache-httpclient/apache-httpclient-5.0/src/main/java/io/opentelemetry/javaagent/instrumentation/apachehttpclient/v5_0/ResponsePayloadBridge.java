@@ -68,7 +68,7 @@ public class ResponsePayloadBridge {
       // If chunked response, ensure we strip the chunk header/trailer from the payload
       if (bridge.isChunked) {
         // Capture chunk header indicating size of chunk
-        byte[] chunkHeaderBytes = new byte[30];
+        byte[] chunkHeaderBytes = new byte[20];
         int payloadStart = -1;
         int chunkSize = 0;
         for (int i = 0; i < bridge.payloadBuffer.length; i++) {
@@ -82,6 +82,10 @@ public class ResponsePayloadBridge {
               break;
             }
           } else {
+            if (i == chunkHeaderBytes.length) {
+              // Chunk header is too long, something is wrong
+              break;
+            }
             // Haven't found the end of the chunk header, capture the byte we found
             chunkHeaderBytes[i] = bridge.payloadBuffer[i];
           }
