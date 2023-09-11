@@ -124,6 +124,7 @@ class SpringBootSmokeTest {
               assertThat(serverSpan, hasAttribute("http.target", "/greeting"));
               assertThat(serverSpan, hasAttribute("http.route", "/greeting"));
               assertThat(serverSpan, hasAttribute("http.status_code", 200L));
+              assertThat(serverSpan, hasAttribute("http.response.body", "Hi!"));
               assertThat(serverSpan, hasAttributeOfTypeString("thread.name"));
               assertThat(serverSpan, hasAttributeOfTypeLong("thread.id"));
               assertThat(serverSpan, hasResourceAttributeOfTypeString("lumigo.distro.version"));

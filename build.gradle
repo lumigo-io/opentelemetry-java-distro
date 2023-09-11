@@ -52,6 +52,9 @@ subprojects {
       // Instrumentation versions
       apachehttpclient50         : "5.0",
       awssdk22                   : "2.2.0",
+      servlet30                  : "3.0.1",
+      springwebmvc50             : "5.0.0.RELEASE",
+      springboot                 : "2.7.14",
 
       jackson                    : "2.15.2",
       bytebuddy                  : "1.14.5",
