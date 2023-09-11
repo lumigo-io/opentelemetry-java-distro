@@ -216,6 +216,8 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 17 |
 | jdbc | [jdbc](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html) | 11 |
 | | | 17 |
+| servlet-3.0 | [servlet-30](https://central.sonatype.com/artifact/javax.servlet/javax.servlet-api) | 3.0.1 |
+| spring-webmvc-5.0 | [spring-web](https://central.sonatype.com/artifact/org.springframework/spring-webmvc) | 5.0.0.RELEASE |
 
 ## Baseline setup
 
