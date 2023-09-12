@@ -1,0 +1,34 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("javax.servlet")
+    module.set("javax.servlet-api")
+    versions.set("[3.0,)")
+    assertInverse.set(true)
+  }
+  fail {
+    group.set("javax.servlet")
+    module.set("servlet-api")
+    versions.set("(,)")
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  compileOnly("javax.servlet:javax.servlet-api:${versions.servlet30}")
+  compileOnly("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-common:${versions.opentelemetryJavaagentAlpha}")
+
+  implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-3.0:${versions.opentelemetryJavaagentAlpha}")
+
+  // Instrumentations for testing
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-3.0:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-javax-common:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-common:${versions.opentelemetryJavaagentAlpha}")
+
+  testImplementation("org.eclipse.jetty:jetty-server:8.0.0.v20110901")
+  testImplementation("org.eclipse.jetty:jetty-servlet:8.0.0.v20110901")
+  testImplementation("org.apache.tomcat.embed:tomcat-embed-core:8.0.41")
+  testImplementation("org.apache.tomcat.embed:tomcat-embed-jasper:8.0.41")
+}

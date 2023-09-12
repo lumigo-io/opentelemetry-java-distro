@@ -34,6 +34,8 @@ dependencies {
   javaagentLibs(project(":instrumentation:aws-sdk:aws-sdk-2.2:javaagent"))
   javaagentLibs(project(":instrumentation:java11-http-client:java-http-client"))
   javaagentLibs(project(":instrumentation:jdbc:javaagent"))
+  javaagentLibs(project(":instrumentation:servlet:servlet-3.0:javaagent"))
+  javaagentLibs(project(":instrumentation:spring:spring-webmvc:spring-webmvc-5.0:javaagent"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
