@@ -1,0 +1,43 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("org.springframework")
+    module.set("spring-webmvc")
+    versions.set("[5.0.0.RELEASE,6)")
+    // these versions depend on org.springframework:spring-web which has a bad dependency on
+    // javax.faces:jsf-api:1.1 which was released as pom only
+    skip("1.2.1", "1.2.2", "1.2.3", "1.2.4")
+    // 3.2.1.RELEASE has transitive dependencies like spring-web as "provided" instead of "compile"
+    skip("3.2.1.RELEASE")
+    extraDependency("javax.servlet:javax.servlet-api:3.0.1")
+    assertInverse.set(true)
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+  compileOnly("org.springframework:spring-webmvc:${versions.springwebmvc50}")
+
+  testImplementation project(":instrumentation:spring:spring-webmvc:testing")
+  testImplementation("org.springframework:spring-webmvc:${versions.springwebmvc50}")
+  testImplementation("org.springframework.boot:spring-boot-starter-web:${versions.springboot}")
+  testImplementation("org.springframework.boot:spring-boot-starter-test:${versions.springboot}")
+
+  // Instrumentations for testing
+  testInstrumentation project(":instrumentation:servlet:servlet-3.0:javaagent")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-3.0:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-servlet-javax-common:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-tomcat-7.0:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-spring-webmvc-common:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-spring-webmvc-3.1:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-spring-web-3.1:${versions.opentelemetryJavaagentAlpha}")
+}
+
+configurations.testRuntimeClasspath {
+  resolutionStrategy {
+    // requires old logback (and therefore also old slf4j)
+    force("ch.qos.logback:logback-classic:1.2.11")
+    force("org.slf4j:slf4j-api:1.7.36")
+  }
+}
