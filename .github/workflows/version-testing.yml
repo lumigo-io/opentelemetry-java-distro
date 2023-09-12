@@ -85,4 +85,4 @@ jobs:
           body: ${{ env.new_versions }}
           base: main
           labels: version-testing, automerge
-          reviewers: GuyMoses,kenfinnigan,mmanciop
+          reviewers: GuyMoses,kenfinnigan
