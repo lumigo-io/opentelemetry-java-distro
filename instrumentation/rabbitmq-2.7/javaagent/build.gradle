@@ -1,0 +1,22 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("com.rabbitmq")
+    module.set("amqp-client")
+    versions.set("[2.7.0,)")
+    assertInverse.set(true)
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  compileOnly("com.google.auto.value:auto-value-annotations:${versions.autovalue}")
+  annotationProcessor("com.google.auto.value:auto-value:${versions.autovalue}")
+
+  compileOnly("com.rabbitmq:amqp-client:${versions.rabbitmq27}")
+
+  testImplementation("com.rabbitmq:amqp-client:${versions.rabbitmq27}")
+  testImplementation("org.testcontainers:testcontainers:${versions.testcontainers}")
+}

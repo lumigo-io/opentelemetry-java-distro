@@ -26,4 +26,7 @@ public final class SemanticAttributes {
 
   public static final AttributeKey<String> HTTP_RESPONSE_BODY =
       AttributeKey.stringKey("http.response.body");
+
+  public static final AttributeKey<String> MESSAGING_PAYLOAD =
+      AttributeKey.stringKey("messaging.message.payload");
 }

@@ -9,7 +9,7 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp:4.11.0")
   implementation("io.opentelemetry:opentelemetry-sdk")
   implementation("org.hamcrest:hamcrest:${versions.hamcrest}")
-  implementation("org.testcontainers:testcontainers:1.17.6")
+  implementation("org.testcontainers:testcontainers:${versions.testcontainers}")
 
   annotationProcessor("com.google.auto.value:auto-value:${versions.autovalue}")
   compileOnly("com.google.auto.value:auto-value-annotations:${versions.autovalue}")

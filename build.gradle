@@ -22,7 +22,10 @@ subprojects {
 
   apply plugin: "java"
   // Exclude OTeL instrumentation override sub projects
-  if (it.name != "apache-httpclient-5.0" && it.name != "java-http-client" && it.name != "library") {
+  if (it.name != "apache-httpclient-5.0"
+      && it.name != "java-http-client"
+      && it.name != "library"
+      && !it.path.contains("rabbitmq-2.7")) {
     apply plugin: "com.diffplug.spotless"
 
     spotless {
@@ -52,6 +55,7 @@ subprojects {
       // Instrumentation versions
       apachehttpclient50         : "5.0",
       awssdk22                   : "2.2.0",
+      rabbitmq27                 : "2.7.0",
       servlet30                  : "3.0.1",
       springwebmvc50             : "5.0.0.RELEASE",
       springboot                 : "2.7.14",
@@ -62,6 +66,7 @@ subprojects {
       autovalue                  : "1.10.1",
       junit                      : "5.9.3",
       mockito                    : "5.4.0",
+      testcontainers             : "1.17.6",
       hamcrest                   : "2.2"
     ]
 
