@@ -211,7 +211,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.2-alpha1 |
 | | | 5.2-beta1 |
 | | | 5.3-alpha1 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.20.147 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.20.149 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
 | | | 17 |
 | jdbc | [jdbc](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html) | 11 |
@@ -232,7 +232,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 3.1-b08 |
 | | | 3.1-b09 |
 | spring-webmvc-5.0 | [spring-webmvc-5.0](https://central.sonatype.com/artifact/org.springframework/spring-webmvc) | 5.0.0.RELEASE~5.3.29 |
-| | | 6.0.0~6.0.11 |
+| | | 6.0.0~6.0.12 |
 
 ## Baseline setup
 
