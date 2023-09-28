@@ -223,7 +223,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | rabbitmq-2.7 | [rabbitmq-2.7](https://central.sonatype.com/artifact/com.rabbitmq/amqp-client) | 2.7.0 |
 | | | 3.1.2~3.6.6 |
 | | | 4.0.0~4.12.0 |
-| | | 5.0.0~5.18.0 |
+| | | 5.0.0~5.19.0 |
 | servlet-3.0 | [servlet-3.0](https://central.sonatype.com/artifact/javax.servlet/javax.servlet-api) | 3.0.1~3.1.0 |
 | | | 4.0.0~4.0.1 |
 | | | 3.1-b01 |
