@@ -1,0 +1,35 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("io.grpc")
+    module.set("grpc-core")
+    versions.set("[1.6.0,)")
+    assertInverse.set(true)
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  compileOnly("io.grpc:grpc-core:${versions.grpc16}")
+  compileOnly("io.grpc:grpc-protobuf:${versions.grpc16}")
+
+  testImplementation project(":instrumentation:grpc-1.6:testing")
+
+  testImplementation("io.grpc:grpc-netty:${versions.grpc16}")
+  testImplementation("io.grpc:grpc-protobuf:${versions.grpc16}")
+  testImplementation("io.grpc:grpc-services:${versions.grpc16}")
+  testImplementation("io.grpc:grpc-stub:${versions.grpc16}")
+
+  // Instrumentations for testing
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-grpc-1.6:${versions.opentelemetryJavaagentAlpha}")
+}
+
+tasks {
+  test {
+    // The agent context debug mechanism isn't compatible with the bridge approach which may add a
+    // gRPC context to the root.
+    jvmArgs("-Dotel.javaagent.experimental.thread-propagation-debugger.enabled=false")
+  }
+}
