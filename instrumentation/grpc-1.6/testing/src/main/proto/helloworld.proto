@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package example;
+
+service Greeter {
+  rpc SayHello (Request) returns (Response) {
+  }
+
+  rpc SayHelloDetailed (Request) returns (ComboObject) {
+  }
+
+  rpc SayMultipleHello (Request) returns (stream Response) {
+  }
+
+  rpc Conversation (stream Message) returns (stream Message) {
+  }
+}
+
+message Request {
+  string name = 1;
+}
+
+message Message {
+  string message = 1;
+}
+
+message Response {
+  string message = 1;
+}
+
+message ComboObject {
+  string name = 1;
+  string message = 2;
+  int32 age = 3;
+}

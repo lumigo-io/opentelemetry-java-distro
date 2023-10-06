@@ -29,4 +29,10 @@ public final class SemanticAttributes {
 
   public static final AttributeKey<String> MESSAGING_PAYLOAD =
       AttributeKey.stringKey("messaging.message.payload");
+
+  public static final AttributeKey<String> GRPC_REQUEST_BODY =
+      AttributeKey.stringKey("rpc.grpc.request.payload");
+
+  public static final AttributeKey<String> GRPC_RESPONSE_BODY =
+      AttributeKey.stringKey("rpc.grpc.response.payload");
 }
