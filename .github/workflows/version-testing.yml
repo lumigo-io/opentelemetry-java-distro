@@ -44,6 +44,7 @@ jobs:
   push-branch:
     runs-on: ubuntu-latest
     name: push-branch
+    if: github.event_name != 'pull_request'
     needs: check-new-versions-of-instrumented-packages
     steps:
       - uses: actions/checkout@v3
