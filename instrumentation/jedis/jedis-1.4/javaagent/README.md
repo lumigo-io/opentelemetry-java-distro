@@ -6,3 +6,4 @@ Changes list:
 * `JedisDbAttributesGetter` add command's arguments by default: `CommonConfig.get().isStatementSanitizationEnabled()` -> `false`
 * JedisClientTest - because we don't have version: `testing.waitAndAssertTraces` -> `TracesAssert.assertThat(testing.waitForTraces(2))` 
 * JedisClientTest - because we also include thread name/id: `hasAttributesSatisfyingExactly` -> `hasAttributesSatisfying`
+* JedisClientTest - I added a test for transactions: `setSetTransactionCommand`

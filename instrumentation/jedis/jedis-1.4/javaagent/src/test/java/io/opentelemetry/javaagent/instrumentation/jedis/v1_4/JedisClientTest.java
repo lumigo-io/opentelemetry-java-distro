@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.containers.GenericContainer;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 class JedisClientTest {
   @RegisterExtension
@@ -101,6 +102,58 @@ class JedisClientTest {
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "GET foo"),
                                 equalTo(SemanticAttributes.DB_OPERATION, "GET"),
+                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
+                                equalTo(SemanticAttributes.NET_PEER_PORT, port))));
+  }
+
+  @Test
+  void setSetTransactionCommand() {
+    Transaction transaction = jedis.multi();
+    transaction.set("foo", "bar");
+    transaction.set("foo2", "bar2");
+    transaction.exec();
+
+    TracesAssert.assertThat(testing.waitForTraces(4))
+        .hasSize(4)
+        .hasTracesSatisfyingExactly(
+            trace ->
+                trace.hasSpansSatisfyingExactly(
+                    span ->
+                        span.hasName("MULTI")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttributesSatisfying(
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
+                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
+                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+            trace ->
+                trace.hasSpansSatisfyingExactly(
+                    span ->
+                        span.hasName("SET")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttributesSatisfying(
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo bar"),
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
+                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
+                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+            trace ->
+                trace.hasSpansSatisfyingExactly(
+                    span ->
+                        span.hasName("SET")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttributesSatisfying(
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo2 bar2"),
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
+                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
+                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+            trace ->
+                trace.hasSpansSatisfyingExactly(
+                    span ->
+                        span.hasName("EXEC")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttributesSatisfying(
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_PEER_PORT, port))));
   }
