@@ -34,9 +34,6 @@ public class GrpcConfigCustomizer implements AutoConfigurationCustomizerProvider
         config -> {
           Map<String, String> overrides = new HashMap<>();
 
-          // disable OTeL instrumentation for gRPC
-          overrides.put("otel.instrumentation.grpc.enabled", "false");
-
           // If not set by user, set to true
           if (null == config.getBoolean(GRPC_EXPERIMENTAL_ATTRIBUTES_KEY)) {
             overrides.put(GRPC_EXPERIMENTAL_ATTRIBUTES_KEY, "true");
