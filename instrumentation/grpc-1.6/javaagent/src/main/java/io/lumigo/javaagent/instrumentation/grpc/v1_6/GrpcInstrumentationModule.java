@@ -20,9 +20,6 @@ package io.lumigo.javaagent.instrumentation.grpc.v1_6;
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
-import io.opentelemetry.javaagent.instrumentation.grpc.v1_6.GrpcClientBuilderBuildInstrumentation;
-import io.opentelemetry.javaagent.instrumentation.grpc.v1_6.GrpcContextInstrumentation;
-import io.opentelemetry.javaagent.instrumentation.grpc.v1_6.GrpcServerBuilderInstrumentation;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,11 +35,7 @@ public class GrpcInstrumentationModule extends InstrumentationModule {
         new ClientCallInstrumentation(),
         new ClientCallListenerInstrumentation(),
         new ServerCallInstrumentation(),
-        new ServerCallListenerInstrumentation(),
-        // Upstream instrumentation
-        new GrpcClientBuilderBuildInstrumentation(),
-        new GrpcContextInstrumentation(),
-        new GrpcServerBuilderInstrumentation());
+        new ServerCallListenerInstrumentation());
   }
 
   @Override

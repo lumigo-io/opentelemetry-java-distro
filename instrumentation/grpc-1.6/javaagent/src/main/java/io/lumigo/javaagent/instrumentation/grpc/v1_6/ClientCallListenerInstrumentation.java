@@ -37,11 +37,11 @@ import io.opentelemetry.javaagent.bootstrap.CallDepth;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
+import java.util.ArrayList;
+import java.util.List;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ClientCallListenerInstrumentation implements TypeInstrumentation {
   @Override
@@ -51,7 +51,8 @@ public class ClientCallListenerInstrumentation implements TypeInstrumentation {
 
   @Override
   public ElementMatcher<TypeDescription> typeMatcher() {
-    return not(nameContainsIgnoreCase("TracingClientInterceptor$TracingClientCall$TracingClientCallListener"))
+    return not(nameContainsIgnoreCase(
+            "TracingClientInterceptor$TracingClientCall$TracingClientCallListener"))
         .and(extendsClass(named("io.grpc.ClientCall$Listener")));
   }
 
@@ -70,8 +71,7 @@ public class ClientCallListenerInstrumentation implements TypeInstrumentation {
   @SuppressWarnings("unused")
   public static class ConstructAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
-    public static void methodEnter(
-        @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
+    public static void methodEnter(@Advice.Local("lumigoCallDepth") CallDepth callDepth) {
       callDepth = CallDepth.forClass(ClientCall.Listener.class);
       callDepth.getAndIncrement();
     }
@@ -103,20 +103,16 @@ public class ClientCallListenerInstrumentation implements TypeInstrumentation {
 
       if (msg instanceof GeneratedMessageV3) {
         List<String> responseMsgs =
-            VirtualField
-                .find(ClientCall.Listener.class, StringListHolder.class)
+            VirtualField.find(ClientCall.Listener.class, StringListHolder.class)
                 .get(listener)
                 .getStringList();
         try {
           responseMsgs.add(
-              JsonFormat
-                  .printer()
+              JsonFormat.printer()
                   .omittingInsignificantWhitespace()
                   .print((GeneratedMessageV3) msg));
           Java8BytecodeBridge.currentSpan()
-              .setAttribute(
-                  SemanticAttributes.GRPC_RESPONSE_BODY,
-                  JsonUtil.toJson(responseMsgs));
+              .setAttribute(SemanticAttributes.GRPC_RESPONSE_BODY, JsonUtil.toJson(responseMsgs));
         } catch (InvalidProtocolBufferException e) {
           // At this point we know that msg is a GeneratedMessageV3, so this should never happen
           Java8BytecodeBridge.currentSpan()
