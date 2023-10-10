@@ -4,6 +4,11 @@ instrumentationFolder=$1
 
 instrumentation=$(basename "$instrumentationFolder")
 
+if [ "$instrumentation" == "javaagent" ]; then
+  # Find next directory up
+  instrumentation=$(basename "$(dirname "$instrumentationFolder")")
+fi
+
 # Read the list of versions from the file in tested_versions
 existingVersions=$(cat instrumentation/"${instrumentationFolder}"/src/main/resources/tested_versions/"$instrumentation")
 
