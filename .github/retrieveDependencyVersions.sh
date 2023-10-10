@@ -50,11 +50,11 @@ for instrumentationFolder in $instrumentationFolders; do
   dependency=$(grep -i compileOnly instrumentation/"${instrumentationFolder}"/build.gradle | grep -iE "$search_regex" | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')
 
   # Retrieve all versions of the dependency from Maven Central
-  allVersions=$(curl -s "https://search.maven.org/solrsearch/select?q=g:%22$(echo "$dependency" | cut -d: -f1)%22+AND+a:%22$(echo "$dependency" | cut -d: -f2)%22&core=gav&rows=100&wt=json" | jq -r '.response.docs[].v' | sort -V)
+  allVersions=$(curl -s "https://search.maven.org/solrsearch/select?q=g:%22$(echo "$dependency" | cut -d: -f1)%22+AND+a:%22$(echo "$dependency" | cut -d: -f2)%22&core=gav&rows=150&wt=json" | jq -r '.response.docs[].v' | sort -V)
 
   untested_versions=()
   for version in $allVersions; do
-    if [[ $version > $highestExistingVersion ]]; then
+    if [[ $(printf '%s\n%s' "${version}" "${highestExistingVersion}"|sort -V|head -1) != "${version}" ]]; then
       untested_versions+=("$version")
     fi
   done
