@@ -9,7 +9,6 @@ muzzle {
   }
 }
 
-// TODO: I'm not sure what to do here
 dependencies {
   compileOnly project(":bootstrap")
 
