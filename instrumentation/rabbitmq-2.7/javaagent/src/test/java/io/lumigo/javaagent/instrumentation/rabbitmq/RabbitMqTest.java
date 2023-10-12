@@ -148,7 +148,7 @@ public class RabbitMqTest {
                             .hasAttribute(AttributeKey.stringKey("rabbitmq.command"), "queue.bind");
                       },
                       span -> {
-                        span.hasName(exchangeName + " send")
+                        span.hasName(exchangeName + " publish")
                             .hasKind(SpanKind.PRODUCER)
                             .hasParent(trace.getSpan(0))
                             .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
@@ -223,7 +223,7 @@ public class RabbitMqTest {
                                 AttributeKey.stringKey("rabbitmq.command"), "queue.declare");
                       },
                       span -> {
-                        span.hasName("<default> send")
+                        span.hasName("<default> publish")
                             .hasKind(SpanKind.PRODUCER)
                             .hasParent(trace.getSpan(0))
                             .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
@@ -345,7 +345,7 @@ public class RabbitMqTest {
                   .hasSize(2)
                   .hasSpansSatisfyingExactly(
                       span -> {
-                        span.hasName(exchangeName + " send")
+                        span.hasName(exchangeName + " publish")
                             .hasKind(SpanKind.PRODUCER)
                             .hasNoParent()
                             .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")

@@ -27,8 +27,8 @@ import java.util.Map;
 
 @AutoService(AutoConfigurationCustomizerProvider.class)
 public class ApacheHttpClientConfigCustomizer implements AutoConfigurationCustomizerProvider {
-  final static String CAPTURE_CLIENT_REQUEST_HEADERS = "otel.instrumentation.http.capture-headers.client.request";
-  final static String CAPTURE_CLIENT_RESPONSE_HEADERS = "otel.instrumentation.http.capture-headers.client.response";
+  final static String CAPTURE_CLIENT_REQUEST_HEADERS = "otel.instrumentation.http.client.capture-request-headers";
+  final static String CAPTURE_CLIENT_RESPONSE_HEADERS = "otel.instrumentation.http.client.capture-response-headers";
   final static String CONTENT_TYPE = "content-type";
   final static String CONTENT_ENCODING = "content-encoding";
   final static String TRANSFER_ENCODING = "transfer-encoding";
