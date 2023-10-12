@@ -2,22 +2,17 @@ apply from: "$rootDir/gradle/instrumentation.gradle"
 
 muzzle {
   pass {
-    group.set("redis.clients")
-    module.set("jedis")
-    versions.set("[1.4.0,3.0.0)")
-    assertInverse.set(true)
+    coreJdk()
   }
 }
 
 dependencies {
   compileOnly project(":bootstrap")
 
-  compileOnly("com.google.auto.value:auto-value-annotations:${versions.autovalue}")
-  annotationProcessor("com.google.auto.value:auto-value:${versions.autovalue}")
-
   compileOnly("redis.clients:jedis:${versions.jedis14}")
 
   compileOnly("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-jedis-1.4:${versions.opentelemetryJavaagentAlpha}")
+  implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-jedis-1.4:${versions.opentelemetryJavaagentAlpha}")
 
   testImplementation("redis.clients:jedis:${versions.jedis14}")
   testImplementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-jedis-1.4:${versions.opentelemetryJavaagentAlpha}")
