@@ -283,7 +283,7 @@ public class KafkaClientTest {
               trace.hasSpansSatisfyingExactly(
                   span -> span.hasName("parent").hasKind(SpanKind.INTERNAL).hasNoParent(),
                   span ->
-                      span.hasName(TOPIC + " send")
+                      span.hasName(TOPIC + " publish")
                           .hasKind(SpanKind.PRODUCER)
                           .hasParent(trace.getSpan(0))
                           .hasAttributesSatisfying(sendAttributes("1", JSON_BODY)),
@@ -335,7 +335,7 @@ public class KafkaClientTest {
             trace -> {
               trace.hasSpansSatisfyingExactly(
                   span ->
-                      span.hasName(TOPIC + " send")
+                      span.hasName(TOPIC + " publish")
                           .hasKind(SpanKind.PRODUCER)
                           .hasNoParent()
                           .hasAttributesSatisfying(sendAttributes(null, JSON_BODY)));

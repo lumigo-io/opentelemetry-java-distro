@@ -33,9 +33,9 @@ import java.util.Map;
 @AutoService(AutoConfigurationCustomizerProvider.class)
 public class HttpClientConfigCustomizer implements AutoConfigurationCustomizerProvider {
   static final String CAPTURE_CLIENT_REQUEST_HEADERS =
-      "otel.instrumentation.http.capture-headers.client.request";
+      "otel.instrumentation.http.client.capture-request-headers";
   static final String CAPTURE_CLIENT_RESPONSE_HEADERS =
-      "otel.instrumentation.http.capture-headers.client.response";
+      "otel.instrumentation.http.client.capture-response-headers";
   static final String CONTENT_TYPE = "content-type";
   static final String CONTENT_ENCODING = "content-encoding";
   static final String TRANSFER_ENCODING = "transfer-encoding";

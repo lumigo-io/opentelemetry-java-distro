@@ -110,22 +110,19 @@ AwsSdkTelemetry(
 }
 ```
 
-## `TracingExecutionInterceptor`
+## `SqsImpl`
 
 Modify `createConsumerSpan()` to set message id and payload onto the span:
 
 ```java
 if (consumerInstrumenter.shouldStart(parentContext, executionAttributes)) {
   io.opentelemetry.context.Context context =
-      consumerInstrumenter.start(parentContext, executionAttributes);
+    consumerInstrumenter.start(parentContext, executionAttributes);
 
-  if (message instanceof software.amazon.awssdk.services.sqs.model.Message) {
+  if (message != null) {
     final Span span = Span.fromContext(context);
-    span.setAttribute(
-        SemanticAttributes.MESSAGING_MESSAGE_ID,
-        ((software.amazon.awssdk.services.sqs.model.Message) message).messageId());
-    span.setAttribute("messaging.message.payload",
-        ((software.amazon.awssdk.services.sqs.model.Message) message).toString());
+    span.setAttribute(SemanticAttributes.MESSAGING_MESSAGE_ID, message.messageId());
+    span.setAttribute("messaging.message.payload", message.toString());
   }
 
   // TODO: Even if we keep HTTP attributes (see afterMarshalling), does it make sense here

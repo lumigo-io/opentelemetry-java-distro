@@ -44,13 +44,16 @@ import software.amazon.awssdk.http.SdkHttpResponse;
  */
 public class TracingExecutionInterceptor implements ExecutionInterceptor {
   static final String HTTP_REQUEST_BODY_KEY = "http.request.body";
+
+  // Override the default value to true for experimental span attributes
   private static final boolean CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES =
       ConfigPropertiesUtil.getBoolean(
-          "otel.instrumentation.aws-sdk.experimental-span-attributes", false);
+          "otel.instrumentation.aws-sdk.experimental-span-attributes", true);
 
+  // Override the default value to true for propagation with messaging
   private static final boolean USE_MESSAGING_PROPAGATOR =
       ConfigPropertiesUtil.getBoolean(
-          "otel.instrumentation.aws-sdk.experimental-use-propagator-for-messaging", false);
+          "otel.instrumentation.aws-sdk.experimental-use-propagator-for-messaging", true);
 
   static final String HTTP_RESPONSE_BODY_KEY = "http.response.body";
 

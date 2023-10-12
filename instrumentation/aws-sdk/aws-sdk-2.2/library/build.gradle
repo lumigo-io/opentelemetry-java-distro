@@ -9,4 +9,7 @@ dependencies {
   compileOnly("software.amazon.awssdk:aws-core:${versions.awssdk22}")
   compileOnly("software.amazon.awssdk:aws-json-protocol:${versions.awssdk22}")
   compileOnly("software.amazon.awssdk:sqs:${versions.awssdk22}")
+  compileOnly("software.amazon.awssdk:sns:${versions.awssdk22}")
+
+  compileOnly("io.opentelemetry.javaagent:opentelemetry-muzzle:${versions.opentelemetryJavaagentAlpha}") // For @NoMuzzle
 }
