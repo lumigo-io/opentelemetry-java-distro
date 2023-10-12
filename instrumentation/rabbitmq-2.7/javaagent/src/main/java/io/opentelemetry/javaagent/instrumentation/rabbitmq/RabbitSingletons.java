@@ -57,7 +57,7 @@ public final class RabbitSingletons {
             GlobalOpenTelemetry.get(), instrumentationName, ChannelAndMethod::getMethod)
         .addAttributesExtractor(
             buildMessagingAttributesExtractor(
-                RabbitChannelAttributesGetter.INSTANCE, MessageOperation.SEND))
+                RabbitChannelAttributesGetter.INSTANCE, MessageOperation.PUBLISH))
         .addAttributesExtractor(
             NetClientAttributesExtractor.create(new RabbitChannelNetAttributesGetter()))
         .addContextCustomizer(

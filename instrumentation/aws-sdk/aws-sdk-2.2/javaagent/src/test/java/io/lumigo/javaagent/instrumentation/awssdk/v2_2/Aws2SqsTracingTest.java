@@ -65,7 +65,7 @@ public class Aws2SqsTracingTest {
       "Action=SendMessage&Version=2012-11-05&QueueUrl=http%3A%2F%2Flocalhost%3A11001%2F000000000000%2FtestQueue&MessageBody=%7B%22type%22%3A+%22hello%22%7D";
 
   private static final String receiveMessageRequest =
-      "Action=ReceiveMessage&Version=2012-11-05&QueueUrl=http%3A%2F%2Flocalhost%3A11001%2F000000000000%2FtestQueue&AttributeName.1=AWSTraceHeader";
+      "Action=ReceiveMessage&Version=2012-11-05&QueueUrl=http%3A%2F%2Flocalhost%3A11001%2F000000000000%2FtestQueue&AttributeName.1=AWSTraceHeader&MessageAttributeName.1=traceparent&MessageAttributeName.2=tracestate&MessageAttributeName.3=baggage";
 
   @BeforeAll
   static void setUp() throws URISyntaxException {
