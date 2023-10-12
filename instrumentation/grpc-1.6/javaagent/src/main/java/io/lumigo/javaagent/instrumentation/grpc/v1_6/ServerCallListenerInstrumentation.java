@@ -35,11 +35,11 @@ import io.opentelemetry.javaagent.bootstrap.CallDepth;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
+import java.util.ArrayList;
+import java.util.List;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerCallListenerInstrumentation implements TypeInstrumentation {
   @Override
@@ -50,10 +50,10 @@ public class ServerCallListenerInstrumentation implements TypeInstrumentation {
   @Override
   public ElementMatcher<TypeDescription> typeMatcher() {
     return extendsClass(named("io.grpc.ServerCall$Listener"))
-            .and(
-                not(
-                    named(
-                        "io.opentelemetry.instrumentation.grpc.v1_6.TracingServerInterceptor.TracingServerCall$TracingServertCallListener")));
+        .and(
+            not(
+                named(
+                    "io.opentelemetry.instrumentation.grpc.v1_6.TracingServerInterceptor.TracingServerCall$TracingServertCallListener")));
   }
 
   @Override
@@ -62,7 +62,11 @@ public class ServerCallListenerInstrumentation implements TypeInstrumentation {
         named("onMessage").and(isPublic()).and(not(isAbstract())).and(takesArguments(1)),
         ServerCallListenerInstrumentation.class.getName() + "$OnMessageAdvice");
     transformer.applyAdviceToMethod(
-        named("onHalfClose").or(named("cancel")).and(isPublic()).and(not(isAbstract())).and(takesArguments(0)),
+        named("onHalfClose")
+            .or(named("cancel"))
+            .and(isPublic())
+            .and(not(isAbstract()))
+            .and(takesArguments(0)),
         ServerCallListenerInstrumentation.class.getName() + "$CleanupAdvice");
   }
 
@@ -74,7 +78,9 @@ public class ServerCallListenerInstrumentation implements TypeInstrumentation {
         @Advice.Argument(0) Object msg,
         @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
       callDepth = CallDepth.forClass(ServerCall.Listener.class);
-      if (callDepth.getAndIncrement() != 0) {
+      // Zero level won't have the context attached yet by Contexts.ContextualizedServerCallListener
+      // so we need to skip it.
+      if (callDepth.getAndIncrement() != 1) {
         return;
       }
 
@@ -88,14 +94,11 @@ public class ServerCallListenerInstrumentation implements TypeInstrumentation {
         List<String> requestMsgs = requestMsgsVirtual.get(listener).getStringList();
         try {
           requestMsgs.add(
-              JsonFormat
-                  .printer()
+              JsonFormat.printer()
                   .omittingInsignificantWhitespace()
                   .print((GeneratedMessageV3) msg));
           Java8BytecodeBridge.currentSpan()
-              .setAttribute(
-                  SemanticAttributes.GRPC_REQUEST_BODY,
-                  JsonUtil.toJson(requestMsgs));
+              .setAttribute(SemanticAttributes.GRPC_REQUEST_BODY, JsonUtil.toJson(requestMsgs));
         } catch (InvalidProtocolBufferException e) {
           // At this point we know that msg is a GeneratedMessageV3, so this should never happen
           Java8BytecodeBridge.currentSpan()
@@ -116,9 +119,9 @@ public class ServerCallListenerInstrumentation implements TypeInstrumentation {
   @SuppressWarnings("unused")
   public static class CleanupAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
-    public static void methodEnter(
-        @Advice.This ServerCall.Listener<?> listener) {
-      VirtualField<ServerCall.Listener<?>, StringListHolder> virtualField = VirtualField.find(ServerCall.Listener.class, StringListHolder.class);
+    public static void methodEnter(@Advice.This ServerCall.Listener<?> listener) {
+      VirtualField<ServerCall.Listener<?>, StringListHolder> virtualField =
+          VirtualField.find(ServerCall.Listener.class, StringListHolder.class);
       StringListHolder holder = virtualField.get(listener);
       if (holder == null) {
         return;

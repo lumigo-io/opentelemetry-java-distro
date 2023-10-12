@@ -143,14 +143,12 @@ class GrpcStreamingTest extends AbstractGrpcTest {
                 .collect(Collectors.toList()));
     List<String> clientMessagesList =
         IntStream.rangeClosed(1, serverMessageCount)
-          .boxed()
-          .flatMap(
-              unused ->
-                IntStream.rangeClosed(1, clientMessageCount).mapToObj(i -> "call " + i))
-          .sorted()
-          .collect(Collectors.toList());
-    assertThat(clientMessages)
-        .containsExactlyElementsOf(clientMessagesList);
+            .boxed()
+            .flatMap(
+                unused -> IntStream.rangeClosed(1, clientMessageCount).mapToObj(i -> "call " + i))
+            .sorted()
+            .collect(Collectors.toList());
+    assertThat(clientMessages).containsExactlyElementsOf(clientMessagesList);
     assertThat(clientMessagesList.size()).isEqualTo(clientMessageCount * serverMessageCount);
 
     instrumentation.waitAndAssertTraces(
@@ -204,7 +202,8 @@ class GrpcStreamingTest extends AbstractGrpcTest {
         .boxed()
         .flatMap(
             unused ->
-                IntStream.rangeClosed(1, messageCount).mapToObj(i -> String.format(MESSAGE_TEMPLATE, i)))
+                IntStream.rangeClosed(1, messageCount)
+                    .mapToObj(i -> String.format(MESSAGE_TEMPLATE, i)))
         .sorted()
         .collect(Collectors.joining(",", "[", "]"));
   }

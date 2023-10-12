@@ -1,6 +1,9 @@
 name: Version Testing
 on:
   push:
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
   schedule:
     - cron: '0 7 * * *'
 jobs:
@@ -44,6 +47,7 @@ jobs:
   push-branch:
     runs-on: ubuntu-latest
     name: push-branch
+    if: github.event_name != 'pull_request'
     needs: check-new-versions-of-instrumented-packages
     steps:
       - uses: actions/checkout@v3
@@ -79,7 +83,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
-          title: ${{steps.branch_name.outputs.branch_name}}
+          title: "ci: ${{steps.branch_name.outputs.branch_name}}"
           branch: ${{steps.branch_name.outputs.branch_name}}
           commit-message: ${{ env.new_versions }}
           body: ${{ env.new_versions }}

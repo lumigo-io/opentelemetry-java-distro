@@ -35,11 +35,11 @@ import io.opentelemetry.javaagent.bootstrap.CallDepth;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
+import java.util.ArrayList;
+import java.util.List;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerCallInstrumentation implements TypeInstrumentation {
   @Override
@@ -50,10 +50,10 @@ public class ServerCallInstrumentation implements TypeInstrumentation {
   @Override
   public ElementMatcher<TypeDescription> typeMatcher() {
     return extendsClass(named("io.grpc.ServerCall"))
-            .and(
-                not(
-                    named(
-                        "io.opentelemetry.instrumentation.grpc.v1_6.TracingServerInterceptor.TracingServerCall")));
+        .and(
+            not(
+                named(
+                    "io.opentelemetry.instrumentation.grpc.v1_6.TracingServerInterceptor.TracingServerCall")));
   }
 
   @Override
@@ -88,15 +88,11 @@ public class ServerCallInstrumentation implements TypeInstrumentation {
         List<String> responseMsgs = responseMsgsVirtual.get(serverCall).getStringList();
         try {
           responseMsgs.add(
-              JsonFormat
-                  .printer()
+              JsonFormat.printer()
                   .omittingInsignificantWhitespace()
                   .print((GeneratedMessageV3) msg));
           Java8BytecodeBridge.currentSpan()
-              .setAttribute(
-                  SemanticAttributes.GRPC_RESPONSE_BODY,
-                  JsonUtil.toJson(responseMsgs)
-              );
+              .setAttribute(SemanticAttributes.GRPC_RESPONSE_BODY, JsonUtil.toJson(responseMsgs));
         } catch (InvalidProtocolBufferException e) {
           // At this point we know that msg is a GeneratedMessageV3, so this should never happen
           Java8BytecodeBridge.currentSpan()
@@ -117,9 +113,9 @@ public class ServerCallInstrumentation implements TypeInstrumentation {
   @SuppressWarnings("unused")
   public static class CloseAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
-    public static void methodEnter(
-        @Advice.This ServerCall<?, ?> serverCall) {
-      VirtualField<ServerCall<?, ?>, StringListHolder> virtualField = VirtualField.find(ServerCall.class, StringListHolder.class);
+    public static void methodEnter(@Advice.This ServerCall<?, ?> serverCall) {
+      VirtualField<ServerCall<?, ?>, StringListHolder> virtualField =
+          VirtualField.find(ServerCall.class, StringListHolder.class);
       StringListHolder holder = virtualField.get(serverCall);
       if (holder == null) {
         return;
