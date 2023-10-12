@@ -26,7 +26,6 @@ subprojects {
       && it.name != "java-http-client"
       && it.name != "library"
       && !it.path.contains("rabbitmq-2.7")
-      && !it.path.contains("grpc-1.6")
       && !it.path.contains("jedis-1.4")
       && !it.path.contains("kafka-clients-0.11")) {
     apply plugin: "com.diffplug.spotless"
