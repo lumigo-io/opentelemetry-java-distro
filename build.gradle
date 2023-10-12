@@ -27,7 +27,6 @@ subprojects {
       && it.name != "library"
       && !it.path.contains("aws-sdk-2.2")
       && !it.path.contains("rabbitmq-2.7")
-      && !it.path.contains("jedis-1.4")
       && !it.path.contains("kafka-clients-0.11")) {
     apply plugin: "com.diffplug.spotless"
 
@@ -59,6 +58,7 @@ subprojects {
       apachehttpclient50         : "5.0",
       awssdk22                   : "2.2.0",
       grpc16                     : "1.6.0",
+      jedis14                    : "1.4.0",
       kafkaclients011            : "0.11.0.0",
       rabbitmq27                 : "2.7.0",
       servlet30                  : "3.0.1",
@@ -72,7 +72,6 @@ subprojects {
       junit                      : "5.9.3",
       mockito                    : "5.4.0",
       testcontainers             : "1.17.6",
-      jedis14                    : "1.4.0",
       hamcrest                   : "2.2"
     ]
 
