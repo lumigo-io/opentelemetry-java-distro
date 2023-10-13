@@ -79,9 +79,7 @@ public class ResourceAttributeSmokeTest {
                       .getAttribute(AttributeKey.stringKey("k8s.container.name")),
                   nullValue());
               assertThat(
-                  serverSpan
-                      .getResource()
-                      .getAttribute(AttributeKey.stringKey("lumigo.tag")),
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey("lumigo.tag")),
                   nullValue());
             });
   }
@@ -126,9 +124,8 @@ public class ResourceAttributeSmokeTest {
   @Test
   public void lumigoTag(
       final @TestAppExtension.Configuration(
-          env = {
-              @TestAppExtension.EnvVar(key = LUMIGO_TAG_KEY, value = LUMIGO_TAG_VALUE)
-          }) TestAppExtension.TestApplication target,
+              env = {@TestAppExtension.EnvVar(key = LUMIGO_TAG_KEY, value = LUMIGO_TAG_VALUE)})
+          TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
     assertThat(
@@ -153,9 +150,7 @@ public class ResourceAttributeSmokeTest {
               SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
               assertThat(serverSpan, hasResourceAttributeOfTypeString(LUMIGO_TAG_KEY));
               assertThat(
-                  serverSpan
-                      .getResource()
-                      .getAttribute(AttributeKey.stringKey(LUMIGO_TAG_KEY)),
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey(LUMIGO_TAG_KEY)),
                   is(LUMIGO_TAG_VALUE));
             });
   }
@@ -163,9 +158,9 @@ public class ResourceAttributeSmokeTest {
   @Test
   void invalidLumigoTag(
       final @TestAppExtension.Configuration(
-          env = {
-              @TestAppExtension.EnvVar(key = LUMIGO_TAG_KEY, value = LUMIGO_TAG_INVALID_VALUE)
-          }) TestAppExtension.TestApplication target,
+              env = {
+                @TestAppExtension.EnvVar(key = LUMIGO_TAG_KEY, value = LUMIGO_TAG_INVALID_VALUE)
+              }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
     assertThat(
@@ -189,15 +184,11 @@ public class ResourceAttributeSmokeTest {
 
               SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
               assertThat(
-                  serverSpan
-                      .getResource()
-                      .getAttribute(AttributeKey.stringKey("lumigo.tag")),
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey("lumigo.tag")),
                   nullValue());
             });
 
-    assertThat(
-        target.getLogs(),
-        containsString("Lumigo tag cannot contain the ';' character"));
+    assertThat(target.getLogs(), containsString("Lumigo tag cannot contain the ';' character"));
   }
 
   private static SpanDumpEntry findSpan(
