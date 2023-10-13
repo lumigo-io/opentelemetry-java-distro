@@ -10,7 +10,8 @@ if [ "$instrumentation" == "javaagent" ]; then
 fi
 
 # Read the list of versions from the file in tested_versions
-existingVersions=$(cat instrumentation/"${instrumentationFolder}"/src/main/resources/tested_versions/"$instrumentation")
+# shellcheck disable=SC2207
+existingVersions=($(cat instrumentation/"${instrumentationFolder}"/src/main/resources/tested_versions/"$instrumentation"))
 
 success=true
 
