@@ -46,6 +46,10 @@ public class ResourceAttributeSmokeTest {
   private static final String CONTAINER_NAME_KEY = "lumigo.container.name";
   private static final String CONTAINER_NAME_VALUE = "my-cube";
 
+  private static final String LUMIGO_TAG_KEY = "lumigo.tag";
+  private static final String LUMIGO_TAG_VALUE = "my_app_tag";
+  private static final String LUMIGO_TAG_INVALID_VALUE = "my_app_tag;";
+
   @Test
   void defaultConfig(final TestAppExtension.TestApplication target, final OkHttpClient client)
       throws IOException {
@@ -74,11 +78,14 @@ public class ResourceAttributeSmokeTest {
                       .getResource()
                       .getAttribute(AttributeKey.stringKey("k8s.container.name")),
                   nullValue());
+              assertThat(
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey("lumigo.tag")),
+                  nullValue());
             });
   }
 
   @Test
-  public void testContainerName(
+  public void k8sContainerName(
       final @TestAppExtension.Configuration(
               env = {
                 @TestAppExtension.EnvVar(key = CONTAINER_NAME_KEY, value = CONTAINER_NAME_VALUE)
@@ -112,6 +119,76 @@ public class ResourceAttributeSmokeTest {
                       .getAttribute(AttributeKey.stringKey("k8s.container.name")),
                   is(CONTAINER_NAME_VALUE));
             });
+  }
+
+  @Test
+  public void lumigoTag(
+      final @TestAppExtension.Configuration(
+              env = {@TestAppExtension.EnvVar(key = LUMIGO_TAG_KEY, value = LUMIGO_TAG_VALUE)})
+          TestAppExtension.TestApplication target,
+      final OkHttpClient client)
+      throws IOException {
+    assertThat(
+        target.getLogs(),
+        containsString("SimpleSpanProcessor{spanExporter=io.lumigo.javaagent.FileSpanExporter"));
+
+    final String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    final Request request = new Request.Builder().url(url).get().build();
+
+    try (final Response response = client.newCall(request).execute()) {
+      ResponseBody body = response.body();
+      assertThat(body, is(notNullValue()));
+      assertThat(body.string(), is("Hi!"));
+    }
+
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(30))
+        .untilAsserted(
+            () -> {
+              List<SpanDumpEntry> entries = target.getSpanDump();
+
+              SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
+              assertThat(serverSpan, hasResourceAttributeOfTypeString(LUMIGO_TAG_KEY));
+              assertThat(
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey(LUMIGO_TAG_KEY)),
+                  is(LUMIGO_TAG_VALUE));
+            });
+  }
+
+  @Test
+  void invalidLumigoTag(
+      final @TestAppExtension.Configuration(
+              env = {
+                @TestAppExtension.EnvVar(key = LUMIGO_TAG_KEY, value = LUMIGO_TAG_INVALID_VALUE)
+              }) TestAppExtension.TestApplication target,
+      final OkHttpClient client)
+      throws IOException {
+    assertThat(
+        target.getLogs(),
+        containsString("SimpleSpanProcessor{spanExporter=io.lumigo.javaagent.FileSpanExporter"));
+
+    final String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    final Request request = new Request.Builder().url(url).get().build();
+
+    try (final Response response = client.newCall(request).execute()) {
+      ResponseBody body = response.body();
+      assertThat(body, is(notNullValue()));
+      assertThat(body.string(), is("Hi!"));
+    }
+
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(30))
+        .untilAsserted(
+            () -> {
+              List<SpanDumpEntry> entries = target.getSpanDump();
+
+              SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
+              assertThat(
+                  serverSpan.getResource().getAttribute(AttributeKey.stringKey("lumigo.tag")),
+                  nullValue());
+            });
+
+    assertThat(target.getLogs(), containsString("Lumigo tag cannot contain the ';' character"));
   }
 
   private static SpanDumpEntry findSpan(
