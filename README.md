@@ -288,6 +288,7 @@ specification:
 #### Kubernetes resource attributes
 
 * `k8s.pod.uid` with the Pod identifier, supported for both cgroups v1 and v2
+* `k8s.container.name` with the name of the container.
 
 ### Span exporters
 

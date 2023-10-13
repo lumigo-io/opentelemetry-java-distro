@@ -13,7 +13,7 @@ buildscript {
   dependencies {
     classpath "com.diffplug.spotless:spotless-plugin-gradle:6.19.0"
     classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-    classpath "io.opentelemetry.instrumentation:gradle-plugins:1.27.0-alpha"
+    classpath "io.opentelemetry.instrumentation:gradle-plugins:1.28.0-alpha"
   }
 }
 
