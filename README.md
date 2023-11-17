@@ -243,7 +243,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 3.1-b08 |
 | | | 3.1-b09 |
 | spring-webmvc-5.0 | [spring-webmvc-5.0](https://central.sonatype.com/artifact/org.springframework/spring-webmvc) | 5.0.0.RELEASE~5.3.29 |
-| | | 6.0.0~6.0.13 |
+| | | 6.0.0~6.1.0 |
 
 ## Baseline setup
 
