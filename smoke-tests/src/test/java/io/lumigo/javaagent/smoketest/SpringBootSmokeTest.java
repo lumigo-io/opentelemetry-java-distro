@@ -126,7 +126,7 @@ class SpringBootSmokeTest {
         .untilAsserted(
             () -> {
               List<SpanDumpEntry> entries = target.getSpanDump();
-              assertThat(entries.size(), is(0));
+              assertThat(entries.size(), is(2));
 
               TypeSafeMatcher<SpanDumpEntry> hasSpanName = hasSpanName("GET /greeting");
               assertThrows(NoSuchElementException.class, () -> findSpan(entries, hasSpanName));
