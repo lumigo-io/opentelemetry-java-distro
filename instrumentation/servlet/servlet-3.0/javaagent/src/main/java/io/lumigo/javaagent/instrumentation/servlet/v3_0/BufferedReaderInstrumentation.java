@@ -93,9 +93,7 @@ public class BufferedReaderInstrumentation implements TypeInstrumentation {
       }
 
       if (read == -1) {
-        System.out.println("read() BEFORE captureRequestBody()");
         bufferHolder.captureRequestBody();
-        System.out.println("read() AFTER captureRequestBody()");
       } else {
         bufferHolder.append(read);
       }
