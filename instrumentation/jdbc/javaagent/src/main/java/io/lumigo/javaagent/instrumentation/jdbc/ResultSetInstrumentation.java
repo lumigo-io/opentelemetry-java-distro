@@ -89,7 +89,8 @@ public class ResultSetInstrumentation implements TypeInstrumentation {
 
     @Advice.OnMethodExit(suppress = Throwable.class)
     public static void onExit(
-        @Advice.This ResultSet thiz, @Advice.Local("otelCallDepth") CallDepth callDepth,
+        @Advice.This ResultSet thiz,
+        @Advice.Local("otelCallDepth") CallDepth callDepth,
         @Advice.Return boolean result) {
       if (callDepth.decrementAndGet() > 0) {
         return;
