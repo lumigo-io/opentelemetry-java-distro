@@ -162,4 +162,52 @@ public class JdbcInstrumentationTest {
 
     teardownData(arguments.get(1, Connection.class));
   }
+
+  @ParameterizedTest(name = "{index} => testEmptyResultSet with {0}")
+  @MethodSource("io.lumigo.javaagent.instrumentation.jdbc.JdbcProviders#stream")
+  void testEmptyResultSet(ArgumentsAccessor arguments) throws SQLException {
+    setupData(arguments.get(1, Connection.class));
+
+    // Execute SELECT statement
+    try (Statement statement = arguments.get(1, Connection.class).createStatement()) {
+      instrumentation.runWithSpan(
+          "parent",
+          () -> {
+            try {
+              statement.execute(arguments.getString(2) + " WHERE ID = 9");
+
+              // Read the result set
+              ResultSet results = statement.getResultSet();
+              int count = 0;
+              while (results.next()) {
+                count++;
+                Assertions.assertThat(results.getString(2)).isNotNull();
+                Assertions.assertThat(results.getString(3)).isNotNull();
+                Assertions.assertThat(results.getBlob(4)).isNull();
+              }
+              Assertions.assertThat(count).isEqualTo(0);
+            } catch (SQLException e) {
+              e.printStackTrace();
+            }
+          });
+    }
+
+    assertThat(instrumentation.waitForTraces(1))
+        .hasSize(1)
+        .hasTracesSatisfyingExactly(
+            trace ->
+                trace
+                    .hasSize(2)
+                    .hasSpansSatisfyingExactly(
+                        span -> span.hasName("parent").hasKind(SpanKind.INTERNAL).hasNoParent(),
+                        span ->
+                            span.hasName("sql payload")
+                                .hasKind(SpanKind.INTERNAL)
+                                .hasAttribute(
+                                    AttributeKey.stringKey(
+                                        ResultSetInstrumentation.SQL_PAYLOAD_ATTRIBUTE_KEY),
+                                    "[]")));
+
+    teardownData(arguments.get(1, Connection.class));
+  }
 }

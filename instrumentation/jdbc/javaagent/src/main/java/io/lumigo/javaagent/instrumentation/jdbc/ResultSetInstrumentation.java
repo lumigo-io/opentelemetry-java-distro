@@ -89,7 +89,9 @@ public class ResultSetInstrumentation implements TypeInstrumentation {
 
     @Advice.OnMethodExit(suppress = Throwable.class)
     public static void onExit(
-        @Advice.This ResultSet thiz, @Advice.Local("otelCallDepth") CallDepth callDepth) {
+        @Advice.This ResultSet thiz,
+        @Advice.Local("otelCallDepth") CallDepth callDepth,
+        @Advice.Return boolean result) {
       if (callDepth.decrementAndGet() > 0) {
         return;
       }
@@ -110,13 +112,19 @@ public class ResultSetInstrumentation implements TypeInstrumentation {
       Context context = resultInstrumenter().start(parentContext, null);
       try (Scope ignored = context.makeCurrent()) {
         final Span span = currentSpan();
-        final Span parentSpan = spanFromContext(parentContext);
 
-        final ResultSetMetaData metaData = thiz.getMetaData();
-        String jsonRow = SqlUtility.getRowObject(thiz, metaData, ATTRIBUTE_VALUE_MAX_LENGTH);
-        span.setAttribute(
-            SQL_PAYLOAD_ATTRIBUTE_KEY,
-            SqlUtility.constructJsonArray(Collections.singletonList(jsonRow)));
+        if (result) {
+          final Span parentSpan = spanFromContext(parentContext);
+
+          final ResultSetMetaData metaData = thiz.getMetaData();
+          String jsonRow = SqlUtility.getRowObject(thiz, metaData, ATTRIBUTE_VALUE_MAX_LENGTH);
+          span.setAttribute(
+              SQL_PAYLOAD_ATTRIBUTE_KEY,
+              SqlUtility.constructJsonArray(Collections.singletonList(jsonRow)));
+        } else {
+          // No rows to process in ResultSet
+          span.setAttribute(SQL_PAYLOAD_ATTRIBUTE_KEY, "[]");
+        }
         resultInstrumenter().end(context, null, null, null);
       } catch (SQLException sqle) {
         resultInstrumenter().end(context, null, null, sqle);
