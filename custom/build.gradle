@@ -21,6 +21,13 @@ dependencies {
     exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure"
   }
 
+  implementation("io.opentelemetry.contrib:opentelemetry-samplers:${versions.opentelemetryContrib}") {
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
+    exclude group: "io.opentelemetry", module: "opentelemetry-api"
+    exclude group: "io.opentelemetry", module: "opentelemetry-semconv"
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure"
+  }
+
   annotationProcessor deps.autoservice
   compileOnly deps.autoservice
 

@@ -20,38 +20,20 @@ package io.lumigo.javaagent.common;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class SecretScrubber extends AbstractRegExParser {
-  public static final int DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT = 2048;
-  public static final String LUMIGO_SECRET_MASKING_REGEX = "lumigo.secret.masking.regex";
-  public static final String LUMIGO_SECRET_MASKING_ALL_MAGIC = "all";
-  public static final String SCRUBBED_VALUE = "****";
+public class HttpEndpointFilter extends AbstractRegExParser {
+  public static final String LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX =
+      "lumigo.auto.filter.http.endpoints.regex";
 
   public static final List<String> DEFAULT_REGEX_KEYS =
-      Arrays.asList(
-          ".*pass.*",
-          ".*key.*",
-          ".*secret.*",
-          ".*credential.*",
-          ".*passphrase.*",
-          ".*token.*",
-          "SessionToken",
-          "x-amz-security-token",
-          "Signature",
-          "Credential",
-          "Authorization");
+      Arrays.asList(".*/health.*", ".*/actuator.*");
 
   @Override
   protected String getEnvVarName() {
-    return LUMIGO_SECRET_MASKING_REGEX;
+    return LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX;
   }
 
   @Override
   protected List<String> getDefaultRegexKeys() {
     return DEFAULT_REGEX_KEYS;
-  }
-
-  @Override
-  protected String getMagicValue() {
-    return LUMIGO_SECRET_MASKING_ALL_MAGIC;
   }
 }

@@ -86,6 +86,8 @@ The Lumigo OpenTelemetry Distro for Java additionally supports the following con
 * `LUMIGO_SECRET_MASKING_REGEX='["regex1", "regex2"]'`: Prevents Lumigo from sending keys that match the supplied regular expressions in process environment data. All regular expressions are case-insensitive. The "magic" value `all` will redact everything. By default, Lumigo applies the following regular expressions: `[".*pass.*", ".*key.*", ".*secret.*", ".*credential.*", ".*passphrase.*"]`. More fine-grained settings can be applied via the following environment variable, which will override `LUMIGO_SECRET_MASKING_REGEX` for a specific type of data:
   * `LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT` applies secret redaction to process environment variables (that is, the content of `System.getenv()`)
 * `LUMIGO_TAG=<value>`: Adds the tag value as an attribute to all spans; this is useful to identify the source of the telemetry in Lumigo. See [here](https://docs.lumigo.io/docs/tags) for details.
+* `LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX='["regex1", "regex2"]'`: This option enables the automatic filtering of server endpoints that match the supplied regular expressions. By default, this distribution applies the following regular expressions: `[".*/health.*", ".*/actuator.*"]`. Refer to the
+[Filtering out HTTP endpoints](#filtering-out-http-endpoints) section for details.
 
 For more configuration options, see the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
 
@@ -185,6 +187,19 @@ Attributes eventAttributes = Attributes.of(
 
 Span.current().addEvent("<error-message>", eventAttributes);
 ```
+
+### Filtering out HTTP endpoints
+
+It is possible to automatically filter out spans based on an HTTP servers endpoints for all supported web server frameworks.
+
+Set the `LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX` environment variable to a regex string matching all desired urls to be filtered out.
+Spans with urls matching the filter will be not be delivered (works for both incoming & outgoing HTTP requests).
+Matching is performed against the following attributes of a span: `url.full`, `url.path`, `http.target`[^1], and `http.url`[^2].
+
+[^1] The `http.target` attribute in the Trace HTTP Semantic Conventions is deprecated and replaced by `url.path`.
+[^2] The `http.url` attribute in the Trace HTTP Semantic Conventions is deprecated and replaced by `url.full`.
+
+When filtering out spans, any child spans created from that component will also be filtered out as they will not be recorded.
 
 ## Supported runtimes
 

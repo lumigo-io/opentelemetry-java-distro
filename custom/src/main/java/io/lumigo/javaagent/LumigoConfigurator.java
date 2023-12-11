@@ -18,14 +18,23 @@
 package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
+import io.lumigo.javaagent.common.HttpEndpointFilter;
+import io.lumigo.javaagent.common.ParseExpressionResult;
 import io.lumigo.javaagent.utils.Strings;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.contrib.sampler.RuleBasedRoutingSampler;
+import io.opentelemetry.contrib.sampler.RuleBasedRoutingSamplerBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * This is one of the main entry points for Instrumentation Agent's customizations. It allows
@@ -53,6 +62,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
   public void customize(AutoConfigurationCustomizer autoConfiguration) {
     autoConfiguration
         .addPropertiesCustomizer(this::propertiesCustomizer)
+        .addSamplerCustomizer(this::getSamplerCustomizer)
         .addTracerProviderCustomizer(this::tracerProviderCustomizer)
         .addPropertiesSupplier(this::getDefaultProperties);
   }
@@ -76,6 +86,38 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     }
 
     return tracerProvider;
+  }
+
+  private Sampler getSamplerCustomizer(Sampler sampler, ConfigProperties configProperties) {
+    if (!Strings.isBlank(
+        configProperties.getString(HttpEndpointFilter.LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX))) {
+      LOGGER.finest(
+          "Auto-filtering HTTP server endpoints matching '"
+              + configProperties.getString(
+                  HttpEndpointFilter.LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX)
+              + "' regex");
+
+      RuleBasedRoutingSamplerBuilder samplerBuilder =
+          RuleBasedRoutingSampler.builder(SpanKind.SERVER, sampler);
+
+      HttpEndpointFilter httpEndpointFilter = new HttpEndpointFilter();
+      ParseExpressionResult parseResult =
+          httpEndpointFilter.parseExpressions(configProperties, null);
+
+      for (Pattern pattern : parseResult.getExpressionPatterns()) {
+        samplerBuilder.drop(AttributeKey.stringKey("url.full"), pattern.pattern());
+        samplerBuilder.drop(AttributeKey.stringKey("url.path"), pattern.pattern());
+
+        // Deprecated in favor of url.full
+        samplerBuilder.drop(SemanticAttributes.HTTP_URL, pattern.pattern());
+        // Deprecated in favor of url.path
+        samplerBuilder.drop(SemanticAttributes.HTTP_TARGET, pattern.pattern());
+      }
+
+      return samplerBuilder.build();
+    }
+
+    return sampler;
   }
 
   private Map<String, String> propertiesCustomizer(ConfigProperties originalCfg) {

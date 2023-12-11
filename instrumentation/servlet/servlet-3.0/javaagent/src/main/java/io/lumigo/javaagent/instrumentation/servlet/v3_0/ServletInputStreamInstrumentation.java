@@ -121,9 +121,7 @@ public class ServletInputStreamInstrumentation implements TypeInstrumentation {
 
       if (read == -1) {
         // Buffer is complete
-        System.out.println("IS.read() BEFORE captureRequestBody()");
         bufferHolder.captureRequestBody();
-        System.out.println("IS.read() AFTER captureRequestBody()");
       } else {
         bufferHolder.append(read);
       }

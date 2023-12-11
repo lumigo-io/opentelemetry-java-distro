@@ -25,6 +25,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.lumigo.javaagent.junitextensions.OkHttpClientExtension;
 import io.lumigo.javaagent.junitextensions.TestAppExtension;
@@ -36,6 +37,7 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.NoSuchElementException;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -49,7 +51,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class SpringBootSmokeTest {
 
   @Test
-  public void testDefaultSettings(final TestAppExtension.TestApplication target) {
+  void testDefaultSettings(final TestAppExtension.TestApplication target) {
     final String logs = target.getLogs();
 
     /*
@@ -81,7 +83,7 @@ class SpringBootSmokeTest {
   }
 
   @Test
-  public void testInvalidSpanDump(
+  void testInvalidSpanDump(
       final @Configuration(env = {@EnvVar(key = "LUMIGO_DEBUG_SPANDUMP", value = "invalid")})
           TestAppExtension.TestApplication target) {
     final String logs = target.getLogs();
@@ -90,14 +92,49 @@ class SpringBootSmokeTest {
   }
 
   @Test
-  public void testSwitchOff(
+  void testSwitchOff(
       final @Configuration(env = {@EnvVar(key = "LUMIGO_SWITCH_OFF", value = "true")})
           TestAppExtension.TestApplication target) {
     assertThat(target.getLogs(), containsString("Lumigo OpenTelemetry Java distribution disabled"));
   }
 
   @Test
-  public void testSpanDump(final TestAppExtension.TestApplication target, final OkHttpClient client)
+  void testCustomHttpFilter(
+      final @Configuration(
+              env = {
+                @EnvVar(
+                    key = "LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX",
+                    value = "[\".*/greeting.*\", \".*/actuator.*\"]")
+              }) TestAppExtension.TestApplication target,
+      final OkHttpClient client)
+      throws IOException {
+    assertThat(
+        target.getLogs(),
+        containsString(
+            "sampler=RuleBasedRoutingSampler{rules=[SamplingRule{attributeKey=url.full, delegate=AlwaysOffSampler, pattern=.*/greeting.*}"));
+
+    final String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    final Request request = new Request.Builder().url(url).get().build();
+
+    try (final Response response = client.newCall(request).execute()) {
+      assertThat(response.body(), is(notNullValue()));
+      assertThat(response.code(), is(200));
+    }
+
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(30))
+        .untilAsserted(
+            () -> {
+              List<SpanDumpEntry> entries = target.getSpanDump();
+              assertThat(entries.size(), is(2));
+
+              TypeSafeMatcher<SpanDumpEntry> hasSpanName = hasSpanName("GET /greeting");
+              assertThrows(NoSuchElementException.class, () -> findSpan(entries, hasSpanName));
+            });
+  }
+
+  @Test
+  void testSpanDump(final TestAppExtension.TestApplication target, final OkHttpClient client)
       throws IOException {
     assertThat(
         target.getLogs(),

@@ -51,9 +51,7 @@ public abstract class AbstractBufferHolder {
     try {
       final String requestBody = getBufferAsString(charsetName);
       if (requestBody != null && !requestBody.isEmpty()) {
-        System.out.println("BEFORE SETTING REQUEST BODY ATTRIBUTE");
         span.setAttribute(SemanticAttributes.HTTP_REQUEST_BODY, requestBody);
-        System.out.println("AFTER SETTING REQUEST BODY ATTRIBUTE");
       }
     } catch (UnsupportedEncodingException ignored) {
       // Ignore error, it shouldn't occur as we've previously parsed the charset for validity
@@ -69,9 +67,7 @@ public abstract class AbstractBufferHolder {
     try {
       final String responseBody = getBufferAsString(charsetName);
       if (responseBody != null && !responseBody.isEmpty()) {
-        System.out.println("BEFORE SETTING RESPONSE BODY ATTRIBUTE");
         currentSpan.setAttribute(SemanticAttributes.HTTP_RESPONSE_BODY, responseBody);
-        System.out.println("AFTER SETTING RESPONSE BODY ATTRIBUTE");
       }
     } catch (UnsupportedEncodingException ignored) {
       // Ignore error, it shouldn't occur as we've previously parsed the charset for validity

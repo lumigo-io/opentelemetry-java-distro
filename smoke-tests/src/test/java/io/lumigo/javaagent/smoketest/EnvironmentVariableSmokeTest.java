@@ -202,7 +202,7 @@ class EnvironmentVariableSmokeTest {
         (traceNodes) -> {
           assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
 
-          assertThat(target.getLogs(), containsString("Failed to parse the masking regex:"));
+          assertThat(target.getLogs(), containsString("Failed to parse the regex:"));
         });
   }
 
@@ -223,7 +223,7 @@ class EnvironmentVariableSmokeTest {
         (traceNodes) -> {
           assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
 
-          assertThat(target.getLogs(), containsString("Failed to parse the masking regex:"));
+          assertThat(target.getLogs(), containsString("Failed to parse the regex:"));
         });
   }
 
