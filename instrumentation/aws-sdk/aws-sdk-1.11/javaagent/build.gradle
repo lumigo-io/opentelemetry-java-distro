@@ -1,0 +1,71 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+// compiling against 1.11.0, but instrumentation should work against 1.10.33 with varying effects,
+// depending on the version's implementation. (i.e. DeleteOptionGroup may have less handlerCounts than
+// expected in 1.11.84. Testing against 1.11.0 instead of 1.10.33 because the RequestHandler class
+// used in testing is abstract in 1.10.33
+// keeping base test version on 1.11.0 because RequestHandler2 is abstract in 1.10.33,
+// therefore keeping base version as 1.11.0 even though the instrumentation probably
+// is able to support up to 1.10.33
+muzzle {
+  pass {
+    group.set("com.amazonaws")
+    module.set("aws-java-sdk-core")
+    versions.set("[1.10.33,)")
+    assertInverse.set(true)
+
+    excludeInstrumentationName("aws-sdk-1.11-sqs")
+  }
+
+  fail {
+    group.set("com.amazonaws")
+    module.set("aws-java-sdk-core")
+    versions.set("[1.10.33,)")
+
+    excludeInstrumentationName("aws-sdk-1.11-core")
+  }
+
+  pass {
+    group.set("com.amazonaws")
+    module.set("aws-java-sdk-sqs")
+    versions.set("[1.10.33,)")
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  // Using testInstrumentation below for now
+//  implementation project(":instrumentation:aws-sdk:aws-sdk-1.11:library")
+
+  compileOnly("com.amazonaws:aws-java-sdk-core:${versions.awssdk11}")
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-1.11:${versions.opentelemetryJavaagentAlpha}")
+
+  testImplementation("org.elasticmq:elasticmq-rest-sqs_2.12:1.0.0")
+
+  // needed for SNS
+  testImplementation("org.testcontainers:localstack:${versions.testcontainers}")
+
+  testImplementation("org.apache.httpcomponents:httpclient:4.0")
+
+  testImplementation("com.amazonaws:aws-java-sdk-core:${versions.awssdk11}")
+  testImplementation("com.amazonaws:aws-java-sdk-dynamodb:${versions.awssdk11}")
+  testImplementation("com.amazonaws:aws-java-sdk-ec2:${versions.awssdk11}")
+  testImplementation("com.amazonaws:aws-java-sdk-kinesis:${versions.awssdk11}")
+  testImplementation("com.amazonaws:aws-java-sdk-rds:${versions.awssdk11}")
+  testImplementation("com.amazonaws:aws-java-sdk-s3:${versions.awssdk11}")
+  testImplementation("com.amazonaws:aws-java-sdk-sns:${versions.awssdk11}")
+
+  // Instrumentations for testing
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-aws-sdk-1.11:${versions.opentelemetryJavaagentAlpha}")
+}
+
+tasks.withType(Test) {
+  systemProperty("testLatestDeps", findProperty("testLatestDeps") as Boolean)
+}
+
+tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+  mergeServiceFiles {
+    include("software/amazon/awssdk/global/handlers/execution.interceptors")
+  }
+}

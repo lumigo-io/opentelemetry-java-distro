@@ -58,6 +58,10 @@ public abstract class AbstractBufferHolder {
     }
   }
 
+  public Span getSpan() {
+    return span;
+  }
+
   public void captureResponseBody(Span currentSpan) {
     if (bufferCaptured) {
       return;

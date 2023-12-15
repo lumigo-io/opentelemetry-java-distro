@@ -56,6 +56,7 @@ subprojects {
 
       // Instrumentation versions
       apachehttpclient50         : "5.0",
+      awssdk11                   : "1.11.106",
       awssdk22                   : "2.2.0",
       grpc16                     : "1.6.0",
       jedis14                    : "1.4.0",
