@@ -15,7 +15,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent.instrumentation.awssdk.v2_2;
+package io.lumigo.javaagent.instrumentation.awssdk.v1_11;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
@@ -25,6 +25,8 @@ import java.util.Map;
 
 @AutoService(AutoConfigurationCustomizerProvider.class)
 public class AwsSdkConfigCustomizer implements AutoConfigurationCustomizerProvider {
+  private static final String AWS_SDK_EXPERIMENTAL_SPAN_ATTRIBUTES_KEY =
+      "otel.instrumentation.aws-sdk.experimental-span-attributes";
 
   @Override
   public void customize(AutoConfigurationCustomizer autoConfiguration) {
@@ -32,8 +34,10 @@ public class AwsSdkConfigCustomizer implements AutoConfigurationCustomizerProvid
         config -> {
           Map<String, String> overrides = new HashMap<>();
 
-          // disable OTeL instrumentation for AWS SDK v2.2
-          overrides.put("otel.instrumentation.aws-sdk-2.2.enabled", "false");
+          // If not set by user, set to true
+          if (null == config.getBoolean(AWS_SDK_EXPERIMENTAL_SPAN_ATTRIBUTES_KEY)) {
+            overrides.put(AWS_SDK_EXPERIMENTAL_SPAN_ATTRIBUTES_KEY, "true");
+          }
 
           return overrides;
         });
