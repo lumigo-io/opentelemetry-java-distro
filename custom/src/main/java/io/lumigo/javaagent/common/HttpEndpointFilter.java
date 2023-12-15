@@ -21,15 +21,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HttpEndpointFilter extends AbstractRegExParser {
-  public static final String LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX =
+  public static final String LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX =
       "lumigo.auto.filter.http.endpoints.regex";
+  public static final String LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_CLIENT =
+      "lumigo.auto.filter.http.endpoints.regex.client";
+  public static final String LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_SERVER =
+      "lumigo.auto.filter.http.endpoints.regex.server";
 
   public static final List<String> DEFAULT_REGEX_KEYS =
       Arrays.asList(".*/health.*", ".*/actuator.*");
 
   @Override
   protected String getEnvVarName() {
-    return LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX;
+    return LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX;
   }
 
   @Override
