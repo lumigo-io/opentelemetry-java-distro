@@ -227,6 +227,7 @@ When filtering out spans, any child spans created from that component will also 
 | | | 5.2-alpha1 |
 | | | 5.2-beta1 |
 | | | 5.3-alpha1 |
+| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.619 |
 | aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.21.46 |
 | grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.60.0 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
