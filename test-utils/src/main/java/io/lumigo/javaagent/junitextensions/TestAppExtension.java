@@ -236,6 +236,13 @@ public class TestAppExtension
 
       @Override
       public List<SpanDumpEntry> getSpanDump() throws IOException {
+        // Pause briefly to ensure that the agent has had time to write the span dump
+        try {
+          Thread.sleep(1500);
+        } catch (InterruptedException e) {
+          // Ignore
+        }
+
         Path temp = null;
         try {
           temp = Files.createTempFile("spandump", ".log");

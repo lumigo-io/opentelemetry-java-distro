@@ -67,12 +67,14 @@ dependencies {
   implementation project(":instrumentation:aws-sdk:aws-sdk-2.2:library")
 
   compileOnly("software.amazon.awssdk:aws-core:${versions.awssdk22}")
-  compileOnly("software.amazon.awssdk:aws-json-protocol:${versions.awssdk22}")
 
   testImplementation("org.elasticmq:elasticmq-rest-sqs_2.12:1.0.0")
 
   // Force testing version to use more recent version where field is "bufferPos" and not "bufferpos"
   testImplementation("org.apache.httpcomponents:httpcore:4.4.13")
+
+  // Verify with Apache HTTPClient instrumentation
+  testInstrumentation project(":instrumentation:apache-httpclient:apache-httpclient-5.0")
 
   testImplementation("software.amazon.awssdk:aws-core:${versions.awssdk22}")
   testImplementation("software.amazon.awssdk:dynamodb:${versions.awssdk22}")
@@ -87,6 +89,10 @@ dependencies {
 
 tasks.withType(Test) {
   systemProperty("testLatestDeps", findProperty("testLatestDeps") as Boolean)
+  // The customizer which sets these to true is not part of unit testing the instrumentation, which is why this is needed
+  systemProperty("otel.instrumentation.aws-sdk.experimental-span-attributes", "true")
+  systemProperty("otel.instrumentation.aws-sdk.experimental-use-propagator-for-messaging", "true")
+  systemProperty("otel.instrumentation.aws-sdk.experimental-record-individual-http-error", "true")
 }
 
 tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {

@@ -38,29 +38,32 @@ import software.amazon.awssdk.http.SdkHttpRequest;
 import software.amazon.awssdk.http.SdkHttpResponse;
 
 /**
+ * FORKED FROM `library-autoconfigure` module of upstream.
  * A {@link ExecutionInterceptor} for use as an SPI by the AWS SDK to automatically trace all
  * requests. This is a copy of the original class from the OpenTelemetry Java SDK, with the
  * customization for payload collection
  */
 public class TracingExecutionInterceptor implements ExecutionInterceptor {
   static final String HTTP_REQUEST_BODY_KEY = "http.request.body";
+  static final String HTTP_RESPONSE_BODY_KEY = "http.response.body";
 
-  // Override the default value to true for experimental span attributes
   private static final boolean CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES =
       ConfigPropertiesUtil.getBoolean(
-          "otel.instrumentation.aws-sdk.experimental-span-attributes", true);
+          "otel.instrumentation.aws-sdk.experimental-span-attributes", false);
 
-  // Override the default value to true for propagation with messaging
   private static final boolean USE_MESSAGING_PROPAGATOR =
       ConfigPropertiesUtil.getBoolean(
-          "otel.instrumentation.aws-sdk.experimental-use-propagator-for-messaging", true);
+          "otel.instrumentation.aws-sdk.experimental-use-propagator-for-messaging", false);
 
-  static final String HTTP_RESPONSE_BODY_KEY = "http.response.body";
+  private static final boolean RECORD_INDIVIDUAL_HTTP_ERROR =
+      ConfigPropertiesUtil.getBoolean(
+          "otel.instrumentation.aws-sdk.experimental-record-individual-http-error", false);
 
   private final ExecutionInterceptor delegate =
       AwsSdkTelemetry.builder(GlobalOpenTelemetry.get())
           .setCaptureExperimentalSpanAttributes(CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES)
           .setUseConfiguredPropagatorForMessaging(USE_MESSAGING_PROPAGATOR)
+          .setRecordIndividualHttpError(RECORD_INDIVIDUAL_HTTP_ERROR)
           .setContextCustomizer(context -> new PayloadBridge.Builder().init(context))
           .build()
           .newExecutionInterceptor();
