@@ -24,7 +24,7 @@ import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.assertj.core.api.Assertions;
@@ -56,6 +56,8 @@ public class SnsTracingTest {
   }
 
   @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void snsNotificationTriggersSqsMessage() {
     String queueName = "snsToSqsTestQueue";
     String topicName = "snsToSqsTestTopic";

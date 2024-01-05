@@ -26,7 +26,7 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.trace.data.StatusData;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -49,6 +49,8 @@ public class TimeoutTest {
       .build();
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testTimeout() {
     mockServer.shutdownServer();
 

@@ -41,7 +41,13 @@ public class ResponsePayloadBridge {
   private ResponsePayloadBridge() {}
 
   public static void appendPayload(Context context, byte[] buffer, int bodyStartPos, int length) {
+    if (bodyStartPos == length) {
+      // No payload to append
+      return;
+    }
+
     ResponsePayloadBridge bridge = context.get(CONTEXT_KEY);
+
     // Don't append anymore if we've already added the payload at the end of the Span.
     if (bridge != null && !bridge.payloadRetrieved) {
       if (bodyStartPos > -1 && bodyStartPos < length && bridge.isFirstPayload) {

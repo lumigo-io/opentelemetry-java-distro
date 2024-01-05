@@ -32,6 +32,7 @@ public class JavaHttpClientSingletons {
                     .setCapturedRequestHeaders(CommonConfig.get().getClientRequestHeaders())
                     .setCapturedResponseHeaders(CommonConfig.get().getClientResponseHeaders())
                     .setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
+            builder -> builder.setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
             Arrays.asList(
                 PeerServiceAttributesExtractor.create(
                     JavaHttpClientAttributesGetter.INSTANCE,

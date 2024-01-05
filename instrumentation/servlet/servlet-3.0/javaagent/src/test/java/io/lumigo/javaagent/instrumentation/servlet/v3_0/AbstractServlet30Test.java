@@ -21,7 +21,7 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -62,6 +62,8 @@ public abstract class AbstractServlet30Test {
     serverUrl = URI.create("http://localhost:" + port);
   }
 
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   private static void assertInstrumentation(String urlPath) {
     HttpRequest request =
         HttpRequest.newBuilder(URI.create(serverUrl + urlPath))

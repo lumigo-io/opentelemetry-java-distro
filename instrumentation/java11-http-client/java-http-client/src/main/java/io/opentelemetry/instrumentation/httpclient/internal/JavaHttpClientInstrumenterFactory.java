@@ -15,6 +15,7 @@ import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttribut
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientExperimentalMetrics;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientMetrics;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanNameExtractor;
+import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanNameExtractorBuilder;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanStatusExtractor;
 import io.opentelemetry.javaagent.instrumentation.httpclient.ResponsePayloadBridge;
 import java.net.http.HttpRequest;
@@ -33,6 +34,7 @@ public final class JavaHttpClientInstrumenterFactory {
       OpenTelemetry openTelemetry,
       Consumer<HttpClientAttributesExtractorBuilder<HttpRequest, HttpResponse<?>>>
           extractorConfigurer,
+      Consumer<HttpSpanNameExtractorBuilder<HttpRequest>> spanNameExtractorConfigurer,
       List<AttributesExtractor<? super HttpRequest, ? super HttpResponse<?>>> additionalExtractors,
       boolean emitExperimentalHttpClientMetrics) {
     JavaHttpClientAttributesGetter httpAttributesGetter = JavaHttpClientAttributesGetter.INSTANCE;
@@ -42,9 +44,13 @@ public final class JavaHttpClientInstrumenterFactory {
             HttpClientAttributesExtractor.builder(httpAttributesGetter);
     extractorConfigurer.accept(httpAttributesExtractorBuilder);
 
+    HttpSpanNameExtractorBuilder<HttpRequest> httpSpanNameExtractorBuilder =
+        HttpSpanNameExtractor.builder(httpAttributesGetter);
+    spanNameExtractorConfigurer.accept(httpSpanNameExtractorBuilder);
+
     InstrumenterBuilder<HttpRequest, HttpResponse<?>> builder =
         Instrumenter.<HttpRequest, HttpResponse<?>>builder(
-            openTelemetry, INSTRUMENTATION_NAME, HttpSpanNameExtractor.create(httpAttributesGetter))
+            openTelemetry, INSTRUMENTATION_NAME, httpSpanNameExtractorBuilder.build())
         .setSpanStatusExtractor(HttpSpanStatusExtractor.create(httpAttributesGetter))
         .addAttributesExtractor(httpAttributesExtractorBuilder.build())
         .addAttributesExtractors(additionalExtractors)

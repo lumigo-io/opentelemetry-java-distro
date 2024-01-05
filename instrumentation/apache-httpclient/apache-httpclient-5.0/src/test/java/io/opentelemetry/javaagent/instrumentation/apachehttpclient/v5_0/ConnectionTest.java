@@ -23,7 +23,7 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.trace.data.StatusData;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -53,6 +53,8 @@ public class ConnectionTest {
       .build();
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testConnectionReset() {
     final String urlPath = "/reset";
 
@@ -90,6 +92,8 @@ public class ConnectionTest {
   }
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testMalformedChunk() {
     final String urlPath = "/malformed";
 
@@ -132,6 +136,8 @@ public class ConnectionTest {
   }
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testGarbageResponse() {
     final String urlPath = "/garbage";
 
@@ -169,6 +175,8 @@ public class ConnectionTest {
   }
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testServerError() {
     final String urlPath = "/server-error";
 
@@ -206,6 +214,8 @@ public class ConnectionTest {
   }
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testNullResponse() {
     final String jsonBody = "\"null\"";
     final String urlPath = "/response";

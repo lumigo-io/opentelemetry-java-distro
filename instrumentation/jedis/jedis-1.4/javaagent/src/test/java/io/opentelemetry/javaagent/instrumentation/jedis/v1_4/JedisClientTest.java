@@ -24,7 +24,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,6 +64,8 @@ class JedisClientTest {
   }
 
   @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void setCommand() {
     jedis.set("foo", "bar");
 
@@ -84,6 +86,8 @@ class JedisClientTest {
   }
 
   @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void getCommand() {
     jedis.set("foo", "bar");
     String value = jedis.get("foo");
@@ -118,6 +122,8 @@ class JedisClientTest {
   }
 
   @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void setSetTransactionCommand() {
     Transaction transaction = jedis.multi();
     transaction.set("foo", "bar");
@@ -170,6 +176,8 @@ class JedisClientTest {
   }
 
   @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void commandWithNoArguments() {
     jedis.set("foo", "bar");
     String value = jedis.randomKey();
