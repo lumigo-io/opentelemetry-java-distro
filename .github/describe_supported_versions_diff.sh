@@ -5,7 +5,7 @@ set -eu
 readonly SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
 readonly ROOT_DIR="$(dirname ${SCRIPT_DIR})"
 
-echo "feat: Test additional package versions [auto-test-update]"
+echo "chore: Test additional package versions [auto-test-update]"
 
 # Loop through the git changes in /instrumentation to produce a list of new versions for each instrumentation package
 git diff --name-only -- "${ROOT_DIR}/instrumentation/" | \
