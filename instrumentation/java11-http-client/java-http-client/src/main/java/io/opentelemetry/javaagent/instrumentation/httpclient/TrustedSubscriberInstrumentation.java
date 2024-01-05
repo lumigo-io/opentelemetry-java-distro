@@ -48,7 +48,7 @@ public class TrustedSubscriberInstrumentation implements TypeInstrumentation {
         isMethod()
             .and(named("onNext"))
             .and(takesArguments(1)),
-      TrustedSubscriberInstrumentation.class.getName() + "$OnNextAdvice");
+        TrustedSubscriberInstrumentation.class.getName() + "$OnNextAdvice");
   }
 
   @SuppressWarnings("unused")

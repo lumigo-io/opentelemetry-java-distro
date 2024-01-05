@@ -9,8 +9,8 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.net.PeerServiceAttributesExtractor;
 import io.opentelemetry.instrumentation.httpclient.internal.HttpHeadersSetter;
+import io.opentelemetry.instrumentation.httpclient.internal.JavaHttpClientAttributesGetter;
 import io.opentelemetry.instrumentation.httpclient.internal.JavaHttpClientInstrumenterFactory;
-import io.opentelemetry.instrumentation.httpclient.internal.JavaHttpClientNetAttributesGetter;
 import io.opentelemetry.javaagent.bootstrap.internal.CommonConfig;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -24,18 +24,21 @@ public class JavaHttpClientSingletons {
   static {
     SETTER = new HttpHeadersSetter(GlobalOpenTelemetry.getPropagators());
 
-    JavaHttpClientNetAttributesGetter netAttributesGetter = new JavaHttpClientNetAttributesGetter();
-
     INSTRUMENTER =
         JavaHttpClientInstrumenterFactory.createInstrumenter(
             GlobalOpenTelemetry.get(),
-            CommonConfig.get().getClientRequestHeaders(),
-            CommonConfig.get().getClientResponseHeaders(),
+            builder ->
+                builder
+                    .setCapturedRequestHeaders(CommonConfig.get().getClientRequestHeaders())
+                    .setCapturedResponseHeaders(CommonConfig.get().getClientResponseHeaders())
+                    .setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
             Arrays.asList(
                 PeerServiceAttributesExtractor.create(
-                    netAttributesGetter, CommonConfig.get().getPeerServiceMapping()),
+                    JavaHttpClientAttributesGetter.INSTANCE,
+                    CommonConfig.get().getPeerServiceMapping()),
                 // Custom HTTP payload extractor
-                new HttpPayloadExtractor())
+                new HttpPayloadExtractor()),
+            CommonConfig.get().shouldEmitExperimentalHttpClientMetrics()
             );
   }
 

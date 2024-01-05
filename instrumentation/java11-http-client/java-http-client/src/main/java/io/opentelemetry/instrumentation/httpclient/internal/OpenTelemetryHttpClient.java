@@ -102,8 +102,8 @@ public final class OpenTelemetryHttpClient extends HttpClient {
     Throwable error = null;
     Context context = instrumenter.start(parentContext, request);
     try (Scope ignore = context.makeCurrent()) {
-      io.opentelemetry.instrumentation.httpclient.internal.HttpRequestWrapper requestWrapper =
-          new io.opentelemetry.instrumentation.httpclient.internal.HttpRequestWrapper(request, headersSetter.inject(request.headers()));
+      HttpRequestWrapper requestWrapper =
+          new HttpRequestWrapper(request, headersSetter.inject(request.headers()));
 
       response = client.send(requestWrapper, responseBodyHandler);
     } catch (Throwable throwable) {
@@ -140,8 +140,8 @@ public final class OpenTelemetryHttpClient extends HttpClient {
 
     Context context = instrumenter.start(parentContext, request);
     try (Scope ignore = context.makeCurrent()) {
-      io.opentelemetry.instrumentation.httpclient.internal.HttpRequestWrapper requestWrapper =
-          new io.opentelemetry.instrumentation.httpclient.internal.HttpRequestWrapper(request, headersSetter.inject(request.headers()));
+      HttpRequestWrapper requestWrapper =
+          new HttpRequestWrapper(request, headersSetter.inject(request.headers()));
 
       CompletableFuture<HttpResponse<T>> future = action.apply(requestWrapper);
       future = future.whenComplete(new ResponseConsumer(instrumenter, context, request));

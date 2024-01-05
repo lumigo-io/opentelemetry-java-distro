@@ -6,8 +6,8 @@
 package io.opentelemetry.instrumentation.httpclient.internal;
 
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
-
 import javax.annotation.Nullable;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
  */
-enum JavaHttpClientAttributesGetter
+public enum JavaHttpClientAttributesGetter
     implements HttpClientAttributesGetter<HttpRequest, HttpResponse<?>> {
   INSTANCE;
 
@@ -45,5 +45,43 @@ enum JavaHttpClientAttributesGetter
   public List<String> getHttpResponseHeader(
       HttpRequest httpRequest, HttpResponse<?> httpResponse, String name) {
     return httpResponse.headers().allValues(name);
+  }
+
+  @Nullable
+  @Override
+  public String getNetworkProtocolName(HttpRequest request, @Nullable HttpResponse<?> response) {
+    return "http";
+  }
+
+  @Nullable
+  @Override
+  public String getNetworkProtocolVersion(HttpRequest request, @Nullable HttpResponse<?> response) {
+    HttpClient.Version version;
+    if (response != null) {
+      version = response.version();
+    } else {
+      version = request.version().orElse(null);
+    }
+    if (version == null) {
+      return null;
+    }
+    switch (version) {
+      case HTTP_1_1:
+        return "1.1";
+      case HTTP_2:
+        return "2";
+    }
+    return null;
+  }
+
+  @Override
+  @Nullable
+  public String getServerAddress(HttpRequest request) {
+    return request.uri().getHost();
+  }
+
+  @Override
+  public Integer getServerPort(HttpRequest request) {
+    return request.uri().getPort();
   }
 }
