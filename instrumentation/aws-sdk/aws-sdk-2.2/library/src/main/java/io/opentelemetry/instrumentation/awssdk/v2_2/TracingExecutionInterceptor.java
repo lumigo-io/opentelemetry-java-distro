@@ -12,9 +12,10 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.contrib.awsxray.propagator.AwsXrayPropagator;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.List;
 import javax.annotation.Nullable;
+import software.amazon.awssdk.auth.signer.AwsSignerExecutionAttribute;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.core.ClientType;
 import software.amazon.awssdk.core.SdkRequest;
@@ -87,6 +88,14 @@ final class TracingExecutionInterceptor implements ExecutionInterceptor {
 
     io.opentelemetry.context.Context parentOtelContext = io.opentelemetry.context.Context.current();
     SdkRequest request = context.request();
+
+    // Ignore presign request. These requests don't run all interceptor methods and the span created
+    // here would never be ended and scope closed.
+    if (executionAttributes.getAttribute(AwsSignerExecutionAttribute.PRESIGNER_EXPIRATION)
+        != null) {
+      return request;
+    }
+
     executionAttributes.putAttribute(SDK_REQUEST_ATTRIBUTE, request);
 
     if (!requestInstrumenter.shouldStart(parentOtelContext, executionAttributes)) {

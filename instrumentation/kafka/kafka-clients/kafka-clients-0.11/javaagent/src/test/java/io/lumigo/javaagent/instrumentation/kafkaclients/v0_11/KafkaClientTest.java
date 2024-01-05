@@ -27,7 +27,7 @@ import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -181,7 +181,7 @@ public class KafkaClientTest {
         equalTo(SemanticAttributes.MESSAGING_SYSTEM, "kafka"),
         equalTo(SemanticAttributes.MESSAGING_DESTINATION_NAME, TOPIC),
         satisfies(
-            SemanticAttributes.MESSAGING_KAFKA_CLIENT_ID,
+            SemanticAttributes.MESSAGING_CLIENT_ID,
             (value) -> value.startsWith(clientPrefix)));
   }
 
@@ -223,7 +223,7 @@ public class KafkaClientTest {
     assertions.add(equalTo(SemanticAttributes.MESSAGING_OPERATION, "process"));
     assertions.add(
         satisfies(
-            SemanticAttributes.MESSAGING_KAFKA_SOURCE_PARTITION,
+            SemanticAttributes.MESSAGING_KAFKA_DESTINATION_PARTITION,
             AbstractLongAssert::isNotNegative));
     assertions.add(
         satisfies(

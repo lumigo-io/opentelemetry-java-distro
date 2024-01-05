@@ -23,7 +23,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.test.utils.PortUtils;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -71,6 +71,8 @@ public class SpringWebMvcTest {
   }
 
   @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testHttpPost() {
     String jsonRequestBody = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":42}";
     String jsonResponse = "{\"count\":1,\"message\":\"Hello John Doe!\"}";

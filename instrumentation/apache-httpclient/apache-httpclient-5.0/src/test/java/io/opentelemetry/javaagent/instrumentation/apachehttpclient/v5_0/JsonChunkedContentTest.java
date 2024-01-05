@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -49,6 +49,8 @@ public class JsonChunkedContentTest {
       .build();
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testJsonResponse() {
     final String jsonBody = "{\"message\":\"Welcome Gary!\"}";
     final String urlPath = "/response";
@@ -102,6 +104,8 @@ public class JsonChunkedContentTest {
   }
 
   @Test
+  //TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testJsonRequestResponse() {
     final String requestBody = "{\"name\":\"gary\"}";
     final String responseBody = "{\"message\":\"Welcome Gary!\"}";

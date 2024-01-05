@@ -26,7 +26,7 @@ import io.opentelemetry.contrib.sampler.RuleBasedRoutingSamplerBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
