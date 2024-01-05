@@ -19,6 +19,8 @@ public final class AwsSdkTelemetryBuilder {
 
   private boolean useMessagingPropagator;
 
+  private boolean recordIndividualHttpError;
+
   private boolean useXrayPropagator = true;
 
   private Function<Context, Context> contextCustomizer;
@@ -62,6 +64,20 @@ public final class AwsSdkTelemetryBuilder {
   }
 
   /**
+   * Sets whether errors returned by each individual HTTP request should be recorded as events for
+   * the SDK span.
+   *
+   * <p>This option is off by default. If enabled, the HTTP error code and the error message will be
+   * captured and associated with the span. This provides detailed insights into errors on a
+   * per-request basis.
+   */
+  @CanIgnoreReturnValue
+  public AwsSdkTelemetryBuilder setRecordIndividualHttpError(boolean recordIndividualHttpError) {
+    this.recordIndividualHttpError = recordIndividualHttpError;
+    return this;
+  }
+
+  /**
    * This setter implemented package-private for testing the messaging propagator, it does not seem
    * too useful in general. The option is on by default.
    *
@@ -90,6 +106,7 @@ public final class AwsSdkTelemetryBuilder {
         captureExperimentalSpanAttributes,
         useMessagingPropagator,
         useXrayPropagator,
+        recordIndividualHttpError,
         contextCustomizer);
   }
 }

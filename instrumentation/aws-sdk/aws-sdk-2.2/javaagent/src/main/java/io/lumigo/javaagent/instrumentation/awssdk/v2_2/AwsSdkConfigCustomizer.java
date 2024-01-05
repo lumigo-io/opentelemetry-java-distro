@@ -25,6 +25,12 @@ import java.util.Map;
 
 @AutoService(AutoConfigurationCustomizerProvider.class)
 public class AwsSdkConfigCustomizer implements AutoConfigurationCustomizerProvider {
+  private static final String AWS_SDK_EXPERIMENTAL_SPAN_ATTRIBUTES_KEY =
+      "otel.instrumentation.aws-sdk.experimental-span-attributes";
+  private static final String AWS_SDK_EXPERIMENTAL_USE_PROPAGATOR_FOR_MESSAGING_KEY =
+      "otel.instrumentation.aws-sdk.experimental-use-propagator-for-messaging";
+  private static final String AWS_SDK_EXPERIMENTAL_RECORD_INDIVIDUAL_HTTP_ERROR_KEY =
+      "otel.instrumentation.aws-sdk.experimental-record-individual-http-error";
 
   @Override
   public void customize(AutoConfigurationCustomizer autoConfiguration) {
@@ -34,6 +40,17 @@ public class AwsSdkConfigCustomizer implements AutoConfigurationCustomizerProvid
 
           // disable OTeL instrumentation for AWS SDK v2.2
           overrides.put("otel.instrumentation.aws-sdk-2.2.enabled", "false");
+
+          // If not set by user, set to true
+          if (null == config.getBoolean(AWS_SDK_EXPERIMENTAL_SPAN_ATTRIBUTES_KEY)) {
+            overrides.put(AWS_SDK_EXPERIMENTAL_SPAN_ATTRIBUTES_KEY, "true");
+          }
+          if (null == config.getBoolean(AWS_SDK_EXPERIMENTAL_USE_PROPAGATOR_FOR_MESSAGING_KEY)) {
+            overrides.put(AWS_SDK_EXPERIMENTAL_USE_PROPAGATOR_FOR_MESSAGING_KEY, "true");
+          }
+          if (null == config.getBoolean(AWS_SDK_EXPERIMENTAL_RECORD_INDIVIDUAL_HTTP_ERROR_KEY)) {
+            overrides.put(AWS_SDK_EXPERIMENTAL_RECORD_INDIVIDUAL_HTTP_ERROR_KEY, "true");
+          }
 
           return overrides;
         });
