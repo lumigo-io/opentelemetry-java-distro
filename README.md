@@ -69,7 +69,7 @@ java -javaagent:<path-to-lumigo-otel-javaagent> -jar app.jar
 The Lumigo OpenTelemetry Distro for Java is made of upstream OpenTelemetry packages as well as some additional logic and, as such, the environment variables that work with "vanilla" OpenTelemetry work also with the Lumigo OpenTelemetry Distro for Java.
 Specifically supported are:
 
-* [General configurations](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration)
+* [General configurations](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration)
 
 The system properties are lower case versions of the environment variables, and with dots replaced by underscores.
 For example, the environment variable `LUMIGO_TRACER_TOKEN` can be set using the system property `lumigo.tracer.token`.
