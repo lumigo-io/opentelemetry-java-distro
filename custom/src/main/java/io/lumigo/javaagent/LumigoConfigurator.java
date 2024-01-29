@@ -55,7 +55,6 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
         .addPropertiesCustomizer(this::propertiesCustomizer)
         .addTracerProviderCustomizer(this::tracerProviderCustomizer)
         .addPropertiesSupplier(this::getDefaultProperties);
-    SamplingConfigurer.customize(autoConfiguration);
   }
 
   private SdkTracerProviderBuilder tracerProviderCustomizer(

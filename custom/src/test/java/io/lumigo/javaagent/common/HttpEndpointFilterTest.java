@@ -65,6 +65,35 @@ class HttpEndpointFilterTest {
   }
 
   @Test
+  void testServerOverrideWithOriginals() {
+    ConfigProperties mockConfig = mock();
+    when(mockConfig.getString(HttpEndpointFilter.LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_SERVER))
+        .thenReturn("[\".*/health.*\", \".*/actuator.*\", \".*/custom.*\"]");
+
+    HttpEndpointFilter filter = new HttpEndpointFilter();
+    ParseExpressionResult result =
+        filter.parseExpressions(
+            mockConfig, HttpEndpointFilter.LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_SERVER);
+
+    assertThat(result.getExpressionPatterns().size(), equalTo(3));
+    assertThat(result.getExpressionPatterns().get(0).pattern(), equalTo(".*/health.*"));
+    assertThat(result.getExpressionPatterns().get(1).pattern(), equalTo(".*/actuator.*"));
+    assertThat(result.getExpressionPatterns().get(2).pattern(), equalTo(".*/custom.*"));
+    assertThat(
+        result.getRegularExpressions(),
+        equalTo("[\".*/health.*\", \".*/actuator.*\", \".*/custom.*\"]"));
+
+    result =
+        filter.parseExpressions(
+            mockConfig, HttpEndpointFilter.LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_CLIENT);
+
+    assertThat(result.getExpressionPatterns().size(), equalTo(2));
+    assertThat(result.getExpressionPatterns().get(0).pattern(), equalTo(".*/health.*"));
+    assertThat(result.getExpressionPatterns().get(1).pattern(), equalTo(".*/actuator.*"));
+    assertThat(result.getRegularExpressions(), equalTo(""));
+  }
+
+  @Test
   void testClientOverride() {
     ConfigProperties mockConfig = mock();
     when(mockConfig.getString(HttpEndpointFilter.LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_CLIENT))
