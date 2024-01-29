@@ -17,6 +17,7 @@
  */
 package io.lumigo.javaagent;
 
+import com.google.auto.service.AutoService;
 import io.lumigo.javaagent.common.HttpEndpointFilter;
 import io.lumigo.javaagent.common.ParseExpressionResult;
 import io.opentelemetry.api.common.AttributeKey;
@@ -24,18 +25,22 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.contrib.sampler.RuleBasedRoutingSampler;
 import io.opentelemetry.contrib.sampler.RuleBasedRoutingSamplerBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
+import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-public final class SamplingConfigurer {
+@AutoService(AutoConfigurationCustomizerProvider.class)
+public class SamplingConfigurer implements AutoConfigurationCustomizerProvider {
   private static final Logger LOGGER = Logger.getLogger(SamplingConfigurer.class.getName());
 
-  static void customize(AutoConfigurationCustomizer autoConfiguration) {
-    autoConfiguration.addSamplerCustomizer(SamplingConfigurer::customizeServerSpans);
-    autoConfiguration.addSamplerCustomizer(SamplingConfigurer::customizeClientSpans);
+  @Override
+  public void customize(AutoConfigurationCustomizer autoConfiguration) {
+    autoConfiguration
+        .addSamplerCustomizer(SamplingConfigurer::customizeServerSpans)
+        .addSamplerCustomizer(SamplingConfigurer::customizeClientSpans);
   }
 
   private static Sampler customizeServerSpans(Sampler sampler, ConfigProperties configProperties) {

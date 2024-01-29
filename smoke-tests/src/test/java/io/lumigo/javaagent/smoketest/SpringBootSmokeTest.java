@@ -25,6 +25,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.lumigo.javaagent.junitextensions.OkHttpClientExtension;
@@ -103,15 +104,21 @@ class SpringBootSmokeTest {
       final @Configuration(
               env = {
                 @EnvVar(
-                    key = "LUMIGO_AUTO_FILTER_HTTP_ENDPOINTS_REGEX",
+                    key = "LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX",
                     value = "[\".*/greeting.*\", \".*/actuator.*\"]")
               }) TestAppExtension.TestApplication target,
       final OkHttpClient client)
       throws IOException {
+    // Client span filtering present
     assertThat(
         target.getLogs(),
         containsString(
-            "sampler=RuleBasedRoutingSampler{rules=[SamplingRule{attributeKey=url.full, delegate=AlwaysOffSampler, pattern=.*/greeting.*}"));
+            "SamplingRule{attributeKey=url.full, delegate=AlwaysOffSampler, pattern=.*/greeting.*}"));
+    // Server span filtering present
+    assertThat(
+        target.getLogs(),
+        containsString(
+            "SamplingRule{attributeKey=url.path, delegate=AlwaysOffSampler, pattern=.*/greeting.*}"));
 
     final String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
     final Request request = new Request.Builder().url(url).get().build();
@@ -130,6 +137,48 @@ class SpringBootSmokeTest {
 
               TypeSafeMatcher<SpanDumpEntry> hasSpanName = hasSpanName("GET /greeting");
               assertThrows(NoSuchElementException.class, () -> findSpan(entries, hasSpanName));
+            });
+  }
+
+  @Test
+  void testCustomHttpServerFilter(
+      final @Configuration(
+              env = {
+                @EnvVar(
+                    key = "LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_SERVER",
+                    value = "[\".*/health.*\", \".*/actuator.*\", \".*/version.*\"]")
+              }) TestAppExtension.TestApplication target,
+      final OkHttpClient client)
+      throws IOException {
+    // Server span filtering present
+    assertThat(
+        target.getLogs(),
+        containsString(
+            "SamplingRule{attributeKey=url.path, delegate=AlwaysOffSampler, pattern=.*/version.*}"));
+    // Client span filtering not present
+    assertThat(
+        target.getLogs(),
+        not(
+            containsString(
+                "SamplingRule{attributeKey=url.full, delegate=AlwaysOffSampler, pattern=.*/version.*}")));
+
+    final String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    final Request request = new Request.Builder().url(url).get().build();
+
+    try (final Response response = client.newCall(request).execute()) {
+      assertThat(response.body(), is(notNullValue()));
+      assertThat(response.code(), is(200));
+    }
+
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(30))
+        .untilAsserted(
+            () -> {
+              List<SpanDumpEntry> entries = target.getSpanDump();
+              assertThat(entries.size(), is(3));
+
+              TypeSafeMatcher<SpanDumpEntry> hasSpanName = hasSpanName("GET /greeting");
+              assertNotNull(findSpan(entries, hasSpanName));
             });
   }
 
