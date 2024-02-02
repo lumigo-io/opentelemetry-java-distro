@@ -26,6 +26,7 @@ subprojects {
       && it.name != "java-http-client"
       && it.name != "library"
       && !it.path.contains("aws-sdk-2.2")
+      && !it.path.contains("spring-webmvc-3.1")
       && !it.path.contains("rabbitmq-2.7")
       && !it.path.contains("kafka-clients-0.11")) {
     apply plugin: "com.diffplug.spotless"
@@ -63,7 +64,7 @@ subprojects {
       kafkaclients011            : "0.11.0.0",
       rabbitmq27                 : "2.7.0",
       servlet30                  : "3.0.1",
-      springwebmvc50             : "5.0.0.RELEASE",
+      springwebmvc31             : "3.1.0.RELEASE",
       springboot                 : "2.7.14",
 
       jackson                    : "2.15.2",
