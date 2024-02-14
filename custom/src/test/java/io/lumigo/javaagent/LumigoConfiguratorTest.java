@@ -30,7 +30,8 @@ public class LumigoConfiguratorTest {
 
   @Test
   void testStripTraceSuffixWhenPresent() {
-    String result = LumigoConfigurator.stripTracesSuffix(LumigoConfigurator.LUMIGO_ENDPOINT_URL + "/v1/traces");
+    String result =
+        LumigoConfigurator.stripTracesSuffix(LumigoConfigurator.LUMIGO_ENDPOINT_URL + "/v1/traces");
     assertEquals(LumigoConfigurator.LUMIGO_ENDPOINT_URL, result);
   }
 }
