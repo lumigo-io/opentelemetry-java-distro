@@ -101,6 +101,9 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
     String lumigoEndpoint = originalCfg.getString(LUMIGO_ENDPOINT);
     if (!Strings.isBlank(lumigoEndpoint)) {
+      // This truncation is needed because the Lumigo operator is currently adding the suffix
+      // "/v1/traces" to the endpoint, and we don't want to duplicate it.
+      lumigoEndpoint = stripTracesSuffix(lumigoEndpoint);
       setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.endpoint", lumigoEndpoint);
     } else {
       /*
@@ -147,5 +150,13 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
 
   private Map<String, String> getDefaultProperties() {
     return Collections.singletonMap("otel.traces.sampler", "always_on");
+  }
+
+  static String stripTracesSuffix(String endpoint) {
+    int suffixIndex = endpoint.indexOf("/v1/traces");
+    if (suffixIndex > 0) {
+      return endpoint.substring(0, suffixIndex);
+    }
+    return endpoint;
   }
 }
