@@ -219,9 +219,9 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.2-beta1 |
 | | | 5.3-alpha1 |
 | | | 5.4-alpha1 |
-| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.666 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.24.10 |
-| grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.61.1 |
+| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.667 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.24.11 |
+| grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.62.2 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
 | | | 17 |
 | jdbc | [jdbc](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html) | 11 |
@@ -234,7 +234,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | kafka-clients-0.11 | [kafka-clients-0.11](https://central.sonatype.com/artifact/org.apache.kafka/kafka-clients) | 0.8.2-beta~0.11.0.3 |
 | | | 1.0.0~1.1.1 |
 | | | 2.0.0~2.8.2 |
-| | | 3.0.0~3.6.1 |
+| | | 3.0.0~3.7.0 |
 | rabbitmq-2.7 | [rabbitmq-2.7](https://central.sonatype.com/artifact/com.rabbitmq/amqp-client) | 2.7.0 |
 | | | 3.1.2~3.6.6 |
 | | | 4.0.0~4.12.0 |
