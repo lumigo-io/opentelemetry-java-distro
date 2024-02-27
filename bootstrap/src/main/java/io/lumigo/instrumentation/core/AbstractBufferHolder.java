@@ -21,6 +21,8 @@ import io.opentelemetry.api.trace.Span;
 import java.io.UnsupportedEncodingException;
 
 public abstract class AbstractBufferHolder {
+  public static final int MAX_BUFFER_LENGTH = 2048;
+
   protected final Span span;
   protected final String charsetName;
 
