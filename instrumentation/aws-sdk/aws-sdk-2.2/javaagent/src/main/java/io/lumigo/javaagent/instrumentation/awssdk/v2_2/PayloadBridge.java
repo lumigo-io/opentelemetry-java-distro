@@ -37,6 +37,22 @@ public class PayloadBridge {
 
   private PayloadBridge() {}
 
+  public static int getRequestPayloadBufferSize(Context context) {
+    PayloadBridge bridge = context.get(CONTEXT_KEY);
+    if (bridge != null) {
+      return bridge.requestPayloadBufferLength;
+    }
+    return -1;
+  }
+
+  public static boolean isFirstRequestPayload(Context context) {
+    PayloadBridge bridge = context.get(CONTEXT_KEY);
+    if (bridge != null) {
+      return bridge.isFirstRequestPayload;
+    }
+    return true;
+  }
+
   public static void appendResponsePayload(
       Context context, byte[] buffer, int bodyStartPos, int length) {
     PayloadBridge bridge = context.get(CONTEXT_KEY);
