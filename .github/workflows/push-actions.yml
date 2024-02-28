@@ -50,16 +50,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK for running Gradle
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
       - name: Spotless
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           # this is a common failure point, so we run it first
           arguments: spotlessCheck
@@ -69,29 +69,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: 'us-west-2'
 
       - name: Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           # exclude spotlessCheck to avoid running it twice
           arguments: check -x spotlessCheck
           cache-read-only: true
 
       - name: Upload test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: 'Smoke test reports'
@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Cache go dependencies
         uses: actions/cache@v3
         with:
@@ -120,7 +120,7 @@ jobs:
           install_only: true
 
       - name: Set up JDK for running Gradle
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -143,7 +143,7 @@ jobs:
           go test -v -timeout 1h -json ./... --args -v 5 -build-tag=$(git rev-parse --short HEAD) 2>&1 | tee /tmp/gotest.log | gotestfmt
 
       - name: Upload test log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: k8s-e2e-test-log
@@ -158,14 +158,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up JDK for running Gradle
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
       - name: Assemble the agent
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           # Skip tests and spotless to get more specific K8s info in case
           # of PRs with issues
@@ -176,7 +176,7 @@ jobs:
           cache-read-only: true
       - uses: actions/setup-node@v3
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -235,7 +235,7 @@ jobs:
     name: List instrumentations to test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: list_instrumentations
         run: |
           instrumentationFolders=$(find instrumentation -type d -name "tested_versions" -not -path "*/build/*" | sed 's/instrumentation\///g' | sed 's/\/src\/main\/resources\/tested_versions//' | sort)
@@ -255,14 +255,14 @@ jobs:
         jdk_version: [ 11, 17 ]
         instrumentation_to_test: ${{ fromJson(needs.instrumentations-to-test.outputs.instrumentations) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.jdk_version }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.jdk_version }}
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
