@@ -74,9 +74,9 @@ public class SessionOutputBufferInstrumentation implements TypeInstrumentation {
       // The HTTP body begins after the first two consecutive set of '\r\n' characters in the
       // request
       for (int i = 0;
-          // We check only if we have at least two characters left, otherwise there is not
+          // We check only if we have at least four characters left, otherwise there is not
           // enough data in the buffer to contain an HTTP body anyhow.
-          i < len - 1;
+          i < len - 3;
           i++
       ) {
 
