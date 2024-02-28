@@ -219,8 +219,8 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.2-beta1 |
 | | | 5.3-alpha1 |
 | | | 5.4-alpha1 |
-| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.667 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.24.11 |
+| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.668 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.24.12 |
 | grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.62.2 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
 | | | 17 |
