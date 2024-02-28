@@ -16,14 +16,14 @@ jobs:
         jdk_version: [ 11, 17 ]
     name: check-new-versions-of-instrumented-packages
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.jdk_version }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.jdk_version }}
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -39,7 +39,7 @@ jobs:
               cp "$path" versions_artifact;
             fi
           done
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.jdk_version }}
           path: versions_artifact
@@ -50,18 +50,18 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: check-new-versions-of-instrumented-packages
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.7
       - run: mkdir versions_artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         continue-on-error: true  # when there aren't changes the artifact won't be uploaded and this step will fail
         with:
           name: 11
           path: versions_artifacts/11
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
           name: 17
@@ -80,7 +80,7 @@ jobs:
           echo "$new_versions" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           title: "ci: ${{steps.branch_name.outputs.branch_name}}"
