@@ -230,7 +230,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 2.0.0~2.10.2 |
 | | | 3.0.0~3.10.0 |
 | | | 4.0.0~4.4.5 |
-| | | 5.0.0~5.2.0-alpha3 |
+| | | 5.0.0~5.2.0-beta1 |
 | kafka-clients-0.11 | [kafka-clients-0.11](https://central.sonatype.com/artifact/org.apache.kafka/kafka-clients) | 0.8.2-beta~0.11.0.3 |
 | | | 1.0.0~1.1.1 |
 | | | 2.0.0~2.8.2 |
