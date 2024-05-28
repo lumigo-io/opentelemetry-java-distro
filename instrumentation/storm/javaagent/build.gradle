@@ -1,7 +1,4 @@
 apply from: "$rootDir/gradle/instrumentation.gradle"
-//plugins {
-//    id 'java'
-//}
 
 muzzle {
   pass {
@@ -9,11 +6,7 @@ muzzle {
   }
 }
 
-//group = 'io.lumigo.javaagent'
-//version = 'dev-SNAPSHOT'
-
-
 dependencies {
   compileOnly project(":bootstrap")
-  implementation 'com.google.auto.service:auto-service:1.1.1'
+//  implementation 'org.apache.storm:storm-core:2.6.0'
 }
