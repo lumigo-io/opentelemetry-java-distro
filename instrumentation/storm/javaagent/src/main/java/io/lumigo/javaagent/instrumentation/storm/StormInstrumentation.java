@@ -10,6 +10,7 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
 import static io.lumigo.javaagent.instrumentation.storm.StormSingleton.stormInstrumenter;
+import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.hasClassesNamed;
 import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.hasSuperType;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
@@ -21,12 +22,18 @@ public class StormInstrumentation implements TypeInstrumentation {
   }
 
   @Override
-  public void transform(TypeTransformer typeTransformer) {
-//    typeTransformer.applyAdviceToMethod(
-//        named("execute"),
-//        StormInstrumentation.class.getName() + "$StormExecuteAdvice");
+  public ElementMatcher<ClassLoader> classLoaderOptimization() {
+    return hasClassesNamed("org.apache.storm.topology.base.BaseRichBolt");
   }
 
+  @Override
+  public void transform(TypeTransformer typeTransformer) {
+    typeTransformer.applyAdviceToMethod(
+        named("execute"),
+        StormInstrumentation.class.getName() + "$StormExecuteAdvice");
+  }
+
+  @SuppressWarnings("unused")
   public static class StormExecuteAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
     public static void onEnter(
@@ -45,6 +52,7 @@ public class StormInstrumentation implements TypeInstrumentation {
     }
   }
 
+  @SuppressWarnings("unused")
   @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
   public static void onExit(@Advice.Argument(1) Object request,
       @Advice.Return Object response,

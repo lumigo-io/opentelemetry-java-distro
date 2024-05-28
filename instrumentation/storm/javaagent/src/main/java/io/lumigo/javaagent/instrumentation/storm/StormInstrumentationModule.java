@@ -9,13 +9,13 @@ import java.util.List;
 @AutoService(InstrumentationModule.class)
 public class StormInstrumentationModule extends InstrumentationModule {
 
-  protected StormInstrumentationModule() {
+  public StormInstrumentationModule() {
     super("storm", "lumigo-storm");
   }
 
   @Override
   public boolean isHelperClass(String className) {
-    return className.startsWith("io.lumigo.javaagent.instrumentation.storm.");
+    return className.startsWith("io.lumigo.javaagent.instrumentation.storm");
   }
 
   @Override

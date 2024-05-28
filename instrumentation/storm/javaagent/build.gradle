@@ -1,8 +1,17 @@
 apply from: "$rootDir/gradle/instrumentation.gradle"
 
+//repositories {
+//  maven {
+//    url "https://repo.clojars.org/"
+//  }
+//}
+
 muzzle {
   pass {
-    coreJdk()
+    group.set("org.apache.storm")
+    module.set("storm-core")
+    versions.set("[2.6.0,)")
+    assertInverse.set(true)
   }
 }
 
