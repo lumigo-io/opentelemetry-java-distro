@@ -18,7 +18,6 @@
 package io.lumigo.javaagent.instrumentation.storm;
 
 import static io.lumigo.javaagent.instrumentation.storm.StormExecutorSingleton.stormExecutorInstrumenter;
-import static io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge.currentSpan;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
 import io.opentelemetry.api.trace.Span;
@@ -59,14 +58,14 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
       }
       System.out.println("StormExecutorAdvice.onEnter");
 
-      Context context = stormExecutorInstrumenter().start(parentContext, addressedTuple);
-      Scope scope = context.makeCurrent();
-      final Span span = currentSpan();
-      span.addEvent()
-      span.setAttribute(
-          "storm.executor.transferMessageId", addressedTuple.tuple.getMessageId().toString());
-      scope.close();
-      stormExecutorInstrumenter().end(context, addressedTuple, null, null);
+      // Make sure the parent span is active on the Context when you start the new span
+      try (Scope scope = parentContext.makeCurrent()) {
+        Context context = stormExecutorInstrumenter().start(parentContext, addressedTuple);
+        final Span span = Java8BytecodeBridge.spanFromContext(context);
+        span.setAttribute(
+            "storm.executor.transferMessageId", addressedTuple.tuple.getMessageId().toString());
+        stormExecutorInstrumenter().end(context, addressedTuple, null, null);
+      }
     }
   }
 }
