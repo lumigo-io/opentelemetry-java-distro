@@ -53,7 +53,8 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
     public static void onEnter(@Advice.Argument(0) AddressedTuple addressedTuple) {
       Context parentContext = Java8BytecodeBridge.currentContext();
 
-      if (!stormExecutorInstrumenter().shouldStart(parentContext, addressedTuple)) {
+      if (!stormExecutorInstrumenter().shouldStart(parentContext, addressedTuple)
+          || (addressedTuple.tuple.getMessageId().toString().contains("{}"))) {
         return;
       }
       System.out.println("StormExecutorAdvice.onEnter");
@@ -62,8 +63,9 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
       try (Scope scope = parentContext.makeCurrent()) {
         Context context = stormExecutorInstrumenter().start(parentContext, addressedTuple);
         final Span span = Java8BytecodeBridge.spanFromContext(context);
-        span.setAttribute(
-            "storm.executor.transferMessageId", addressedTuple.tuple.getMessageId().toString());
+        span.setAttribute("service.name", Thread.currentThread().getName().split("-")[2]);
+        span.setAttribute("thread.name", Thread.currentThread().getName());
+        span.setAttribute("messaging.message.id", addressedTuple.tuple.getMessageId().toString());
         stormExecutorInstrumenter().end(context, addressedTuple, null, null);
       }
     }

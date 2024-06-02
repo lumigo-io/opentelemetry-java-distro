@@ -62,9 +62,12 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
       context = stormInstrumenter().start(parentContext, tuple);
       scope = context.makeCurrent();
       final Span span = currentSpan();
-      span.setAttribute("storm.tuple.messageId", tuple.getMessageId().toString());
+      span.setAttribute("messaging.message.id", tuple.getMessageId().toString());
       span.setAttribute("storm.tuple.firstValue", tuple.getValues().get(0).toString());
       span.setAttribute("storm.stormId", tuple.getContext().getStormId());
+      span.setAttribute("storm.version", tuple.getContext().getRawTopology().get_storm_version());
+      span.setAttribute("service.name", Thread.currentThread().getName().split("-")[2]);
+      span.setAttribute("thread.name", Thread.currentThread().getName());
     }
 
     @SuppressWarnings("unused")
