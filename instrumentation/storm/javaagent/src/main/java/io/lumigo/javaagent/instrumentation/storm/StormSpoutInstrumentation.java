@@ -18,59 +18,48 @@
 package io.lumigo.javaagent.instrumentation.storm;
 
 import static io.lumigo.javaagent.instrumentation.storm.StormSingleton.stormInstrumenter;
+import static io.lumigo.javaagent.instrumentation.storm.StormSpoutSingleton.stormSpoutInstrumenter;
 import static io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge.currentSpan;
 import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.implementsInterface;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import java.util.stream.Collectors;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import org.apache.storm.tuple.Tuple;
 
-public class StormBoltInstrumentation implements TypeInstrumentation {
+public class StormSpoutInstrumentation implements TypeInstrumentation {
 
   @Override
   public ElementMatcher<TypeDescription> typeMatcher() {
-    return implementsInterface(named("org.apache.storm.topology.IBasicBolt"));
+    return implementsInterface(named("org.apache.storm.spout.ISpout"));
   }
 
   @Override
   public void transform(TypeTransformer typeTransformer) {
     typeTransformer.applyAdviceToMethod(
-        named("execute"), StormBoltInstrumentation.class.getName() + "$StormExecuteAdvice");
+        named("nextTuple"), StormSpoutInstrumentation.class.getName() + "$StormNextTupleAdvice");
   }
 
   @SuppressWarnings("unused")
-  public static class StormExecuteAdvice {
+  public static class StormNextTupleAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
     public static void onEnter(
-        @Advice.Argument(0) Tuple tuple,
-        @Advice.Local("otelContext") Context context,
-        @Advice.Local("otelScope") Scope scope) {
+        @Advice.Local("otelContext") Context context, @Advice.Local("otelScope") Scope scope) {
       Context parentContext = Java8BytecodeBridge.currentContext();
 
-      if (!stormInstrumenter().shouldStart(parentContext, tuple)) {
+      if (!stormInstrumenter().shouldStart(parentContext, null)) {
         return;
       }
       System.out.println("StormExecuteAdvice.onEnter");
-      context = stormInstrumenter().start(parentContext, tuple);
+      context = stormSpoutInstrumenter().start(parentContext, null);
       scope = context.makeCurrent();
       final Span span = currentSpan();
-      span.setAttribute("messaging.message.id", tuple.getMessageId().toString());
-      span.setAttribute(
-          AttributeKey.stringArrayKey("storm.tuple.values"),
-          tuple.getValues().stream().map(Object::toString).collect(Collectors.toList()));
-      span.setAttribute("storm.sourceComponent", tuple.getSourceComponent());
-      span.setAttribute("storm.stormId", tuple.getContext().getStormId());
-      span.setAttribute("storm.version", tuple.getContext().getRawTopology().get_storm_version());
       span.setAttribute("service.name", Thread.currentThread().getName().split("-")[2]);
       span.setAttribute("thread.name", Thread.currentThread().getName());
     }
@@ -78,7 +67,6 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
     public static void onExit(
-        @Advice.Argument(0) Tuple tuple,
         @Advice.Thrown Throwable exception,
         @Advice.Local("otelContext") Context context,
         @Advice.Local("otelScope") Scope scope) {
@@ -87,7 +75,7 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
         return;
       }
       scope.close();
-      stormInstrumenter().end(context, tuple, null, exception);
+      stormSpoutInstrumenter().end(context, null, null, exception);
     }
   }
 }

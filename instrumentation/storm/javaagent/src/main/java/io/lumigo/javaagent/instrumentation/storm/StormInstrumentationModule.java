@@ -38,6 +38,8 @@ public class StormInstrumentationModule extends InstrumentationModule {
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
     return Arrays.asList(
-        new StormBoltInstrumentation(), new StormExecutorTransferInstrumentation());
+        new StormSpoutInstrumentation(),
+        new StormBoltInstrumentation(),
+        new StormExecutorTransferInstrumentation());
   }
 }

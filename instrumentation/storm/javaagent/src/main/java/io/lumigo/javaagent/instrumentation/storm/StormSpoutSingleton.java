@@ -21,21 +21,21 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanKindExtractor;
 
-public final class StormSingleton {
+public final class StormSpoutSingleton {
   private static final String INSTRUMENTATION_NAME = "io.lumigo.storm";
 
-  private static final Instrumenter<Object, Object> STORM_INSTRUMENTER;
+  private static final Instrumenter<Object, Object> STORM_SPOUT_INSTRUMENTER;
 
   static {
-    STORM_INSTRUMENTER =
+    STORM_SPOUT_INSTRUMENTER =
         Instrumenter.builder(
-                GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, (request) -> "storm bolt span")
+                GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, (request) -> "storm spout span")
             .buildInstrumenter(SpanKindExtractor.alwaysInternal());
   }
 
-  public static Instrumenter<Object, Object> stormInstrumenter() {
-    return STORM_INSTRUMENTER;
+  public static Instrumenter<Object, Object> stormSpoutInstrumenter() {
+    return STORM_SPOUT_INSTRUMENTER;
   }
 
-  private StormSingleton() {}
+  private StormSpoutSingleton() {}
 }
