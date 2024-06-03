@@ -25,12 +25,32 @@ public final class StormSingleton {
   private static final String INSTRUMENTATION_NAME = "io.lumigo.storm";
 
   private static final Instrumenter<Object, Object> STORM_INSTRUMENTER;
+  private static final Instrumenter<Object, Object> STORM_SPOUT_INSTRUMENTER;
+  private static final Instrumenter<Object, Object> STORM_EXECUTOR_INSTRUMENTER;
 
   static {
     STORM_INSTRUMENTER =
         Instrumenter.builder(
-                GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, (request) -> "storm bolt span")
+                GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, (request) -> "Storm Bolt")
             .buildInstrumenter(SpanKindExtractor.alwaysInternal());
+
+    STORM_SPOUT_INSTRUMENTER =
+        Instrumenter.builder(
+                GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, (request) -> "Storm Spout")
+            .buildInstrumenter(SpanKindExtractor.alwaysInternal());
+
+    STORM_EXECUTOR_INSTRUMENTER =
+        Instrumenter.builder(
+                GlobalOpenTelemetry.get(), INSTRUMENTATION_NAME, (request) -> "Storm Executor")
+            .buildInstrumenter(SpanKindExtractor.alwaysInternal());
+  }
+
+  public static Instrumenter<Object, Object> stormExecutorInstrumenter() {
+    return STORM_EXECUTOR_INSTRUMENTER;
+  }
+
+  public static Instrumenter<Object, Object> stormSpoutInstrumenter() {
+    return STORM_SPOUT_INSTRUMENTER;
   }
 
   public static Instrumenter<Object, Object> stormInstrumenter() {

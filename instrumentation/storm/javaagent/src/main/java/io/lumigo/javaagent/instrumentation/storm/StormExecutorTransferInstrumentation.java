@@ -17,7 +17,7 @@
  */
 package io.lumigo.javaagent.instrumentation.storm;
 
-import static io.lumigo.javaagent.instrumentation.storm.StormExecutorSingleton.stormExecutorInstrumenter;
+import static io.lumigo.javaagent.instrumentation.storm.StormSingleton.stormExecutorInstrumenter;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -27,7 +27,6 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import java.util.stream.Collectors;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -57,25 +56,19 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
 
       if (!stormExecutorInstrumenter().shouldStart(parentContext, addressedTuple)
           || (addressedTuple.tuple.getMessageId().toString().contains("{}"))) {
+        // We don't want to start a new span if the message id is empty
         return;
       }
-      System.out.println("StormExecutorAdvice.onEnter");
 
       // Make sure the parent span is active on the Context when you start the new span
       try (Scope scope = parentContext.makeCurrent()) {
         Context context = stormExecutorInstrumenter().start(parentContext, addressedTuple);
         final Span span = Java8BytecodeBridge.spanFromContext(context);
-        span.setAttribute("service.name", Thread.currentThread().getName().split("-")[2]);
-        span.setAttribute("thread.name", Thread.currentThread().getName());
-        span.setAttribute("messaging.message.id", addressedTuple.tuple.getMessageId().toString());
-        span.setAttribute(
-            AttributeKey.stringArrayKey("storm.tuple.values"),
-            addressedTuple.tuple.getValues().stream()
-                .map(Object::toString)
-                .collect(Collectors.toList()));
-        span.setAttribute(
-            "storm.destComponent",
-            addressedTuple.tuple.getContext().getComponentId(addressedTuple.getDest()));
+        span.setAttribute("service.name", StormUtils.getServiceName());
+        span.setAttribute("thread.name", StormUtils.getThreadName());
+        span.setAttribute("messaging.message.id", StormUtils.getMessageId(addressedTuple.tuple));
+        span.setAttribute(AttributeKey.stringArrayKey("storm.tuple.values"), StormUtils.getValues(addressedTuple.tuple));
+        span.setAttribute("storm.destComponent", StormUtils.getDestComponent(addressedTuple));
         stormExecutorInstrumenter().end(context, addressedTuple, null, null);
       }
     }

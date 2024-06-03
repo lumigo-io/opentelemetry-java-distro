@@ -29,7 +29,6 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import java.util.stream.Collectors;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -60,19 +59,18 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
       if (!stormInstrumenter().shouldStart(parentContext, tuple)) {
         return;
       }
-      System.out.println("StormExecuteAdvice.onEnter");
+
       context = stormInstrumenter().start(parentContext, tuple);
       scope = context.makeCurrent();
       final Span span = currentSpan();
-      span.setAttribute("messaging.message.id", tuple.getMessageId().toString());
-      span.setAttribute(
-          AttributeKey.stringArrayKey("storm.tuple.values"),
-          tuple.getValues().stream().map(Object::toString).collect(Collectors.toList()));
-      span.setAttribute("storm.sourceComponent", tuple.getSourceComponent());
-      span.setAttribute("storm.stormId", tuple.getContext().getStormId());
-      span.setAttribute("storm.version", tuple.getContext().getRawTopology().get_storm_version());
-      span.setAttribute("service.name", Thread.currentThread().getName().split("-")[2]);
-      span.setAttribute("thread.name", Thread.currentThread().getName());
+      span.setAttribute("storm.type", "bolt");
+      span.setAttribute("messaging.message.id", StormUtils.getMessageId(tuple));
+      span.setAttribute(AttributeKey.stringArrayKey("storm.tuple.values"), StormUtils.getValues(tuple));
+      span.setAttribute("storm.sourceComponent", StormUtils.getSourceComponent(tuple));
+      span.setAttribute("storm.stormId", StormUtils.getStormId(tuple));
+      span.setAttribute("storm.version", StormUtils.getStormVersion(tuple));
+      span.setAttribute("service.name", StormUtils.getServiceName());
+      span.setAttribute("thread.name", StormUtils.getThreadName());
     }
 
     @SuppressWarnings("unused")
@@ -82,7 +80,6 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
         @Advice.Thrown Throwable exception,
         @Advice.Local("otelContext") Context context,
         @Advice.Local("otelScope") Scope scope) {
-      System.out.println("StormExecuteAdvice.onExit");
       if (scope == null) {
         return;
       }

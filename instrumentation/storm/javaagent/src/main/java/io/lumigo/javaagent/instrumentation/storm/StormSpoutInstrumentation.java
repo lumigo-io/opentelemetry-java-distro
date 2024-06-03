@@ -18,7 +18,7 @@
 package io.lumigo.javaagent.instrumentation.storm;
 
 import static io.lumigo.javaagent.instrumentation.storm.StormSingleton.stormInstrumenter;
-import static io.lumigo.javaagent.instrumentation.storm.StormSpoutSingleton.stormSpoutInstrumenter;
+import static io.lumigo.javaagent.instrumentation.storm.StormSingleton.stormSpoutInstrumenter;
 import static io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge.currentSpan;
 import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.implementsInterface;
 import static net.bytebuddy.matcher.ElementMatchers.named;
@@ -56,12 +56,13 @@ public class StormSpoutInstrumentation implements TypeInstrumentation {
       if (!stormInstrumenter().shouldStart(parentContext, null)) {
         return;
       }
-      System.out.println("StormExecuteAdvice.onEnter");
+
       context = stormSpoutInstrumenter().start(parentContext, null);
       scope = context.makeCurrent();
       final Span span = currentSpan();
-      span.setAttribute("service.name", Thread.currentThread().getName().split("-")[2]);
-      span.setAttribute("thread.name", Thread.currentThread().getName());
+      span.setAttribute("storm.type", "spout");
+      span.setAttribute("service.name", StormUtils.getServiceName());
+      span.setAttribute("thread.name", StormUtils.getThreadName());
     }
 
     @SuppressWarnings("unused")
@@ -70,7 +71,6 @@ public class StormSpoutInstrumentation implements TypeInstrumentation {
         @Advice.Thrown Throwable exception,
         @Advice.Local("otelContext") Context context,
         @Advice.Local("otelScope") Scope scope) {
-      System.out.println("StormExecuteAdvice.onExit");
       if (scope == null) {
         return;
       }
