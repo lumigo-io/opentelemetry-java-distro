@@ -17,5 +17,6 @@ muzzle {
 
 dependencies {
   compileOnly project(":bootstrap")
-  implementation 'org.apache.storm:storm-client:2.6.0'
+  compileOnly("org.apache.storm:storm-client:${versions.storm}")
+  testImplementation project(":instrumentation:storm:testing")
 }

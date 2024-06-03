@@ -65,7 +65,8 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
       final Span span = currentSpan();
       span.setAttribute("storm.type", "bolt");
       span.setAttribute("messaging.message.id", StormUtils.getMessageId(tuple));
-      span.setAttribute(AttributeKey.stringArrayKey("storm.tuple.values"), StormUtils.getValues(tuple));
+      span.setAttribute(
+          AttributeKey.stringArrayKey("storm.tuple.values"), StormUtils.getValues(tuple));
       span.setAttribute("storm.sourceComponent", StormUtils.getSourceComponent(tuple));
       span.setAttribute("storm.stormId", StormUtils.getStormId(tuple));
       span.setAttribute("storm.version", StormUtils.getStormVersion(tuple));

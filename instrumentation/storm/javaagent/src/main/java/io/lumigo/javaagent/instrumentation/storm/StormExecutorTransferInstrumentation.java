@@ -67,7 +67,9 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
         span.setAttribute("service.name", StormUtils.getServiceName());
         span.setAttribute("thread.name", StormUtils.getThreadName());
         span.setAttribute("messaging.message.id", StormUtils.getMessageId(addressedTuple.tuple));
-        span.setAttribute(AttributeKey.stringArrayKey("storm.tuple.values"), StormUtils.getValues(addressedTuple.tuple));
+        span.setAttribute(
+            AttributeKey.stringArrayKey("storm.tuple.values"),
+            StormUtils.getValues(addressedTuple.tuple));
         span.setAttribute("storm.destComponent", StormUtils.getDestComponent(addressedTuple));
         stormExecutorInstrumenter().end(context, addressedTuple, null, null);
       }
