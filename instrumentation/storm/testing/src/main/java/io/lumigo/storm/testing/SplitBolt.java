@@ -29,6 +29,7 @@ import org.apache.storm.tuple.Values;
 
 @Slf4j
 public class SplitBolt extends BaseBasicBolt {
+  private static final long serialVersionUID = 1L;
 
   @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {

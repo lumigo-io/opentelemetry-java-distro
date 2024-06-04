@@ -28,9 +28,10 @@ import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
 
 public class SentenceSpout extends BaseRichSpout {
+  private static final long serialVersionUID = 1L;
   private int counter = 0;
   private int numberOfTuples = 1;
-  private SpoutOutputCollector collector;
+  private transient SpoutOutputCollector collector;
 
   public SentenceSpout(int numberOfTuples) {
     super();
@@ -47,7 +48,7 @@ public class SentenceSpout extends BaseRichSpout {
   public void nextTuple() {
     if (counter >= numberOfTuples) {
       // We want to stop generating tuples after we have emitted the required number of tuples
-      Utils.sleep(1000 * counter);
+      Utils.sleep(1000);
       counter += 1;
       return;
     }
