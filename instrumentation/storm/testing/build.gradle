@@ -12,5 +12,5 @@ dependencies {
   compileOnly("org.projectlombok:lombok:1.18.30")
   compileOnly("org.apache.storm:storm-core:${versions.storm}")
   compileOnly("org.apache.storm:storm-client:${versions.storm}")
-  compileOnly("org.apache.storm:storm-metrics:${versions.storm}")
+  compileOnly("org.junit.jupiter:junit-jupiter-api:${versions.mockito}")
 }

@@ -32,19 +32,6 @@ public class SplitBolt extends BaseBasicBolt {
 
   @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {
-    System.out.println(
-        "SplitBolt.execute: "
-            + tuple.getString(0)
-            + " MessageId: "
-            + tuple.getMessageId()
-            + " Tuple: "
-            + tuple
-            + "Anchors: "
-            + tuple.getMessageId().getAnchorsToIds()
-            + "StreamId: "
-            + tuple.getSourceStreamId()
-            + "Component: "
-            + tuple.getSourceComponent());
     String sentence = tuple.getString(0);
     stream(sentence.split(" ")).forEach(word -> collector.emit(new Values(word)));
   }

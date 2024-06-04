@@ -18,7 +18,6 @@
 package io.lumigo.storm.testing;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -28,43 +27,35 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
 
-public class RandomSentenceSpout extends BaseRichSpout {
-  private static int counter = 0;
+public class SentenceSpout extends BaseRichSpout {
+  private int counter = 0;
+  private int numberOfTuples = 1;
   private SpoutOutputCollector collector;
-  private Random rand;
+
+  public SentenceSpout(int numberOfTuples) {
+    super();
+    this.numberOfTuples = numberOfTuples;
+  }
 
   @Override
   public void open(
       Map<String, Object> conf, TopologyContext context, SpoutOutputCollector collector) {
     this.collector = collector;
-    rand = new Random();
   }
 
   @Override
   public void nextTuple() {
-    if (counter > 0) {
-      // We want to exit after 1 tuple because we want only one trace in the instrumentation test
-      Utils.sleep(100000);
+    if (counter >= numberOfTuples) {
+      // We want to stop generating tuples after we have emitted the required number of tuples
+      Utils.sleep(1000 * counter);
+      counter += 1;
       return;
     }
-    String[] sentences =
-        new String[] {
-          sentence("the cow jumped over the moon"),
-          sentence("an apple a day keeps the doctor away"),
-          sentence("four score and seven years ago"),
-          sentence("snow white and the seven dwarfs"),
-          sentence("i am at two with nature")
-        };
-    final String sentence = sentences[rand.nextInt(sentences.length)];
+    final String sentence = "the cow jumped over the moon";
 
     String msgID = UUID.randomUUID().toString();
-    System.out.println("Spout.execute: " + sentence + " MessageId: " + msgID);
     collector.emit(new Values(sentence), msgID);
     counter += 1;
-  }
-
-  private String sentence(String input) {
-    return input;
   }
 
   @Override

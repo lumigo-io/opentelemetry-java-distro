@@ -31,19 +31,6 @@ public class WordCountBolt extends BaseBasicBolt {
 
   @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {
-    System.out.println(
-        "WordCountBolt.execute: "
-            + tuple.getString(0)
-            + " MessageId: "
-            + tuple.getMessageId()
-            + " Tuple: "
-            + tuple
-            + "Anchors: "
-            + tuple.getMessageId().getAnchorsToIds()
-            + "StreamId: "
-            + tuple.getSourceStreamId()
-            + "Component: "
-            + tuple.getSourceComponent());
     String word = tuple.getString(0);
     counts.compute(word, (k, count) -> count == null ? 1 : count + 1);
     collector.emit(new Values(word, counts.get(word)));

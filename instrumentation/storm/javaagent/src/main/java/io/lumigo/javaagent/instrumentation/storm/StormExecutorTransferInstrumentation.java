@@ -27,6 +27,7 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
+import io.opentelemetry.semconv.SemanticAttributes;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -65,12 +66,15 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
         Context context = stormExecutorInstrumenter().start(parentContext, addressedTuple);
         final Span span = Java8BytecodeBridge.spanFromContext(context);
         span.setAttribute("service.name", StormUtils.getServiceName());
-        span.setAttribute("thread.name", StormUtils.getThreadName());
-        span.setAttribute("messaging.message.id", StormUtils.getMessageId(addressedTuple.tuple));
+        span.setAttribute(SemanticAttributes.THREAD_NAME, StormUtils.getThreadName());
+        span.setAttribute(
+            SemanticAttributes.MESSAGING_MESSAGE_ID, StormUtils.getMessageId(addressedTuple.tuple));
         span.setAttribute(
             AttributeKey.stringArrayKey("storm.tuple.values"),
             StormUtils.getValues(addressedTuple.tuple));
-        span.setAttribute("storm.destComponent", StormUtils.getDestComponent(addressedTuple));
+        span.setAttribute(
+            SemanticAttributes.MESSAGING_DESTINATION_NAME,
+            StormUtils.getDestComponent(addressedTuple));
         stormExecutorInstrumenter().end(context, addressedTuple, null, null);
       }
     }
