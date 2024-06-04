@@ -28,7 +28,7 @@ import org.apache.storm.tuple.Values;
 
 public class WordCountBolt extends BaseBasicBolt {
   private static final long serialVersionUID = 1L;
-  private transient Map<String, Integer> counts = new HashMap<>();
+  private Map<String, Integer> counts = new HashMap<>();
 
   @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {

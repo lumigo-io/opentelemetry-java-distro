@@ -31,7 +31,7 @@ public class SentenceSpout extends BaseRichSpout {
   private static final long serialVersionUID = 1L;
   private int counter = 0;
   private int numberOfTuples = 1;
-  private transient SpoutOutputCollector collector;
+  private SpoutOutputCollector collector;
 
   public SentenceSpout(int numberOfTuples) {
     super();
