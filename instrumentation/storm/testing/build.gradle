@@ -8,7 +8,6 @@ repositories {
 }
 
 dependencies {
-  // add lombok in version 1.18.30
   compileOnly("org.projectlombok:lombok:1.18.30")
   compileOnly("org.apache.storm:storm-core:${versions.storm}")
   compileOnly("org.apache.storm:storm-client:${versions.storm}")
