@@ -59,8 +59,7 @@ public class WordCountTopologyLocal {
     // Verify the topology data
     List<List<Object>> spoutTuples = Testing.readTuples(results, "spout");
     List<List<Object>> expectedSpoutTuples =
-        Collections.singletonList(
-            Collections.singletonList("the cow jumped over the moon"));
+        Collections.singletonList(Collections.singletonList("the cow jumped over the moon"));
 
     Assertions.assertTrue(
         Testing.multiseteq(expectedSpoutTuples, spoutTuples),
@@ -68,13 +67,13 @@ public class WordCountTopologyLocal {
 
     List<List<Object>> splitTuples = Testing.readTuples(results, "split");
     List<List<Object>> expectedSplitTuples =
-            Arrays.asList(
-                Collections.singletonList("the"),
-                Collections.singletonList("cow"),
-                Collections.singletonList("jumped"),
-                Collections.singletonList("over"),
-                Collections.singletonList("the"),
-                Collections.singletonList("moon"));
+        Arrays.asList(
+            Collections.singletonList("the"),
+            Collections.singletonList("cow"),
+            Collections.singletonList("jumped"),
+            Collections.singletonList("over"),
+            Collections.singletonList("the"),
+            Collections.singletonList("moon"));
     Assertions.assertTrue(
         Testing.multiseteq(expectedSplitTuples, splitTuples),
         expectedSplitTuples + " expected, but found " + splitTuples);
