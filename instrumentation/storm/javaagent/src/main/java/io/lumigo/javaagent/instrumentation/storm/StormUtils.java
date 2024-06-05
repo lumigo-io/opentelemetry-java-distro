@@ -24,11 +24,18 @@ import org.apache.storm.tuple.Tuple;
 
 public class StormUtils {
 
+  public static String STORM_TYPE_KEY = "storm.type";
+  public static String STORM_ID_KEY = "storm.id";
+  public static String STORM_VERSION_KEY = "storm.version";
+  public static String STORM_TUPLE_VALUES_KEY = "storm.tuple.values";
+  public static String SOURCE_COMPONENT_KEY = "source.component";
+  public static String COMPONENT_NAME_KEY = "component.name";
+
   public static String getThreadName() {
     return Thread.currentThread().getName();
   }
 
-  public static String getServiceName() {
+  public static String getComponentName() {
     // The only way to get the name is from the thread name
     return getThreadName().split("-")[2];
   }

@@ -29,6 +29,7 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
+import io.opentelemetry.semconv.SemanticAttributes;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -60,9 +61,9 @@ public class StormSpoutInstrumentation implements TypeInstrumentation {
       context = stormSpoutInstrumenter().start(parentContext, null);
       scope = context.makeCurrent();
       final Span span = currentSpan();
-      span.setAttribute("storm.type", "spout");
-      span.setAttribute("service.name", StormUtils.getServiceName());
-      span.setAttribute("thread.name", StormUtils.getThreadName());
+      span.setAttribute(StormUtils.STORM_TYPE_KEY, "spout");
+      span.setAttribute(StormUtils.COMPONENT_NAME_KEY, StormUtils.getComponentName());
+      span.setAttribute(SemanticAttributes.THREAD_NAME, StormUtils.getThreadName());
     }
 
     @SuppressWarnings("unused")

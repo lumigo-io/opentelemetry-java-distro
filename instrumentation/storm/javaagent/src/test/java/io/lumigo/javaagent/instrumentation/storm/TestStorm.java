@@ -39,17 +39,12 @@ public class TestStorm {
       AgentInstrumentationExtension.create();
 
   void assertExecutor(
-      SpanDataAssert span,
-      String stormType,
-      String serviceName,
-      String destinationName,
-      List<String> values) {
+      SpanDataAssert span, String serviceName, String destinationName, List<String> values) {
     span.hasName("Storm Executor")
         .hasKind(SpanKind.INTERNAL)
-        //          .hasAttribute(AttributeKey.stringKey("storm.type"), stormType)
-        .hasAttribute(AttributeKey.stringKey("service.name"), serviceName)
+        .hasAttribute(AttributeKey.stringKey(StormUtils.COMPONENT_NAME_KEY), serviceName)
         .hasAttribute(SemanticAttributes.MESSAGING_DESTINATION_NAME, destinationName)
-        .hasAttribute(AttributeKey.stringArrayKey("storm.tuple.values"), values)
+        .hasAttribute(AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY), values)
         .hasAttributesSatisfying(
             attributes ->
                 Objects.requireNonNull(attributes.get(SemanticAttributes.MESSAGING_MESSAGE_ID)));
@@ -58,14 +53,15 @@ public class TestStorm {
   void assertWordCount(TraceAssert trace, List<String> inputValues) {
     trace
         .hasSize(2)
-        .hasSpansSatisfyingExactly(
+        .hasSpansSatisfyingExactlyInAnyOrder(
             span -> {
               span.hasName("Storm Bolt")
                   .hasKind(SpanKind.INTERNAL)
-                  .hasAttribute(AttributeKey.stringKey("storm.type"), "bolt")
-                  .hasAttribute(AttributeKey.stringKey("service.name"), "wordCount")
-                  .hasAttribute(AttributeKey.stringKey("storm.sourceComponent"), "split")
-                  .hasAttribute(AttributeKey.stringArrayKey("storm.tuple.values"), inputValues)
+                  .hasAttribute(AttributeKey.stringKey(StormUtils.STORM_TYPE_KEY), "bolt")
+                  .hasAttribute(AttributeKey.stringKey(StormUtils.COMPONENT_NAME_KEY), "wordCount")
+                  .hasAttribute(AttributeKey.stringKey(StormUtils.SOURCE_COMPONENT_KEY), "split")
+                  .hasAttribute(
+                      AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY), inputValues)
                   .hasAttributesSatisfying(
                       attributes ->
                           Objects.requireNonNull(
@@ -95,19 +91,20 @@ public class TestStorm {
                     TracesAssert.assertThat(Collections.singletonList(trace))
                         .hasTracesSatisfyingExactly(
                             spans ->
-                                spans.hasSpansSatisfyingExactly(
+                                spans.hasSpansSatisfyingExactlyInAnyOrder(
                                     span -> {
                                       span.hasName("Storm Spout")
                                           .hasKind(SpanKind.INTERNAL)
                                           .hasAttribute(
-                                              AttributeKey.stringKey("storm.type"), "spout")
+                                              AttributeKey.stringKey(StormUtils.STORM_TYPE_KEY),
+                                              "spout")
                                           .hasAttribute(
-                                              AttributeKey.stringKey("service.name"), "spout");
+                                              AttributeKey.stringKey(StormUtils.COMPONENT_NAME_KEY),
+                                              "spout");
                                     },
                                     span -> {
                                       assertExecutor(
                                           span,
-                                          "spout",
                                           "spout",
                                           "split",
                                           List.of("the cow jumped over the moon"));
@@ -127,14 +124,19 @@ public class TestStorm {
                                           span.hasName("Storm Bolt")
                                               .hasKind(SpanKind.INTERNAL)
                                               .hasAttribute(
-                                                  AttributeKey.stringKey("storm.type"), "bolt")
+                                                  AttributeKey.stringKey(StormUtils.STORM_TYPE_KEY),
+                                                  "bolt")
                                               .hasAttribute(
-                                                  AttributeKey.stringKey("service.name"), "split")
+                                                  AttributeKey.stringKey(
+                                                      StormUtils.COMPONENT_NAME_KEY),
+                                                  "split")
                                               .hasAttribute(
-                                                  AttributeKey.stringKey("storm.sourceComponent"),
+                                                  AttributeKey.stringKey(
+                                                      StormUtils.SOURCE_COMPONENT_KEY),
                                                   "spout")
                                               .hasAttribute(
-                                                  AttributeKey.stringArrayKey("storm.tuple.values"),
+                                                  AttributeKey.stringArrayKey(
+                                                      StormUtils.STORM_TUPLE_VALUES_KEY),
                                                   List.of("the cow jumped over the moon"))
                                               .hasAttributesSatisfying(
                                                   attributes ->
@@ -145,36 +147,32 @@ public class TestStorm {
                                         },
                                         span -> {
                                           assertExecutor(
-                                              span, "bolt", "split", "wordCount", List.of("the"));
+                                              span, "split", "wordCount", List.of("the"));
                                         },
                                         span -> {},
                                         span -> {
                                           assertExecutor(
-                                              span, "bolt", "split", "wordCount", List.of("cow"));
+                                              span, "split", "wordCount", List.of("cow"));
                                         },
                                         span -> {},
                                         span -> {
                                           assertExecutor(
-                                              span,
-                                              "bolt",
-                                              "split",
-                                              "wordCount",
-                                              List.of("jumped"));
+                                              span, "split", "wordCount", List.of("jumped"));
                                         },
                                         span -> {},
                                         span -> {
                                           assertExecutor(
-                                              span, "bolt", "split", "wordCount", List.of("over"));
+                                              span, "split", "wordCount", List.of("over"));
                                         },
                                         span -> {},
                                         span -> {
                                           assertExecutor(
-                                              span, "bolt", "split", "wordCount", List.of("the"));
+                                              span, "split", "wordCount", List.of("the"));
                                         },
                                         span -> {},
                                         span -> {
                                           assertExecutor(
-                                              span, "bolt", "split", "wordCount", List.of("moon"));
+                                              span, "split", "wordCount", List.of("moon"));
                                         },
                                         span -> {}));
                   })

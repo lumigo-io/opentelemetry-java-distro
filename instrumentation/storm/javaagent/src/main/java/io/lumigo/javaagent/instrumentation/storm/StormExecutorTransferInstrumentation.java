@@ -65,12 +65,13 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
       try (Scope scope = parentContext.makeCurrent()) {
         Context context = stormExecutorInstrumenter().start(parentContext, addressedTuple);
         final Span span = Java8BytecodeBridge.spanFromContext(context);
-        span.setAttribute("service.name", StormUtils.getServiceName());
+        span.setAttribute(StormUtils.COMPONENT_NAME_KEY, StormUtils.getComponentName());
         span.setAttribute(SemanticAttributes.THREAD_NAME, StormUtils.getThreadName());
+        span.setAttribute(SemanticAttributes.MESSAGING_SYSTEM, "storm");
         span.setAttribute(
             SemanticAttributes.MESSAGING_MESSAGE_ID, StormUtils.getMessageId(addressedTuple.tuple));
         span.setAttribute(
-            AttributeKey.stringArrayKey("storm.tuple.values"),
+            AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY),
             StormUtils.getValues(addressedTuple.tuple));
         span.setAttribute(
             SemanticAttributes.MESSAGING_DESTINATION_NAME,
