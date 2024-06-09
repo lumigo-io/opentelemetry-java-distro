@@ -9,7 +9,7 @@ This is lumigo instrumentation for the [storm](https://storm.apache.org/) librar
 * Storm `ExecutorTransfer` - the class that is responsible for transferring tuples between storm components (used inside the storm `OutputCollector`).
 
 each one of those components has their own instrumentation class.
-I create an internal span for each run of the spout / bolt and for each tuple that is emitted with the OutputCollector to each component its emitted to.
+An internal span is created for each run of the `spout` / `bolt` and each tuple emitted with the OutputCollector to each component it's emitted to.
 
 ## Otel conventions
 for this instrumentation add following attributes to the spans:
