@@ -12,7 +12,7 @@ each one of those components has their own instrumentation class.
 An internal span is created for each run of the `spout` / `bolt` and each tuple emitted with the OutputCollector to each component it's emitted to.
 
 ## Otel conventions
-for this instrumentation add following attributes to the spans:
+for this instrumentation we used the following attributes:
 1. `thread.name` - semantic convention default attribute
 2. `messaging.system` - semantic convention default attribute
 3. `messaging.message.id` - semantic convention default attribute
