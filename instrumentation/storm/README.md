@@ -12,11 +12,17 @@ each one of those components has their own instrumentation class.
 I create an internal span for each run of the spout / bolt and for each tuple that is emitted with the OutputCollector to each component its emitted to.
 
 ## Otel conventions
-for this instrumentation we use the following attributes from otel conventions:
-1. THREAD_NAME - `thread.name`
-2. MESSAGING_SYSTEM - `messaging.system`
-3. MESSAGING_MESSAGE_ID - `messaging.message.id`
-4. MESSAGING_DESTINATION_NAME - `messaging.destination.name`
+for this instrumentation add following attributes to the spans:
+1. `thread.name` - semantic convention default attribute
+2. `messaging.system` - semantic convention default attribute
+3. `messaging.message.id` - semantic convention default attribute
+4. `messaging.destination.name` - semantic convention default attribute
+5. `storm.type` - the type of the storm component spout / bolt
+6. `storm.id` - the id of the storm topology
+7. `storm.version` - the version of the storm library
+8. `storm.tuple.values` - the value that emitted to each bolt
+9. `source.component` - the previous component name (can be used to create trigger by behaviour)
+10. `component.name` - the name of the component in the invocation override the otel_service_name property
 
 ## Building transactions
 
