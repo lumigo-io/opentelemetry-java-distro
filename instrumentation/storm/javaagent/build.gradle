@@ -1,0 +1,24 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+repositories {
+  maven {
+    url "https://repo.clojars.org/"
+  }
+}
+
+muzzle {
+  pass {
+    group.set("org.apache.storm")
+    module.set("storm-client")
+    versions.set("[2.6.0,)")
+    assertInverse.set(true)
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+  compileOnly("org.apache.storm:storm-client:${versions.storm}")
+
+  testImplementation("org.apache.storm:storm-core:${versions.storm}")
+  testImplementation project(":instrumentation:storm:testing")
+}
