@@ -29,6 +29,13 @@ for this instrumentation we used the following attributes:
 Transactions are built using storm `message.id` added to the `spout` / `bolt` span attributes (based on Opentelemetry semantic convensions).
 This message id is created by the `ExecutorTransfer` when it sends the tuple to the next component, and we add it to the `ExecutorTransfer` span too.
 In addition, the `ExecutorTransfer` span has a parent span of the spout / bolt that emitted the tuple.
+looks like this:
+```
+spout span
+  |-> executor span (with message.id)
+  
+bolt span (with message.id)
+```
 
 ## Possible improvements:
 
