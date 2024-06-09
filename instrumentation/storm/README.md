@@ -34,4 +34,4 @@ In addition, the `ExecutorTransfer` span has a parent span of the spout / bolt t
 
 * Create Internal span for spout is which emitted no tuple. 
 * We create internal span for tuples that emitted with the `OutputCollector` to storm internal components (like the acker) - we don't show them in the three because they are not bolts / spout, so they don't have spans.
-* We infer the component name from the thread name because I didn't manage to find any other way to do it.
+* We infer the component name from the thread name because no other way was found
