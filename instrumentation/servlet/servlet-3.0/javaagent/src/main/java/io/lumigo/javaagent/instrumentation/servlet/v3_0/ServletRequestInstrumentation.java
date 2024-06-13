@@ -122,6 +122,7 @@ public class ServletRequestInstrumentation implements TypeInstrumentation {
   public static class GetReaderAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
     public static void methodEnter(
+        @Advice.Origin("#t") Class<?> declaringClass,
         @Advice.This ServletRequest thiz,
         @Advice.Local("lumigoSpanHolder") SpanAndRelatedObjectHolder spanHolder,
         @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
@@ -134,8 +135,10 @@ public class ServletRequestInstrumentation implements TypeInstrumentation {
       // Jetty implements getReader() by wrapping getInputStream() in an InputStreamReader
       // To enable instrumentation of the InputStream, we need to set a flag indicating to
       // not skip it due to the call depth
+      // changed from thiz.getClass() to declaringClass because muzzle check plugin didn't allow it.
+      // and won't inject the instrumentation.
       VirtualField.find(ServletRequest.class, Boolean.class)
-          .set(thiz, thiz.getClass().getName().contains("jetty"));
+          .set(thiz, declaringClass.getName().contains("jetty"));
     }
 
     @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
