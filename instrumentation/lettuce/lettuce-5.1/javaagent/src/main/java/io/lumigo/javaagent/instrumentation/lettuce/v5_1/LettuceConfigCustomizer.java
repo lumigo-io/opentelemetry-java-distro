@@ -19,6 +19,9 @@ public class LettuceConfigCustomizer implements AutoConfigurationCustomizerProvi
         config -> {
           Map<String, String> overrides = new HashMap<>();
 
+          // disable OTeL instrumentation for Lettuce
+          overrides.put("otel.instrumentation.lettuce.enabled", "false");
+
           if (null == config.getBoolean(LETTUCE_EXPERIMENTAL_ATTRIBUTE_KEY)) {
             overrides.put(LETTUCE_EXPERIMENTAL_ATTRIBUTE_KEY, "true");
           }

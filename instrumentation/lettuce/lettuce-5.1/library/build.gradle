@@ -1,0 +1,11 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  compileOnly("io.lettuce:lettuce-core:${versions.lettuce51}")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-lettuce-common:${versions.opentelemetryJavaagentAlpha}")
+
+//  implementation(project(":instrumentation:lettuce:lettuce-common:library"))
+}

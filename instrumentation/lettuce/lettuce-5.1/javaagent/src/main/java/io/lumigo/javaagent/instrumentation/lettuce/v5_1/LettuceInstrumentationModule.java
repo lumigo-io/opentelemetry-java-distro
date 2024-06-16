@@ -20,6 +20,8 @@ package io.lumigo.javaagent.instrumentation.lettuce.v5_1;
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
+import io.opentelemetry.javaagent.instrumentation.lettuce.v5_1.DefaultClientResourcesInstrumentation;
+import io.opentelemetry.javaagent.instrumentation.lettuce.v5_1.LettuceAsyncCommandInstrumentation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +35,8 @@ public class LettuceInstrumentationModule extends InstrumentationModule {
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
-    return Arrays.asList(new LettucePayloadInstrumentation());
+    return Arrays.asList( new LettucePayloadInstrumentation());
+//        new DefaultClientResourcesInstrumentation(),
+//        new LettuceAsyncCommandInstrumentation());
   }
 }
