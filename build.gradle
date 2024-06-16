@@ -67,6 +67,7 @@ subprojects {
       springwebmvc31             : "3.1.0.RELEASE",
       springboot                 : "2.7.14",
       storm                      : "2.6.0",
+      lettuce51                  : "6.3.2.RELEASE",
 
       jackson                    : "2.15.2",
       bytebuddy                  : "1.14.5",

@@ -10,7 +10,7 @@ muzzle {
   pass {
     group.set("org.apache.storm")
     module.set("storm-client")
-    versions.set("[2.6.0,)")
+    versions.set("[2.0.0,)")
     assertInverse.set(true)
   }
 }
