@@ -15,7 +15,13 @@ dependencies {
   compileOnly("io.lettuce:lettuce-core:${versions.lettuce51}")
 
 //  implementation(project(":instrumentation:lettuce:lettuce-5.1:library"))
-//  implementation project(":instrumentation:lettuce:lettuce-5.1:library")
+  implementation project(":instrumentation:lettuce:lettuce-5.1:library")
 
-  compileOnly("io.opentelemetry.instrumentation:opentelemetry-lettuce-5.1")
+//  compileOnly("io.opentelemetry.instrumentation:opentelemetry-lettuce-5.1")
+}
+
+tasks {
+  test {
+    systemProperty("testLatestDeps", findProperty("testLatestDeps") as Boolean)
+  }
 }

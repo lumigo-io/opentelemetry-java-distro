@@ -5,7 +5,15 @@ dependencies {
   compileOnly project(":bootstrap")
 
   compileOnly("io.lettuce:lettuce-core:${versions.lettuce51}")
-  implementation("io.opentelemetry.instrumentation:opentelemetry-lettuce-common:${versions.opentelemetryJavaagentAlpha}")
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-lettuce-common:${versions.opentelemetryJavaagentAlpha}")
 
 //  implementation(project(":instrumentation:lettuce:lettuce-common:library"))
+
+  compileOnly("io.opentelemetry.javaagent:opentelemetry-muzzle:${versions.opentelemetryJavaagentAlpha}") // For @NoMuzzle
+}
+
+tasks {
+  test {
+    systemProperty("testLatestDeps", findProperty("testLatestDeps") as Boolean)
+  }
 }
