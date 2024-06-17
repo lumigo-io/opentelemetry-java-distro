@@ -98,7 +98,8 @@ public class ServerCallListenerInstrumentation implements TypeInstrumentation {
                   .omittingInsignificantWhitespace()
                   .print((GeneratedMessageV3) msg));
           Java8BytecodeBridge.currentSpan()
-              .setAttribute(LumigoSemanticAttributes.GRPC_REQUEST_BODY, JsonUtil.toJson(requestMsgs));
+              .setAttribute(
+                  LumigoSemanticAttributes.GRPC_REQUEST_BODY, JsonUtil.toJson(requestMsgs));
         } catch (InvalidProtocolBufferException e) {
           // At this point we know that msg is a GeneratedMessageV3, so this should never happen
           Java8BytecodeBridge.currentSpan()
