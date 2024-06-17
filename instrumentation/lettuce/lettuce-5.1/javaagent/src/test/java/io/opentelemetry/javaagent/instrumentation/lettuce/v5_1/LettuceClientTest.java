@@ -65,8 +65,9 @@ class LettuceClientTest {
 
   @BeforeEach
   void setup() {
-    commands.flushall();
-    connection.flushCommands();
+    commands.flushdb();
+    connection.close();
+    redisClient.close();
     testing.clearData();
   }
 
