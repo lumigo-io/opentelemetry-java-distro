@@ -5,8 +5,6 @@
 
 package io.opentelemetry.instrumentation.lettuce.v5_1;
 
-import static io.opentelemetry.instrumentation.lettuce.common.LettuceArgSplitter.splitArgs;
-
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.lettuce.core.output.CommandOutput;
 import io.lettuce.core.protocol.CompleteableCommand;
@@ -243,6 +241,10 @@ final class OpenTelemetryTracing implements Tracing {
                 if (error != null) {
                   span.setStatus(StatusCode.ERROR, error);
                 }
+                Object result = output.get();
+                if (result != null) {
+                  span.setAttribute("db.response.body", result.toString());
+                }
               }
 
               finish(span);
@@ -326,11 +328,11 @@ final class OpenTelemetryTracing implements Tracing {
     }
 
     private void finish(Span span) {
-      System.out.println("OpenTelemetrySpan.finish");
       if (name != null) {
-        String statement =
-            sanitizer.sanitize(name, argsList != null ? argsList : splitArgs(argsString));
-        span.setAttribute(SemanticAttributes.DB_STATEMENT, statement);
+        String statement = argsList != null ?  String.join(" ", argsList) : argsString;
+        if (statement != null) {
+          span.setAttribute(SemanticAttributes.DB_STATEMENT, statement);
+        }
       }
       span.end();
     }

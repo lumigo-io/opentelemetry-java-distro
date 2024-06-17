@@ -53,7 +53,7 @@ public abstract class AbstractBufferHolder {
     try {
       final String requestBody = getBufferAsString(charsetName);
       if (requestBody != null && !requestBody.isEmpty()) {
-        span.setAttribute(SemanticAttributes.HTTP_REQUEST_BODY, requestBody);
+        span.setAttribute(LumigoSemanticAttributes.HTTP_REQUEST_BODY, requestBody);
       }
     } catch (UnsupportedEncodingException ignored) {
       // Ignore error, it shouldn't occur as we've previously parsed the charset for validity
@@ -73,7 +73,7 @@ public abstract class AbstractBufferHolder {
     try {
       final String responseBody = getBufferAsString(charsetName);
       if (responseBody != null && !responseBody.isEmpty()) {
-        currentSpan.setAttribute(SemanticAttributes.HTTP_RESPONSE_BODY, responseBody);
+        currentSpan.setAttribute(LumigoSemanticAttributes.HTTP_RESPONSE_BODY, responseBody);
       }
     } catch (UnsupportedEncodingException ignored) {
       // Ignore error, it shouldn't occur as we've previously parsed the charset for validity

@@ -9,7 +9,6 @@ import io.lettuce.core.codec.StringCodec;
 import io.lettuce.core.protocol.CommandArgs.KeyArgument;
 import io.lettuce.core.protocol.CommandArgs.SingularArgument;
 import io.lettuce.core.protocol.CommandArgs.ValueArgument;
-import io.opentelemetry.instrumentation.lettuce.common.LettuceArgSplitter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public final class OtelCommandArgsUtil {
 
   /**
    * Extract argument {@link List} from {@link CommandArgs} so that we wouldn't need to parse them
-   * from command {@link String} with {@link LettuceArgSplitter#splitArgs}.
+   * from command {@link String} with {LettuceArgSplitter#splitArgs}.
    */
   public static List<String> getCommandArgs(CommandArgs<?, ?> commandArgs) {
     List<String> result = new ArrayList<>();

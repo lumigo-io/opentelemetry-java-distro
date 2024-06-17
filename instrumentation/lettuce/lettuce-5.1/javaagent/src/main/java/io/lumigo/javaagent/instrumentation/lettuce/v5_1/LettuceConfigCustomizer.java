@@ -26,7 +26,7 @@ public class LettuceConfigCustomizer implements AutoConfigurationCustomizerProvi
             overrides.put(LETTUCE_EXPERIMENTAL_ATTRIBUTE_KEY, "true");
           }
 
-          if (null == config.getBoolean(DB_STATEMENT_SANITIZER_KEY) || config.getBoolean(DB_STATEMENT_SANITIZER_KEY)) {
+          if (null == config.getBoolean(DB_STATEMENT_SANITIZER_KEY)) {
             overrides.put(DB_STATEMENT_SANITIZER_KEY, "false");
           }
 

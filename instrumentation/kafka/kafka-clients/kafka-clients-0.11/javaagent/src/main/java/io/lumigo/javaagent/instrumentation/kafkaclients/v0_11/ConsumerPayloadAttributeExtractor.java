@@ -17,7 +17,7 @@
  */
 package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 
-import io.lumigo.instrumentation.core.SemanticAttributes;
+import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -30,7 +30,7 @@ public class ConsumerPayloadAttributeExtractor implements AttributesExtractor<Ka
       KafkaProcessRequest kafkaProcessRequest) {
     if (null != kafkaProcessRequest.getRecord().value()) {
       attributes.put(
-          SemanticAttributes.MESSAGING_PAYLOAD,
+          LumigoSemanticAttributes.MESSAGING_PAYLOAD,
           kafkaProcessRequest.getRecord().value().toString());
     }
   }

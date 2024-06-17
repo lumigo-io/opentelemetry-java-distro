@@ -18,7 +18,7 @@
 package io.lumigo.javaagent.instrumentation.rabbitmq;
 
 import com.rabbitmq.client.GetResponse;
-import io.lumigo.instrumentation.core.SemanticAttributes;
+import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -36,7 +36,7 @@ public class GetResponseBodyAttributeExtractor implements AttributesExtractor<Re
   public void onEnd(AttributesBuilder attributes, Context context, ReceiveRequest receiveRequest,
       @Nullable GetResponse getResponse, @Nullable Throwable error) {
     if (null != getResponse) {
-      attributes.put(SemanticAttributes.MESSAGING_PAYLOAD, new String(getResponse.getBody()));
+      attributes.put(LumigoSemanticAttributes.MESSAGING_PAYLOAD, new String(getResponse.getBody()));
     }
   }
 }

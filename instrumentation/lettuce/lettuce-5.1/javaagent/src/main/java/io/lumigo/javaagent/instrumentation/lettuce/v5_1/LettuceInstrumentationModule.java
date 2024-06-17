@@ -22,15 +22,27 @@ import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModul
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.instrumentation.lettuce.v5_1.DefaultClientResourcesInstrumentation;
 import io.opentelemetry.javaagent.instrumentation.lettuce.v5_1.LettuceAsyncCommandInstrumentation;
-
+import net.bytebuddy.matcher.ElementMatcher;
 import java.util.Arrays;
 import java.util.List;
+
+import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.hasClassesNamed;
 
 @AutoService(InstrumentationModule.class)
 public class LettuceInstrumentationModule extends InstrumentationModule {
 
   public LettuceInstrumentationModule() {
-    super("lettuce", "lumigo-lettuce-5.1");
+    super("lumigo-lettuce", "lumigo-lettuce-5.1");
+  }
+
+  @Override
+  public ElementMatcher.Junction<ClassLoader> classLoaderMatcher() {
+    return hasClassesNamed("io.lettuce.core.tracing.Tracing");
+  }
+
+  @Override
+  public boolean isHelperClass(String className) {
+    return className.startsWith("io.lettuce.core.protocol.OtelCommandArgsUtil");
   }
 
   @Override
