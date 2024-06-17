@@ -13,12 +13,9 @@ dependencies {
   compileOnly project(":bootstrap")
 
   compileOnly("io.lettuce:lettuce-core:${versions.lettuce51}")
-
-//  implementation(project(":instrumentation:lettuce:lettuce-5.1:library"))
   implementation project(":instrumentation:lettuce:lettuce-5.1:library")
 
   testImplementation("io.opentelemetry.instrumentation:opentelemetry-lettuce-5.1:${versions.opentelemetryJavaagentAlpha}")
   testImplementation("io.lettuce:lettuce-core:${versions.lettuce51}")
   testImplementation("org.testcontainers:testcontainers:${versions.testcontainers}")
-//  compileOnly("io.opentelemetry.instrumentation:opentelemetry-lettuce-5.1")
 }
