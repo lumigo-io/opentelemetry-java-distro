@@ -27,7 +27,6 @@ import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.semconv.SemanticAttributes;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,31 +40,34 @@ class LettuceClientTest {
   @RegisterExtension
   static final InstrumentationExtension testing = AgentInstrumentationExtension.create();
 
-  GenericContainer<?> redisServer =
+  static GenericContainer<?> redisServer =
       new GenericContainer<>("redis:6.2.3-alpine").withExposedPorts(6379);
 
-  int port;
+  static int port;
 
-  RedisClient redisClient;
-  StatefulRedisConnection<String, String> connection;
-  RedisCommands<String, String> commands;
+  static RedisClient redisClient;
+  static StatefulRedisConnection<String, String> connection;
+  static RedisCommands<String, String> commands;
 
-  @BeforeEach
-  void setupSpec() {
+  @BeforeAll
+  static void setupSpec() {
     redisServer.start();
     port = redisServer.getMappedPort(6379);
     redisClient = RedisClient.create("redis://localhost:"+port+"/0");
     connection = redisClient.connect();
     commands = connection.sync();
-    testing.clearData();
   }
 
-  @AfterEach
-  void cleanupSpec() {
-    commands.flushdb();
-    connection.close();
-    redisClient.close();
+  @AfterAll
+  static void cleanupSpec() {
     redisServer.stop();
+  }
+
+  @BeforeEach
+  void setup() {
+    commands.flushdb();
+    connection.flushCommands();
+    testing.clearData();
   }
 
   @Test
