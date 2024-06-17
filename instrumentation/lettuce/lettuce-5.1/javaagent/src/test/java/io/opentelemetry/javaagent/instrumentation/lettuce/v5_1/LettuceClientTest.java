@@ -65,6 +65,9 @@ class LettuceClientTest {
 
   @BeforeEach
   void setup() {
+    commands.flushall();
+    connection.flushCommands();
+    testing.waitForTraces(1);
     testing.clearData();
   }
 
@@ -94,10 +97,10 @@ class LettuceClientTest {
   // TODO Update to use new http semantic conventions in 2.0
   @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void getCommand() {
-    commands.set("foo2", "bar2");
-    String value = commands.get("foo2");
+    commands.set("foo", "bar");
+    String value = commands.get("foo");
 
-    assertThat(value).isEqualTo("bar2");
+    assertThat(value).isEqualTo("bar");
 
     TracesAssert.assertThat(testing.waitForTraces(2))
         .hasSize(2)
@@ -109,7 +112,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo2 bar2"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
@@ -120,8 +123,42 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo2"),
-                                equalTo(AttributeKey.stringKey("db.response.body"), "bar2"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo"),
+                                equalTo(AttributeKey.stringKey("db.response.body"), "bar"),
+                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
+                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
+  }
+
+  @Test
+  // TODO Update to use new http semantic conventions in 2.0
+  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
+  void commandWithNoArguments() {
+    commands.set("foo", "bar");
+    String value = commands.randomkey();
+
+    assertThat(value).isEqualTo("foo");
+
+    TracesAssert.assertThat(testing.waitForTraces(2))
+        .hasSize(2)
+        .hasTracesSatisfyingExactly(
+            trace ->
+                trace.hasSpansSatisfyingExactly(
+                    span ->
+                        span.hasName("SET")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttributesSatisfying(
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
+                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
+            trace ->
+                trace.hasSpansSatisfyingExactly(
+                    span ->
+                        span.hasName("RANDOMKEY")
+                            .hasKind(SpanKind.CLIENT)
+                            .hasAttributesSatisfying(
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
+                                equalTo(AttributeKey.stringKey("db.response.body"), "foo"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
   }
