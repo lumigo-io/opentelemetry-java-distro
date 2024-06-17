@@ -27,6 +27,7 @@ import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.semconv.SemanticAttributes;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,9 +66,13 @@ class LettuceClientTest {
 
   @BeforeEach
   void setup() {
-    commands.flushdb();
-    connection.flushCommands();
     testing.clearData();
+  }
+
+  @AfterEach
+  void cleanup() {
+    commands.flushall();
+    connection.flushCommands();
   }
 
   @Test
