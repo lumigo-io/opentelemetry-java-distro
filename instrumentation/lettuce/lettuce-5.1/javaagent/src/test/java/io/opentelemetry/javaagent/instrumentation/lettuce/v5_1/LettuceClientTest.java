@@ -27,7 +27,6 @@ import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.semconv.SemanticAttributes;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,10 +94,10 @@ class LettuceClientTest {
   // TODO Update to use new http semantic conventions in 2.0
   @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void getCommand() {
-    commands.set("foo", "bar");
-    String value = commands.get("foo");
+    commands.set("foo2", "bar2");
+    String value = commands.get("foo2");
 
-    assertThat(value).isEqualTo("bar");
+    assertThat(value).isEqualTo("bar2");
 
     TracesAssert.assertThat(testing.waitForTraces(2))
         .hasSize(2)
