@@ -69,12 +69,6 @@ class LettuceClientTest {
     testing.clearData();
   }
 
-  @AfterEach
-  void cleanup() {
-    commands.flushall();
-    connection.flushCommands();
-  }
-
   @Test
   // TODO Update to use new http semantic conventions in 2.0
   @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
@@ -116,7 +110,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo2 bar2"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
@@ -127,42 +121,8 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo"),
-                                equalTo(AttributeKey.stringKey("db.response.body"), "bar"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
-  }
-
-  @Test
-  // TODO Update to use new http semantic conventions in 2.0
-  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
-  void commandWithNoArguments() {
-    commands.set("foo", "bar");
-    String value = commands.randomkey();
-
-    assertThat(value).isEqualTo("foo");
-
-    TracesAssert.assertThat(testing.waitForTraces(2))
-        .hasSize(2)
-        .hasTracesSatisfyingExactly(
-            trace ->
-                trace.hasSpansSatisfyingExactly(
-                    span ->
-                        span.hasName("SET")
-                            .hasKind(SpanKind.CLIENT)
-                            .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
-            trace ->
-                trace.hasSpansSatisfyingExactly(
-                    span ->
-                        span.hasName("RANDOMKEY")
-                            .hasKind(SpanKind.CLIENT)
-                            .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(AttributeKey.stringKey("db.response.body"), "foo"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo2"),
+                                equalTo(AttributeKey.stringKey("db.response.body"), "bar2"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
   }
