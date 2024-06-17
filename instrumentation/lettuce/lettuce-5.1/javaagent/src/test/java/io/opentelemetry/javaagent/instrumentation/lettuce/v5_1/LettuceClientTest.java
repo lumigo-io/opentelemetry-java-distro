@@ -64,9 +64,10 @@ class LettuceClientTest {
   }
 
   @BeforeEach
-  void setup() {
+  void setup() throws InterruptedException {
     commands.flushall();
     connection.flushCommands();
+    wait(200);
     testing.clearData();
   }
 
