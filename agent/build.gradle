@@ -43,6 +43,7 @@ dependencies {
   javaagentLibs(project(":instrumentation:servlet:servlet-3.0:javaagent"))
   javaagentLibs(project(":instrumentation:spring:spring-webmvc:spring-webmvc-3.1:javaagent"))
   javaagentLibs(project(":instrumentation:storm:javaagent"))
+  javaagentLibs(project(":instrumentation:lettuce:lettuce-5.1:javaagent"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
@@ -96,7 +97,7 @@ tasks {
 
   // 2. the distro javaagent libs are then isolated - moved to the inst/ directory
   // having a separate task for isolating javaagent libs is required to avoid duplicates with the upstream javaagent
-  // duplicatesStrategy in shadowJar won't be applied when adding files with with(CopySpec) because each CopySpec has
+  // duplicatesStrategy in shadowJar won't be applied when adding files with (CopySpec) because each CopySpec has
   // its own duplicatesStrategy
   task isolateJavaagentLibs(type: Copy) {
     dependsOn(tasks.relocateJavaagentLibs)

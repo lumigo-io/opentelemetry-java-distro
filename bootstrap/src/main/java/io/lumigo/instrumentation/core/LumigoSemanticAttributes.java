@@ -20,7 +20,7 @@ package io.lumigo.instrumentation.core;
 import io.opentelemetry.api.common.AttributeKey;
 
 /** Semantic Attribute keys specific to Lumigo. */
-public final class SemanticAttributes {
+public final class LumigoSemanticAttributes {
   public static final AttributeKey<String> HTTP_REQUEST_BODY =
       AttributeKey.stringKey("http.request.body");
 
@@ -35,4 +35,7 @@ public final class SemanticAttributes {
 
   public static final AttributeKey<String> GRPC_RESPONSE_BODY =
       AttributeKey.stringKey("rpc.grpc.response.payload");
+
+  public static final AttributeKey<String> DB_RESPONSE_BODY =
+      AttributeKey.stringKey("db.response.body");
 }

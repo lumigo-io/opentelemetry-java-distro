@@ -32,6 +32,8 @@ include "instrumentation:spring:spring-webmvc:spring-webmvc-3.1:javaagent"
 include "instrumentation:spring:spring-webmvc:testing"
 include "instrumentation:storm:javaagent"
 include 'instrumentation:storm:testing'
+include 'instrumentation:lettuce:lettuce-5.1:library'
+include 'instrumentation:lettuce:lettuce-5.1:javaagent'
 include "smoke-tests"
 include "testing:agent-for-testing"
 include "test-utils"

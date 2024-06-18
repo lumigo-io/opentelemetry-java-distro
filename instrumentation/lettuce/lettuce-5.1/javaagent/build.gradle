@@ -1,0 +1,21 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("io.lettuce")
+    module.set("lettuce-core")
+    versions.set("[5.1.0.RELEASE,)")
+    assertInverse.set(true)
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  compileOnly("io.lettuce:lettuce-core:${versions.lettuce51}")
+  implementation project(":instrumentation:lettuce:lettuce-5.1:library")
+
+  testImplementation("io.opentelemetry.instrumentation:opentelemetry-lettuce-5.1:${versions.opentelemetryJavaagentAlpha}")
+  testImplementation("io.lettuce:lettuce-core:${versions.lettuce51}")
+  testImplementation("org.testcontainers:testcontainers:${versions.testcontainers}")
+}

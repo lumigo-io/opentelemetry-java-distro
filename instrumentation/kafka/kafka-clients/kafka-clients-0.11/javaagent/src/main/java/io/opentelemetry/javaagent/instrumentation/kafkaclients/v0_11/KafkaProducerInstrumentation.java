@@ -13,7 +13,7 @@ import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 
-import io.lumigo.instrumentation.core.SemanticAttributes;
+import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.instrumentation.kafka.internal.KafkaProducerRequest;
@@ -106,7 +106,7 @@ public class KafkaProducerInstrumentation implements TypeInstrumentation {
       // Lumigo custom setting payload as span attribute
       if (null != record.value()) {
         Java8BytecodeBridge.currentSpan()
-            .setAttribute(SemanticAttributes.MESSAGING_PAYLOAD, record.value().toString());
+            .setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, record.value().toString());
       }
 
       callback = new ProducerCallback(callback, parentContext, context, request);

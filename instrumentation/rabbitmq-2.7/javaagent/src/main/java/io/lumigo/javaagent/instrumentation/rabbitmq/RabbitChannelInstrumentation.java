@@ -24,7 +24,7 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.not;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
-import io.lumigo.instrumentation.core.SemanticAttributes;
+import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
@@ -60,7 +60,7 @@ public class RabbitChannelInstrumentation implements TypeInstrumentation {
       Context context = Java8BytecodeBridge.currentContext();
       Span span = Java8BytecodeBridge.spanFromContext(context);
       if (span != null && body != null) {
-        span.setAttribute(SemanticAttributes.MESSAGING_PAYLOAD, new String(body));
+        span.setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, new String(body));
       }
     }
   }

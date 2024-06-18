@@ -1,0 +1,11 @@
+apply from: "$rootDir/gradle/library-instrumentation.gradle"
+
+jar {
+  archiveBaseName.set("opentelemetry-instrumentation-lettuce-5.1-library")
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+  compileOnly("io.lettuce:lettuce-core:${versions.lettuce51}")
+
+}
