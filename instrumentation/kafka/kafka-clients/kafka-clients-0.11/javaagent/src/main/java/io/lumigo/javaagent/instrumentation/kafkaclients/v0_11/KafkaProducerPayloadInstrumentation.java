@@ -36,6 +36,7 @@ public class KafkaProducerPayloadInstrumentation implements TypeInstrumentation 
     public static void onEnter(
         @Advice.Argument(value = 0, readOnly = false) ProducerRecord<?, ?> record
     ) {
+      System.out.println("KafkaProducerPayloadInstrumentation.SendPayloadAdvice.onEnter");
       if (null != record.value()) {
         Java8BytecodeBridge.currentSpan()
             .setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, record.value().toString());
