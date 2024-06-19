@@ -12,13 +12,9 @@ import static net.bytebuddy.matcher.ElementMatchers.returns;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
-import io.opentelemetry.instrumentation.kafka.internal.KafkaConsumerContext;
-import io.opentelemetry.instrumentation.kafka.internal.KafkaConsumerContextUtil;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.TracingList;
 import java.util.Iterator;
-import java.util.List;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -52,13 +48,10 @@ public class ConsumerRecordsPayloadInstrumentation implements TypeInstrumentatio
 
   @SuppressWarnings("unused")
   public static class IterableAdvice {
-
-    @SuppressWarnings("unchecked")
     @Advice.OnMethodExit(suppress = Throwable.class)
     public static <K, V> void wrap(
         @Advice.This ConsumerRecords<?, ?> records,
         @Advice.Return(readOnly = false) Iterable<ConsumerRecord<K, V>> iterable) {
-      System.out.println("ConsumerRecordsPayloadInstrumentation.IterableAdvice.wrap");
       iterable = PayloadTracingIterable.wrap(iterable);
     }
   }
@@ -66,13 +59,10 @@ public class ConsumerRecordsPayloadInstrumentation implements TypeInstrumentatio
 
   @SuppressWarnings("unused")
   public static class IteratorAdvice {
-
-    @SuppressWarnings("unchecked")
     @Advice.OnMethodExit(suppress = Throwable.class)
     public static <K, V> void wrap(
         @Advice.This ConsumerRecords<?, ?> records,
         @Advice.Return(readOnly = false) Iterator<ConsumerRecord<K, V>> iterator) {
-      System.out.println("ConsumerRecordsPayloadInstrumentation.IteratorAdvice.wrap");
       iterator = PayloadTracingIterator.wrap(iterator);
     }
   }

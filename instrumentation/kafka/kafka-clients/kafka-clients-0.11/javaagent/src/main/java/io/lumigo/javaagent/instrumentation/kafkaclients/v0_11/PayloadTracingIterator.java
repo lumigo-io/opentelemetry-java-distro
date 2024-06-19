@@ -7,13 +7,17 @@ package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 
 import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.context.Context;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.bootstrap.kafka.KafkaClientsConsumerProcessTracing;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import io.opentelemetry.semconv.SemanticAttributes;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
 
 public class PayloadTracingIterator<K, V> implements Iterator<ConsumerRecord<K, V>> {
+
+  private static final String LUMIGO_MESSAGE_ID_KEY = "lumigoMessageId";
 
   private final Iterator<ConsumerRecord<K, V>> delegateIterator;
 
@@ -37,18 +41,19 @@ public class PayloadTracingIterator<K, V> implements Iterator<ConsumerRecord<K, 
 
   @Override
   public ConsumerRecord<K, V> next() {
-    System.out.println("PayloadTracingIterator.next");
     ConsumerRecord<K, V> next = delegateIterator.next();
     if (next != null && KafkaClientsConsumerProcessTracing.wrappingEnabled()) {
-      System.out.println("PayloadTracingIterator.next not null");
-      System.out.println(next.getClass());
-      System.out.println(delegateIterator.getClass());
-      Context context = Java8BytecodeBridge.currentContext();
-      Span span = Java8BytecodeBridge.spanFromContext(context);
-      System.out.println(span.getSpanContext().getSpanId());
+      Span span = Java8BytecodeBridge.currentSpan();
       span.setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, next.value().toString());
-      Java8BytecodeBridge.currentSpan()
-            .setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, next.value().toString());
+      span.setAttribute(LumigoSemanticAttributes.MESSAGING_HEADERS, KafkaUtils.convertHeadersToString(next.headers()));
+
+      // Support for lumigo lambda tracer kafka instrumentation
+      Header messageIdHeader =
+          next.headers().lastHeader(LUMIGO_MESSAGE_ID_KEY);
+      if (messageIdHeader != null) {
+        span.setAttribute(SemanticAttributes.MESSAGING_MESSAGE_ID,
+            new String(messageIdHeader.value(), StandardCharsets.UTF_8));
+      }
     }
     return next;
   }

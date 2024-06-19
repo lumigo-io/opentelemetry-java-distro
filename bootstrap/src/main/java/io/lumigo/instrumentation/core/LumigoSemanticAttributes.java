@@ -18,6 +18,7 @@
 package io.lumigo.instrumentation.core;
 
 import io.opentelemetry.api.common.AttributeKey;
+import java.util.List;
 
 /** Semantic Attribute keys specific to Lumigo. */
 public final class LumigoSemanticAttributes {
@@ -29,6 +30,9 @@ public final class LumigoSemanticAttributes {
 
   public static final AttributeKey<String> MESSAGING_PAYLOAD =
       AttributeKey.stringKey("messaging.message.payload");
+
+  public static final AttributeKey<List<String>> MESSAGING_HEADERS =
+      AttributeKey.stringArrayKey("messaging.message.headers");
 
   public static final AttributeKey<String> GRPC_REQUEST_BODY =
       AttributeKey.stringKey("rpc.grpc.request.payload");

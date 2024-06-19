@@ -5,10 +5,7 @@
 
 package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 
-import io.opentelemetry.instrumentation.kafka.internal.KafkaConsumerContext;
 import io.opentelemetry.javaagent.bootstrap.kafka.KafkaClientsConsumerProcessTracing;
-import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.TracingIterable;
-import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.TracingIterator;
 import java.util.Iterator;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 

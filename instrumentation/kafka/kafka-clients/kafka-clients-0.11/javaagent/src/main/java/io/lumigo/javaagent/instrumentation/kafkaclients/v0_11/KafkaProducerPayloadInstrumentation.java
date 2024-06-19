@@ -1,6 +1,7 @@
 package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 
 import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
@@ -36,10 +37,10 @@ public class KafkaProducerPayloadInstrumentation implements TypeInstrumentation 
     public static void onEnter(
         @Advice.Argument(value = 0, readOnly = false) ProducerRecord<?, ?> record
     ) {
-      System.out.println("KafkaProducerPayloadInstrumentation.SendPayloadAdvice.onEnter");
       if (null != record.value()) {
-        Java8BytecodeBridge.currentSpan()
-            .setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, record.value().toString());
+        Span span = Java8BytecodeBridge.currentSpan();
+        span.setAttribute(LumigoSemanticAttributes.MESSAGING_PAYLOAD, record.value().toString());
+        span.setAttribute(LumigoSemanticAttributes.MESSAGING_HEADERS, KafkaUtils.convertHeadersToString(record.headers()));
       }
     }
   }
