@@ -20,9 +20,6 @@ package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
-import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.ConsumerRecordsInstrumentation;
-import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.KafkaConsumerInstrumentation;
-import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.KafkaProducerInstrumentation;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,23 +30,23 @@ public class KafkaClientInstrumentationModule extends InstrumentationModule {
   }
 
   @Override
-  public boolean isIndyModule() {
-    // OpenTelemetryMetricsReporter is not available in app class loader
-    return false;
-  }
-
-  @Override
   public List<TypeInstrumentation> typeInstrumentations() {
     return Arrays.asList(
-        // Original OTeL instrumentation
-        new KafkaProducerInstrumentation(),
-        new KafkaConsumerInstrumentation(),
-        new ConsumerRecordsInstrumentation()
+        new KafkaProducerPayloadInstrumentation(),
+
+        new TracingIteratorInstrumentation()
     );
   }
 
   @Override
   public boolean isHelperClass(String className) {
-    return className.startsWith("io.lumigo.javaagent.instrumentation.kafkaclients.v0_11.");
+    return className.startsWith("io.lumigo.javaagent.instrumentation.kafkaclients.v0_11.") ||
+        className.startsWith("io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.") ;
+  }
+
+  @Override
+  public int order() {
+    // Run after OTeL kafka Instrumentation
+    return 1;
   }
 }

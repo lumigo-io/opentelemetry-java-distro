@@ -40,9 +40,6 @@ public class KafkaClientConfigCustomizer implements AutoConfigurationCustomizerP
         config -> {
           Map<String, String> overrides = new HashMap<>();
 
-          // disable OTeL instrumentation for Kafka Clients
-          overrides.put("otel.instrumentation.kafka-clients.enabled", "false");
-
           // If not set by user, set to true
           if (null == config.getBoolean(KAFKA_EXPERIMENTAL_ATTRIBUTES_KEY)) {
             overrides.put(KAFKA_EXPERIMENTAL_ATTRIBUTES_KEY, "true");
