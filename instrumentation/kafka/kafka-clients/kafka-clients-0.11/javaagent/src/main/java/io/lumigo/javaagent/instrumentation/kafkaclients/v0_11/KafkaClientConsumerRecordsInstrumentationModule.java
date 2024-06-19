@@ -27,7 +27,7 @@ import java.util.List;
 @AutoService(InstrumentationModule.class)
 public class KafkaClientConsumerRecordsInstrumentationModule extends InstrumentationModule {
   public KafkaClientConsumerRecordsInstrumentationModule() {
-    super("lumigo-kafka-clients", "lumigo-kafka-clients-0.11", "lumigo-kafka", "lumigo-kafka-consumer-payload");
+    super("lumigo-kafka-clients-consumer-payloads", "lumigo-kafka-clients-0.11", "lumigo-kafka", "lumigo-kafka-consumer-payload");
   }
 
   @Override

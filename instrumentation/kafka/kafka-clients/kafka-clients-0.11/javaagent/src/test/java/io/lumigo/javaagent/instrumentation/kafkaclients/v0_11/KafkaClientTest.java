@@ -86,7 +86,7 @@ public class KafkaClientTest {
   @BeforeAll
   static void setUp() throws InterruptedException, IOException {
     kafka =
-        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.10"))
+        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.1"))
             .withEnv("KAFKA_HEAP_OPTS", "-Xmx256M")
             .withLogConsumer(new Slf4jLogConsumer(LOGGER))
             .waitingFor(Wait.forLogMessage(".*started \\(kafka.server.KafkaServer\\).*", 1))
