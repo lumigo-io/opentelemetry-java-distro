@@ -1,16 +1,16 @@
-# Use the official maven/Java 17 image to create a build artifact.
-FROM openjdk:17-jdk-slim as builder
+# Use a specific Gradle image
+FROM gradle:8.8.0-jdk17 AS builder
 
-# Set the working directory in the image to "/app"
 WORKDIR /app
 
-# Copy the Gradle executable to the Docker image
-COPY gradlew .
-COPY gradle gradle
-
-# Copy the rest of your app's source code from your host to your image filesystem.
 COPY build.gradle settings.gradle ./
-COPY . /app
+COPY gradle ./gradle
 
-# Build the project and skip tests
-RUN ./gradlew gradle clean build -x test  -x javadoc -x spotlessApply -x spotlessJavaCheck
+# Pre-download dependencies
+RUN gradle build -x test -x javadoc -x spotlessApply -x spotlessJavaCheck --no-daemon --info || true
+
+# Copy the rest of the source code
+COPY . .
+
+# Final build step
+RUN gradle build -x test -x javadoc -x spotlessApply -x spotlessJavaCheck --no-daemon --info
