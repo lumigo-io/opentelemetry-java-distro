@@ -53,6 +53,7 @@ import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -199,6 +200,10 @@ public class KafkaClientTest {
       assertions.add(equalTo(SemanticAttributes.MESSAGING_KAFKA_MESSAGE_KEY, messageKey));
     }
     if (null != messageValue) {
+      assertions.add(
+          satisfies(
+              AttributeKey.stringArrayKey("messaging.message.headers"),
+              AbstractListAssert::isNotEmpty));
       assertions.add(equalTo(AttributeKey.stringKey("messaging.message.payload"), JSON_BODY));
     }
 
@@ -222,6 +227,10 @@ public class KafkaClientTest {
       assertions.add(equalTo(SemanticAttributes.MESSAGING_KAFKA_MESSAGE_KEY, messageKey));
     }
     if (null != messageValue) {
+      assertions.add(
+          satisfies(
+              AttributeKey.stringArrayKey("messaging.message.headers"),
+              AbstractListAssert::isNotEmpty));
       assertions.add(equalTo(AttributeKey.stringKey("messaging.message.payload"), JSON_BODY));
       assertions.add(
           equalTo(
