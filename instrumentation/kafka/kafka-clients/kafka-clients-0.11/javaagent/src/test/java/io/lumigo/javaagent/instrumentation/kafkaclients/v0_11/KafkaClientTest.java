@@ -113,12 +113,10 @@ public class KafkaClientTest {
         Collections.singletonList(TOPIC),
         new ConsumerRebalanceListener() {
           @Override
-          public void onPartitionsRevoked(
-              Collection<TopicPartition> partitions) {}
+          public void onPartitionsRevoked(Collection<TopicPartition> partitions) {}
 
           @Override
-          public void onPartitionsAssigned(
-              Collection<TopicPartition> partitions) {
+          public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
             consumerReady.countDown();
           }
         });
@@ -181,8 +179,7 @@ public class KafkaClientTest {
         equalTo(SemanticAttributes.MESSAGING_SYSTEM, "kafka"),
         equalTo(SemanticAttributes.MESSAGING_DESTINATION_NAME, TOPIC),
         satisfies(
-            SemanticAttributes.MESSAGING_CLIENT_ID,
-            (value) -> value.startsWith(clientPrefix)));
+            SemanticAttributes.MESSAGING_CLIENT_ID, (value) -> value.startsWith(clientPrefix)));
   }
 
   private static List<AttributeAssertion> sendAttributes(String messageKey, String messageValue) {
@@ -306,8 +303,7 @@ public class KafkaClientTest {
                           .hasKind(SpanKind.CONSUMER)
                           .hasParentSpanId(finalProducerSpanId)
                           .hasAttributesSatisfying(processAttributes("1", JSON_BODY)),
-                  span -> span.hasName("processing").hasParentSpanId(finalConsumerSpanId)
-              );
+                  span -> span.hasName("processing").hasParentSpanId(finalConsumerSpanId));
             });
   }
 

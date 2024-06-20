@@ -20,25 +20,26 @@ package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
-
 import java.util.Collections;
 import java.util.List;
 
 @AutoService(InstrumentationModule.class)
 public class KafkaClientConsumerRecordsInstrumentationModule extends InstrumentationModule {
   public KafkaClientConsumerRecordsInstrumentationModule() {
-    super("lumigo-kafka-clients-consumer-payloads", "lumigo-kafka-clients-0.11", "lumigo-kafka", "lumigo-kafka-consumer-payload");
+    super(
+        "lumigo-kafka-clients-consumer-payloads",
+        "lumigo-kafka-clients-0.11",
+        "lumigo-kafka",
+        "lumigo-kafka-consumer-payload");
   }
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
-    return Collections.singletonList(
-        new ConsumerRecordsPayloadInstrumentation()
-    );
+    return Collections.singletonList(new ConsumerRecordsPayloadInstrumentation());
   }
 
   @Override
   public boolean isHelperClass(String className) {
-    return className.startsWith("io.lumigo.javaagent.instrumentation.kafkaclients.v0_11.") ;
+    return className.startsWith("io.lumigo.javaagent.instrumentation.kafkaclients.v0_11.");
   }
 }
