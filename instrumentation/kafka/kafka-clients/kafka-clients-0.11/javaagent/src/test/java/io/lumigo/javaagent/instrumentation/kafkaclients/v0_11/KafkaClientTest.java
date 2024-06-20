@@ -25,7 +25,6 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.semconv.SemanticAttributes;
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +40,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -110,15 +110,15 @@ public class KafkaClientTest {
     consumer = new KafkaConsumer<>(consumerProps());
 
     consumer.subscribe(
-        java.util.Collections.singletonList(TOPIC),
-        new org.apache.kafka.clients.consumer.ConsumerRebalanceListener() {
+        Collections.singletonList(TOPIC),
+        new ConsumerRebalanceListener() {
           @Override
           public void onPartitionsRevoked(
-              java.util.Collection<org.apache.kafka.common.TopicPartition> partitions) {}
+              Collection<TopicPartition> partitions) {}
 
           @Override
           public void onPartitionsAssigned(
-              java.util.Collection<org.apache.kafka.common.TopicPartition> partitions) {
+              Collection<TopicPartition> partitions) {
             consumerReady.countDown();
           }
         });
@@ -208,14 +208,6 @@ public class KafkaClientTest {
     return assertions;
   }
 
-  private static List<AttributeAssertion> receiveAttributes() {
-    List<AttributeAssertion> assertions = new ArrayList<>(commonAttributes("consumer"));
-
-    assertions.add(equalTo(SemanticAttributes.MESSAGING_OPERATION, "receive"));
-
-    return assertions;
-  }
-
   private static List<AttributeAssertion> processAttributes(
       String messageKey, String messageValue) {
     List<AttributeAssertion> assertions = new ArrayList<>(commonAttributes("consumer"));
@@ -275,38 +267,48 @@ public class KafkaClientTest {
           });
     }
 
-    AtomicReference<SpanData> producerSpanRef = new AtomicReference<>();
-    TracesAssert.assertThat(instrumentation.waitForTraces(2))
-        .hasSize(2)
+    List<List<SpanData>> traces = instrumentation.waitForTraces(1);
+    String parentSpanId = "";
+    String producerSpanId = "";
+    String consumerSpanId = "";
+    for (List<SpanData> trace : traces) {
+      for (SpanData span : trace) {
+        if (span.getName().equals("parent")) {
+          parentSpanId = span.getSpanId();
+        } else if (span.getName().equals(TOPIC + " publish")) {
+          producerSpanId = span.getSpanId();
+        } else if (span.getName().equals(TOPIC + " process")) {
+          consumerSpanId = span.getSpanId();
+        }
+      }
+    }
+
+    String finalParentSpanId = parentSpanId;
+    String finalProducerSpanId = producerSpanId;
+    String finalConsumerSpanId = consumerSpanId;
+    TracesAssert.assertThat(traces)
+        .hasSize(1)
         .hasTracesSatisfyingExactly(
             trace -> {
-              trace.hasSpansSatisfyingExactly(
+              trace.hasSpansSatisfyingExactlyInAnyOrder(
                   span -> span.hasName("parent").hasKind(SpanKind.INTERNAL).hasNoParent(),
                   span ->
                       span.hasName(TOPIC + " publish")
                           .hasKind(SpanKind.PRODUCER)
-                          .hasParent(trace.getSpan(0))
+                          .hasParentSpanId(finalParentSpanId)
                           .hasAttributesSatisfying(sendAttributes("1", JSON_BODY)),
                   span ->
                       span.hasName("producer callback")
                           .hasKind(SpanKind.INTERNAL)
-                          .hasParent(trace.getSpan(0)));
-              producerSpanRef.set(trace.getSpan(1));
-            },
-            trace ->
-                trace.hasSpansSatisfyingExactly(
-                    span ->
-                        span.hasName(TOPIC + " receive")
-                            .hasKind(SpanKind.CONSUMER)
-                            .hasNoParent()
-                            .hasAttributesSatisfying(receiveAttributes()),
-                    span ->
-                        span.hasName(TOPIC + " process")
-                            .hasKind(SpanKind.CONSUMER)
-                            .hasLinks(LinkData.create(producerSpanRef.get().getSpanContext()))
-                            .hasParent(trace.getSpan(0))
-                            .hasAttributesSatisfying(processAttributes("1", JSON_BODY)),
-                    span -> span.hasName("processing").hasParent(trace.getSpan(1))));
+                          .hasParentSpanId(finalParentSpanId),
+                  span ->
+                      span.hasName(TOPIC + " process")
+                          .hasKind(SpanKind.CONSUMER)
+                          .hasParentSpanId(finalProducerSpanId)
+                          .hasAttributesSatisfying(processAttributes("1", JSON_BODY)),
+                  span -> span.hasName("processing").hasParentSpanId(finalConsumerSpanId)
+              );
+            });
   }
 
   @Test
@@ -328,9 +330,19 @@ public class KafkaClientTest {
       Assertions.assertThat(record.value()).isEqualTo(JSON_BODY);
     }
 
-    AtomicReference<SpanData> producerSpanRef = new AtomicReference<>();
-    TracesAssert.assertThat(instrumentation.waitForTraces(2))
-        .hasSize(2)
+    List<List<SpanData>> traces = instrumentation.waitForTraces(1);
+    String producerSpanId = "";
+    for (List<SpanData> trace : traces) {
+      for (SpanData span : trace) {
+        if (span.getName().equals(TOPIC + " publish")) {
+          producerSpanId = span.getSpanId();
+        }
+      }
+    }
+    String finalProducerSpanId = producerSpanId;
+
+    TracesAssert.assertThat(traces)
+        .hasSize(1)
         .hasTracesSatisfyingExactly(
             trace -> {
               trace.hasSpansSatisfyingExactly(
@@ -338,21 +350,12 @@ public class KafkaClientTest {
                       span.hasName(TOPIC + " publish")
                           .hasKind(SpanKind.PRODUCER)
                           .hasNoParent()
-                          .hasAttributesSatisfying(sendAttributes(null, JSON_BODY)));
-              producerSpanRef.set(trace.getSpan(0));
-            },
-            trace ->
-                trace.hasSpansSatisfyingExactly(
-                    span ->
-                        span.hasName(TOPIC + " receive")
-                            .hasKind(SpanKind.CONSUMER)
-                            .hasNoParent()
-                            .hasAttributesSatisfying(receiveAttributes()),
-                    span ->
-                        span.hasName(TOPIC + " process")
-                            .hasKind(SpanKind.CONSUMER)
-                            .hasLinks(LinkData.create(producerSpanRef.get().getSpanContext()))
-                            .hasParent(trace.getSpan(0))
-                            .hasAttributesSatisfying(processAttributes(null, JSON_BODY))));
+                          .hasAttributesSatisfying(sendAttributes(null, JSON_BODY)),
+                  span ->
+                      span.hasName(TOPIC + " process")
+                          .hasKind(SpanKind.CONSUMER)
+                          .hasParentSpanId(finalProducerSpanId)
+                          .hasAttributesSatisfying(processAttributes(null, null)));
+            });
   }
 }

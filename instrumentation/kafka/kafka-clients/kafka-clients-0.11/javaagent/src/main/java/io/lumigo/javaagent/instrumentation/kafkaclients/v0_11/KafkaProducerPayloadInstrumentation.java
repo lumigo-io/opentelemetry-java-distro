@@ -32,6 +32,7 @@ public class KafkaProducerPayloadInstrumentation implements TypeInstrumentation 
         KafkaProducerPayloadInstrumentation.class.getName() + "$SendPayloadAdvice");
   }
 
+  @SuppressWarnings("unused")
   public static class SendPayloadAdvice {
     @Advice.OnMethodEnter(suppress = Throwable.class)
     public static void onEnter(

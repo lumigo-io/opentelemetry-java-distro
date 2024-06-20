@@ -12,9 +12,14 @@ import static net.bytebuddy.matcher.ElementMatchers.returns;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
+import io.opentelemetry.instrumentation.kafka.internal.KafkaConsumerContext;
+import io.opentelemetry.instrumentation.kafka.internal.KafkaConsumerContextUtil;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import java.util.Iterator;
+import java.util.List;
+import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.ConsumerRecordsInstrumentation;
+import io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11.TracingList;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -40,6 +45,13 @@ public class ConsumerRecordsPayloadInstrumentation implements TypeInstrumentatio
     transformer.applyAdviceToMethod(
         isMethod()
             .and(isPublic())
+            .and(named("records"))
+            .and(takesArgument(0, named("org.apache.kafka.common.TopicPartition")))
+            .and(returns(List.class)),
+        ConsumerRecordsPayloadInstrumentation.class.getName() + "$ListAdvice");
+    transformer.applyAdviceToMethod(
+        isMethod()
+            .and(isPublic())
             .and(named("iterator"))
             .and(takesArguments(0))
             .and(returns(Iterator.class)),
@@ -50,9 +62,17 @@ public class ConsumerRecordsPayloadInstrumentation implements TypeInstrumentatio
   public static class IterableAdvice {
     @Advice.OnMethodExit(suppress = Throwable.class)
     public static <K, V> void wrap(
-        @Advice.This ConsumerRecords<?, ?> records,
         @Advice.Return(readOnly = false) Iterable<ConsumerRecord<K, V>> iterable) {
       iterable = PayloadTracingIterable.wrap(iterable);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  public static class ListAdvice {
+    @Advice.OnMethodExit(suppress = Throwable.class)
+    public static <K, V> void wrap(
+        @Advice.Return(readOnly = false) List<ConsumerRecord<K, V>> list) {
+      list = PayloadTracingList.wrap(list);
     }
   }
 
@@ -61,7 +81,6 @@ public class ConsumerRecordsPayloadInstrumentation implements TypeInstrumentatio
   public static class IteratorAdvice {
     @Advice.OnMethodExit(suppress = Throwable.class)
     public static <K, V> void wrap(
-        @Advice.This ConsumerRecords<?, ?> records,
         @Advice.Return(readOnly = false) Iterator<ConsumerRecord<K, V>> iterator) {
       iterator = PayloadTracingIterator.wrap(iterator);
     }
