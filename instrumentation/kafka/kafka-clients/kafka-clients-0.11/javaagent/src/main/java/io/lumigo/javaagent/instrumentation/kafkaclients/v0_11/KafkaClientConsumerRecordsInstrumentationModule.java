@@ -24,28 +24,22 @@ import java.util.Collections;
 import java.util.List;
 
 @AutoService(InstrumentationModule.class)
-public class KafkaClientInstrumentationModule extends InstrumentationModule {
-  public KafkaClientInstrumentationModule() {
+public class KafkaClientConsumerRecordsInstrumentationModule extends InstrumentationModule {
+  public KafkaClientConsumerRecordsInstrumentationModule() {
     super(
-        "lumigo-kafka-clients-producer-payloads",
+        "lumigo-kafka-clients-consumer-payloads",
         "lumigo-kafka-clients-0.11",
         "lumigo-kafka",
-        "lumigo-kafka-producer-payload");
+        "lumigo-kafka-consumer-payload");
   }
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
-    return Collections.singletonList(new KafkaProducerPayloadInstrumentation());
+    return Collections.singletonList(new ConsumerRecordsPayloadInstrumentation());
   }
 
   @Override
   public boolean isHelperClass(String className) {
     return className.startsWith("io.lumigo.javaagent.instrumentation.kafkaclients.v0_11.");
-  }
-
-  @Override
-  public int order() {
-    // Run after OTeL kafka Instrumentation
-    return 1;
   }
 }

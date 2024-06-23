@@ -31,17 +31,11 @@ public class KafkaClientConfigCustomizer implements AutoConfigurationCustomizerP
   private static final String KAFKA_PRODUCER_PROPAGATION_ATTRIBUTE_KEY =
       "otel.instrumentation.kafka.producer-propagation.enabled";
 
-  private static final String MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_KEY =
-      "otel.instrumentation.messaging.experimental.receive-telemetry.enabled";
-
   @Override
   public void customize(AutoConfigurationCustomizer autoConfiguration) {
     autoConfiguration.addPropertiesCustomizer(
         config -> {
           Map<String, String> overrides = new HashMap<>();
-
-          // disable OTeL instrumentation for Kafka Clients
-          overrides.put("otel.instrumentation.kafka-clients.enabled", "false");
 
           // If not set by user, set to true
           if (null == config.getBoolean(KAFKA_EXPERIMENTAL_ATTRIBUTES_KEY)) {
@@ -49,9 +43,6 @@ public class KafkaClientConfigCustomizer implements AutoConfigurationCustomizerP
           }
           if (null == config.getBoolean(KAFKA_PRODUCER_PROPAGATION_ATTRIBUTE_KEY)) {
             overrides.put(KAFKA_PRODUCER_PROPAGATION_ATTRIBUTE_KEY, "true");
-          }
-          if (null == config.getBoolean(MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_KEY)) {
-            overrides.put(MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_KEY, "true");
           }
 
           return overrides;

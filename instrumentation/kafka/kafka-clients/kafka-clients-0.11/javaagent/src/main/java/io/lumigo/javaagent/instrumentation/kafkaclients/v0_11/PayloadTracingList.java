@@ -1,30 +1,40 @@
 /*
- * Copyright The OpenTelemetry Authors
+ * Copyright 2024 Lumigo LTD
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  * SPDX-License-Identifier: Apache-2.0
  */
+package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 
-package io.opentelemetry.javaagent.instrumentation.kafkaclients.v0_11;
-
-import io.opentelemetry.instrumentation.kafka.internal.KafkaConsumerContext;
 import io.opentelemetry.javaagent.bootstrap.kafka.KafkaClientsConsumerProcessTracing;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-public class TracingList<K, V> extends TracingIterable<K, V> implements List<ConsumerRecord<K, V>> {
+public class PayloadTracingList<K, V> extends PayloadTracingIterable<K, V>
+    implements List<ConsumerRecord<K, V>> {
   private final List<ConsumerRecord<K, V>> delegate;
 
-  private TracingList(List<ConsumerRecord<K, V>> delegate, KafkaConsumerContext consumerContext) {
-    super(delegate, consumerContext);
+  private PayloadTracingList(List<ConsumerRecord<K, V>> delegate) {
+    super(delegate);
     this.delegate = delegate;
   }
 
-  public static <K, V> List<ConsumerRecord<K, V>> wrap(
-      List<ConsumerRecord<K, V>> delegate, KafkaConsumerContext consumerContext) {
+  public static <K, V> List<ConsumerRecord<K, V>> wrap(List<ConsumerRecord<K, V>> delegate) {
     if (KafkaClientsConsumerProcessTracing.wrappingEnabled()) {
-      return new TracingList<>(delegate, consumerContext);
+      return new PayloadTracingList<>(delegate);
     }
     return delegate;
   }
@@ -106,7 +116,6 @@ public class TracingList<K, V> extends TracingIterable<K, V> implements List<Con
 
   @Override
   public ConsumerRecord<K, V> get(int index) {
-    // TODO: should this be instrumented as well?
     return delegate.get(index);
   }
 
@@ -127,24 +136,16 @@ public class TracingList<K, V> extends TracingIterable<K, V> implements List<Con
 
   @Override
   public ListIterator<ConsumerRecord<K, V>> listIterator() {
-    // TODO: the API for ListIterator is not really good to instrument it in context of Kafka
-    // Consumer so we will not do that for now
     return delegate.listIterator();
   }
 
   @Override
   public ListIterator<ConsumerRecord<K, V>> listIterator(int index) {
-    // TODO: the API for ListIterator is not really good to instrument it in context of Kafka
-    // Consumer so we will not do that for now
     return delegate.listIterator(index);
   }
 
   @Override
   public List<ConsumerRecord<K, V>> subList(int fromIndex, int toIndex) {
-    // TODO: the API for subList is not really good to instrument it in context of Kafka
-    // Consumer so we will not do that for now
-    // Kafka is essentially a sequential commit log. We should only enable tracing when traversing
-    // sequentially with an iterator
     return delegate.subList(fromIndex, toIndex);
   }
 }
