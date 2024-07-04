@@ -69,6 +69,5 @@ workflows:
           context: common
           skip_on_auto_test_update: true
           requires:
-            - test
             - lumigo-orb/integration-test-parallel
             - lumigo-orb/e2e-test
