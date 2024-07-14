@@ -222,9 +222,10 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.3-alpha1 |
 | | | 5.4-alpha1 |
 | | | 5.4-alpha2 |
-| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.748 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.26.7 |
-| grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.64.0 |
+| | | 5.4-beta1 |
+| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.761 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.26.20 |
+| grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.65.1 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
 | | | 17 |
 | jdbc | [jdbc](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html) | 11 |
@@ -237,7 +238,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | kafka-clients-0.11 | [kafka-clients-0.11](https://central.sonatype.com/artifact/org.apache.kafka/kafka-clients) | 0.8.2-beta~0.11.0.3 |
 | | | 1.0.0~1.1.1 |
 | | | 2.0.0~2.8.2 |
-| | | 3.0.0~3.7.0 |
+| | | 3.0.0~3.7.1 |
 | lettuce-5.1 | [lettuce-5.1](https://central.sonatype.com/artifact/io.lettuce/lettuce-core) | 5.1.0.RELEASE~5.3.7.RELEASE |
 | | | 6.0.0.M1~6.4.0.M1 |
 | rabbitmq-2.7 | [rabbitmq-2.7](https://central.sonatype.com/artifact/com.rabbitmq/amqp-client) | 2.7.0 |
@@ -258,7 +259,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | spring-webmvc-3.1 | [spring-webmvc-3.1](https://central.sonatype.com/artifact/org.springframework/spring-webmvc) | 3.1.0.RELEASE~3.2.18.RELEASE |
 | | | 4.0.0.RELEASE~4.3.30.RELEASE |
 | | | 5.0.0.RELEASE~5.3.31 |
-| | | 6.0.0~6.1.10 |
+| | | 6.0.0~6.1.11 |
 | storm | [storm](https://central.sonatype.com/artifact/org.apache.storm/storm-client) | 2.0.0~2.6.2 |
 
 ## Baseline setup
