@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  testImplementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+  testImplementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv:${versions.opentelemetrySemConv}")
   testImplementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
 
   testImplementation(project(":utils"))
