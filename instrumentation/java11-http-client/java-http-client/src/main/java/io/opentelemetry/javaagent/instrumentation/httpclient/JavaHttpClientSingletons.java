@@ -5,6 +5,8 @@
 
 package io.opentelemetry.javaagent.instrumentation.httpclient;
 
+import static java.util.Collections.singletonList;
+
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientPeerServiceAttributesExtractor;
@@ -14,7 +16,6 @@ import io.opentelemetry.instrumentation.httpclient.internal.JavaHttpClientInstru
 import io.opentelemetry.javaagent.bootstrap.internal.CommonConfig;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Arrays;
 
 public class JavaHttpClientSingletons {
 
@@ -33,14 +34,11 @@ public class JavaHttpClientSingletons {
                     .setCapturedResponseHeaders(CommonConfig.get().getClientResponseHeaders())
                     .setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
             builder -> builder.setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
-            Arrays.asList(
+            singletonList(
                 HttpClientPeerServiceAttributesExtractor.create(
                     JavaHttpClientAttributesGetter.INSTANCE,
-                    CommonConfig.get().getPeerServiceResolver()),
-                // Custom HTTP payload extractor
-                new HttpPayloadExtractor()),
-            CommonConfig.get().shouldEmitExperimentalHttpClientMetrics()
-            );
+                    CommonConfig.get().getPeerServiceResolver())),
+            CommonConfig.get().shouldEmitExperimentalHttpClientTelemetry());
   }
 
   public static Instrumenter<HttpRequest, HttpResponse<?>> instrumenter() {
