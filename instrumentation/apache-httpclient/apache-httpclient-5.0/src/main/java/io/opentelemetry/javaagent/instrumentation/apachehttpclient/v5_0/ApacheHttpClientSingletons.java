@@ -23,7 +23,6 @@ public final class ApacheHttpClientSingletons {
 
   private static final Instrumenter<HttpRequest, HttpResponse> INSTRUMENTER;
 
-
   static {
     ApacheHttpClientHttpAttributesGetter httpAttributesGetter =
         new ApacheHttpClientHttpAttributesGetter();
