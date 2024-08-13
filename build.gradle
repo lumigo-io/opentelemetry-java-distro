@@ -21,6 +21,10 @@ subprojects {
   version = rootProject.version
 
   apply plugin: "java"
+
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+
   // Exclude OTeL instrumentation override sub projects
   if (it.name != "apache-httpclient-5.0"
       && it.name != "java-http-client"
