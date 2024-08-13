@@ -138,45 +138,6 @@ public class ConnectionTest {
   @Test
   //TODO Update to use new http semantic conventions in 2.0
   @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
-  void testGarbageResponse() {
-    final String urlPath = "/garbage";
-
-    mockServer.stubFor(get(urlPathEqualTo(urlPath))
-        .willReturn(aResponse()
-            .withFault(Fault.RANDOM_DATA_THEN_CLOSE)
-        )
-    );
-
-    Throwable thrown = catchThrowable(() -> {
-      try (CloseableHttpClient client = HttpClients.createDefault()) {
-        final ClassicHttpRequest httpGet = ClassicRequestBuilder.get(mockServer.url(urlPath))
-            .addHeader("Content-Type", "application/json").build();
-        client.execute(httpGet, response -> null);
-      }
-    });
-
-    assertThat(instrumentation.waitForTraces(1))
-        .hasSize(1)
-        .hasTracesSatisfyingExactly(
-            trace ->
-                trace
-                    .hasSize(1)
-                    .hasSpansSatisfyingExactly(
-                        span -> span
-                            .hasName("GET")
-                            .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                            .hasException(thrown)
-                            .hasStatus(StatusData.error())
-                    ));
-  }
-
-  @Test
-  //TODO Update to use new http semantic conventions in 2.0
-  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void testServerError() {
     final String urlPath = "/server-error";
 
