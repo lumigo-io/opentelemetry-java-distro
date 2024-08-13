@@ -252,7 +252,7 @@ jobs:
     strategy:
       fail-fast: false # We want to see all tests being tried, rather than stop when the first fails
       matrix:
-        jdk_version: [ 11, 17 ]
+        jdk_version: [ 11, 17, 21]
         instrumentation_to_test: ${{ fromJson(needs.instrumentations-to-test.outputs.instrumentations) }}
     steps:
       - uses: actions/checkout@v4
