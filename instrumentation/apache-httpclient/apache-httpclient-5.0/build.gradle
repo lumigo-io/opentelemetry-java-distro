@@ -1,5 +1,12 @@
 apply from: "$rootDir/gradle/instrumentation.gradle"
 
+compileJava {
+  options.release.set(21)  // Ensure this is correctly set to your desired Java version
+}
+
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
+
 muzzle {
   pass {
     group.set("org.apache.httpcomponents.client5")
