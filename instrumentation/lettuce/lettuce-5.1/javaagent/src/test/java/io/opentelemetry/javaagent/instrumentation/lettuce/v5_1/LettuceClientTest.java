@@ -87,7 +87,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo ?"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
@@ -112,7 +112,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo ?"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
@@ -123,7 +123,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "GET foo"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "bar"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
@@ -148,7 +148,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo ?"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
             trace ->
