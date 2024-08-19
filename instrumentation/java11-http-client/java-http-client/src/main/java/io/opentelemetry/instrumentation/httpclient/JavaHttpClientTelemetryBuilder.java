@@ -106,7 +106,7 @@ public final class JavaHttpClientTelemetryBuilder {
     return this;
   }
 
-  public io.opentelemetry.instrumentation.httpclient.JavaHttpClientTelemetry build() {
+  public JavaHttpClientTelemetry build() {
     Instrumenter<HttpRequest, HttpResponse<?>> instrumenter =
         JavaHttpClientInstrumenterFactory.createInstrumenter(
             openTelemetry,
