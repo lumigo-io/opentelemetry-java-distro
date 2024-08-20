@@ -87,7 +87,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo ?"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
@@ -112,7 +112,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo ?"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
@@ -123,15 +123,13 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "GET foo"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "bar"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
   }
 
   @Test
-  // TODO Update to use new http semantic conventions in 2.0
-  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void commandWithNoArguments() {
     commands.set("foo", "bar");
     String value = commands.randomkey();
@@ -148,7 +146,7 @@ class LettuceClientTest {
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "SET foo ?"),
+                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
                                 equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
             trace ->
