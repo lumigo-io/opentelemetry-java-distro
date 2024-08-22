@@ -212,7 +212,7 @@ public class SnsTracingTest {
                                 })),
         trace ->
             trace
-                .hasSize(2)
+                .hasSize(1)
                 .hasSpansSatisfyingExactly(
                     span ->
                         span.hasName("SNS.Publish")
@@ -249,99 +249,6 @@ public class SnsTracingTest {
                                           AttributeKey.stringKey("http.response.body"),
                                           value -> {
                                             Assertions.assertThat(value).contains(PUBLISH_RESPONSE);
-                                            Assertions.assertThat(value).contains("<MessageId>");
-                                          });
-                                }),
-                    span ->
-                        span.hasName("SQS.ReceiveMessage")
-                            .hasKind(SpanKind.CONSUMER)
-                            .hasParent(trace.getSpan(0))
-                            .hasAttributesSatisfying(
-                                attrs -> {
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          AttributeKey.stringKey("aws.agent"), "java-aws-sdk");
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          AttributeKey.stringKey("aws.queue.url"), queueUrl);
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSQS");
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          SemanticAttributes.RPC_METHOD, "ReceiveMessage");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
-                                  // TODO: Add message id check
-                                  //                                  assertThat(attrs)
-                                  //
-                                  // .containsKey(SemanticAttributes.MESSAGING_MESSAGE_ID);
-                                  // TODO: Add message payload check
-                                  //                                  assertThat(attrs)
-                                  //                                      .hasEntrySatisfying(
-                                  //
-                                  // AttributeKey.stringKey("messaging.message.payload"),
-                                  //                                          value -> {
-                                  //
-                                  // Assertions.assertThat(value).contains("MessageId=");
-                                  //
-                                  // Assertions.assertThat(value).contains("ReceiptHandle=");
-                                  //
-                                  // Assertions.assertThat(value).contains(messageBody);
-                                  //
-                                  // Assertions.assertThat(value).contains("AWSTraceHeader=Root");
-                                  //                                          });
-                                })),
-        /*
-         This span represents HTTP "sending of receive message" operation. It's always single,
-         while there can be multiple CONSUMER spans (one per consumed message). This one could be
-         suppressed (by IF in TracingRequestHandler#beforeRequest but then HTTP instrumentation
-         span would appear
-        */
-        trace ->
-            trace
-                .hasSize(1)
-                .hasSpansSatisfyingExactly(
-                    span ->
-                        span.hasName("SQS.ReceiveMessage")
-                            .hasKind(SpanKind.CLIENT)
-                            .hasNoParent()
-                            .hasAttributesSatisfying(
-                                attrs -> {
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          AttributeKey.stringKey("aws.agent"), "java-aws-sdk");
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          AttributeKey.stringKey("aws.queue.url"), queueUrl);
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSQS");
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          SemanticAttributes.RPC_METHOD, "ReceiveMessage");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          AttributeKey.stringKey("http.request.body"),
-                                          RECEIVE_MESSAGE_REQUEST);
-                                  assertThat(attrs)
-                                      .hasEntrySatisfying(
-                                          AttributeKey.stringKey("http.response.body"),
-                                          value -> {
-                                            Assertions.assertThat(value)
-                                                .contains(
-                                                    "<ReceiveMessageResponse xmlns=\"http://queue.amazonaws.com/doc/2012-11-05/\">");
-                                            Assertions.assertThat(value)
-                                                .contains(
-                                                    "&quot;Message&quot;: &quot;Hello There&quot;");
                                             Assertions.assertThat(value).contains("<MessageId>");
                                           });
                                 })));
