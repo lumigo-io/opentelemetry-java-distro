@@ -56,7 +56,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
 
       - name: Spotless
         uses: gradle/actions/setup-gradle@v3
@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -123,7 +123,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
 
       - name: Build the injector container
         run: make -C integration-tests/k8s build-injector
@@ -163,7 +163,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
       - name: Assemble the agent
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -252,7 +252,7 @@ jobs:
     strategy:
       fail-fast: false # We want to see all tests being tried, rather than stop when the first fails
       matrix:
-        jdk_version: [ 11, 17, 21]
+        jdk_version: [ 11, 17 ]
         instrumentation_to_test: ${{ fromJson(needs.instrumentations-to-test.outputs.instrumentations) }}
     steps:
       - uses: actions/checkout@v4

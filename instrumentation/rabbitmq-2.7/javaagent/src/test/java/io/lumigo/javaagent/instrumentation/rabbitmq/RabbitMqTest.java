@@ -17,8 +17,6 @@
  */
 package io.lumigo.javaagent.instrumentation.rabbitmq;
 
-import static org.junit.Assert.assertTrue;
-
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -47,7 +45,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 public class RabbitMqTest {
-  /*@RegisterExtension
+  @RegisterExtension
   static final AgentInstrumentationExtension instrumentation =
       AgentInstrumentationExtension.create();
 
@@ -94,14 +92,10 @@ public class RabbitMqTest {
     } catch (ShutdownSignalException e) {
       // ignore
     }
-  }*/
+  }
+
 
   @Test
-  void testTrue() throws Exception {
-    if (true) {
-    }
-  }
- /* @Test
   void testBasicPublishAndGet() throws Exception {
 
     String exchangeName = "some-exchange";
@@ -390,5 +384,5 @@ public class RabbitMqTest {
                                 (long) JSON_BODY.getBytes().length);
                       });
             });
-  }*/
+  }
 }
