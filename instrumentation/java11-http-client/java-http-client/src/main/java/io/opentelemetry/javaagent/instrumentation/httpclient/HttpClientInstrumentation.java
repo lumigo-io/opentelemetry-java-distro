@@ -69,25 +69,26 @@ public class HttpClientInstrumentation implements TypeInstrumentation {
 
   @SuppressWarnings("unused")
   public static class SendAdvice {
-
     @Advice.OnMethodEnter(suppress = Throwable.class)
     public static void methodEnter(
         @Advice.Argument(value = 0) HttpRequest httpRequest,
         @Advice.Argument(value = 1, readOnly = false) HttpResponse.BodyHandler<?> bodyHandler,
         @Advice.Local("otelContext") Context context,
-        @Advice.Local("otelScope") Scope scope) {
+        @Advice.Local("otelScope") Scope scope)
+
+    {
       Context parentContext = currentContext();
       if (!instrumenter().shouldStart(parentContext, httpRequest)) {
         return;
       }
 
-      context = instrumenter().start(parentContext, httpRequest);
 
+
+      context = instrumenter().start(parentContext, httpRequest);
       // This is necessary to ensure TrustedSubscriberInstrumentation has access to the correct context
       if (bodyHandler != null) {
         bodyHandler = new BodyHandlerWrapper<>(bodyHandler, context);
       }
-
       scope = context.makeCurrent();
     }
 
@@ -101,7 +102,6 @@ public class HttpClientInstrumentation implements TypeInstrumentation {
       if (scope == null) {
         return;
       }
-
       scope.close();
       instrumenter().end(context, httpRequest, httpResponse, throwable);
     }
@@ -134,7 +134,6 @@ public class HttpClientInstrumentation implements TypeInstrumentation {
       if (bodyHandler != null) {
         bodyHandler = new BodyHandlerWrapper<>(bodyHandler, context);
       }
-
       scope = context.makeCurrent();
     }
 

@@ -150,8 +150,8 @@ class ApacheHttpAsyncClientInstrumentation implements TypeInstrumentation {
     @Override
     public void sendRequest(HttpRequest request, EntityDetails entityDetails, HttpContext context)
         throws HttpException, IOException {
-      if (ApacheHttpClientSingletons.instrumenter().shouldStart(parentContext, request)) {
-        wrappedFutureCallback.context = ApacheHttpClientSingletons.instrumenter().start(parentContext, request);
+      if (instrumenter().shouldStart(parentContext, request)) {
+        wrappedFutureCallback.context = instrumenter().start(parentContext, request);
         wrappedFutureCallback.httpRequest = request;
       }
 

@@ -37,7 +37,6 @@ public class ApacheHttpClientConfigCustomizer implements AutoConfigurationCustom
   public void customize(AutoConfigurationCustomizer autoConfiguration) {
     autoConfiguration.addPropertiesCustomizer(config -> {
       Map<String, String> overrides = new HashMap<>();
-
       // disable OTeL instrumentation for ApacheHttpClient v5
       overrides.put("otel.instrumentation.apache-httpclient-5.0.enabled", "false");
 
