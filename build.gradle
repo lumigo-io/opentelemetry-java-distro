@@ -1,4 +1,3 @@
-group 'io.lumigo.javaagent'
 
 buildscript {
   repositories {
@@ -16,6 +15,9 @@ buildscript {
     classpath "io.opentelemetry.instrumentation:gradle-plugins:1.31.0-alpha"
   }
 }
+
+
+group 'io.lumigo.javaagent'
 
 subprojects {
   version = rootProject.version

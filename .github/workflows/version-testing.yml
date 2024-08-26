@@ -13,7 +13,7 @@ jobs:
       matrix:
         # NOTE: if these are updated, don't forget to
         # update the download-artifacts versions as well
-        jdk_version: [ 11, 17 ]
+        jdk_version: [ 11, 17, 21]
     name: check-new-versions-of-instrumented-packages
     steps:
       - uses: actions/checkout@v4
@@ -66,6 +66,11 @@ jobs:
         with:
           name: 17
           path: versions_artifacts/17
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: 21
+          path: versions_artifacts/21
       - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m gather_version_artifacts
       - run: git --no-pager diff
