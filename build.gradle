@@ -16,16 +16,6 @@ buildscript {
   }
 }
 
-plugins {
-  id 'java'
-}
-
-java {
-  toolchain {
-    languageVersion = JavaLanguageVersion.of(21)
-  }
-}
-
 
 group 'io.lumigo.javaagent'
 
