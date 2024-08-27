@@ -15,11 +15,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.opentelemetry.javaagent.instrumentation.lettuce.v5_1;
+package io.lumigo.javaagent.instrumentation.lettuce.v5_1;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
+import io.opentelemetry.javaagent.instrumentation.lettuce.v5_1.*;
 import net.bytebuddy.matcher.ElementMatcher;
 import java.util.Arrays;
 import java.util.List;
