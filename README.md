@@ -196,7 +196,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 
 ## Supported runtimes
 
-* JDK: 11.x, 17.x
+* JDK: 11.x, 17.x, 21.x
 
 ## Supported packages
 

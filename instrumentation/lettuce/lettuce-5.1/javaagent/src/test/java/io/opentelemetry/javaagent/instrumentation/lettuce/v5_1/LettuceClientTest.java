@@ -130,8 +130,6 @@ class LettuceClientTest {
   }
 
   @Test
-  // TODO Update to use new http semantic conventions in 2.0
-  @SuppressWarnings("deprecation") // until old http semconv are dropped in 2.0
   void commandWithNoArguments() {
     commands.set("foo", "bar");
     String value = commands.randomkey();

@@ -23,6 +23,7 @@ public class HttpClientInstrumentationModule extends InstrumentationModule {
     return asList(
         new HttpClientInstrumentation(),
         new HttpHeadersInstrumentation(),
-        new TrustedSubscriberInstrumentation());
+        new TrustedSubscriberInstrumentation()
+    );
   }
 }

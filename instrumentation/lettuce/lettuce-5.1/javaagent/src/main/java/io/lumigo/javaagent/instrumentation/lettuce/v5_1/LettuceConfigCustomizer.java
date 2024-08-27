@@ -15,6 +15,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+
 package io.lumigo.javaagent.instrumentation.lettuce.v5_1;
 
 import com.google.auto.service.AutoService;

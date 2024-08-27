@@ -96,6 +96,7 @@ public class RabbitMqTest {
     }
   }*/
 
+
   @Test
   void testTrue() throws Exception {
     if (true) {
