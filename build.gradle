@@ -52,10 +52,11 @@ subprojects {
 
   ext {
     versions = [
-      opentelemetrySdk           : "1.32.0",
-      opentelemetryContrib       : "1.32.0-alpha",
-      opentelemetryJavaagent     : "1.32.0",
-      opentelemetryJavaagentAlpha: "1.32.0-alpha",
+      opentelemetrySdk           : "1.41.0",
+      opentelemetryContrib       : "1.38.0-alpha",
+      opentelemetryJavaagent     : "2.6.0",
+      opentelemetryJavaagentAlpha: "2.6.0-alpha",
+      opentelemetrySemconv       : "1.33.6-alpha",
 
       // Instrumentation versions
       apachehttpclient50         : "5.0",

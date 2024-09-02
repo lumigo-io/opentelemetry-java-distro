@@ -2,7 +2,7 @@ apply plugin: 'java-library'
 
 dependencies {
   compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
-  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv:1.33.6-alpha")
 
   // Used by byte-buddy but not brought in as a transitive dependency
   compileOnly("com.google.code.findbugs:annotations:3.0.1u2")
