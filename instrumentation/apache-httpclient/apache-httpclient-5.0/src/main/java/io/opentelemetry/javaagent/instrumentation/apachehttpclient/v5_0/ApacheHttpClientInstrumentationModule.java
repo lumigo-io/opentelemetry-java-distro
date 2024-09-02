@@ -15,16 +15,12 @@ import java.util.List;
 public class ApacheHttpClientInstrumentationModule extends InstrumentationModule {
 
   public ApacheHttpClientInstrumentationModule() {
-    super("lumigo-apache-httpclient", "lumigo-apache-httpclient-5.0");
+    super("apache-httpclient", "apache-httpclient-5.0");
   }
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
     return Arrays.asList(
-        new ApacheHttpClientInstrumentation(),
-        new ApacheHttpAsyncClientInstrumentation(),
-        new SessionInputBufferInstrumentation(),
-        new HttpMessageParserInstrumentation()
-    );
+        new ApacheHttpClientInstrumentation(), new ApacheHttpAsyncClientInstrumentation());
   }
 }
