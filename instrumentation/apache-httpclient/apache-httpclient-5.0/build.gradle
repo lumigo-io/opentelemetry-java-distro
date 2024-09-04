@@ -12,11 +12,8 @@ muzzle {
 dependencies {
   compileOnly project(":bootstrap")
   compileOnly project(":utils")
-  implementation 'io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:2.6.0-alpha'
-
   compileOnly("org.apache.httpcomponents.client5:httpclient5:${versions.apachehttpclient50}")
 
   testImplementation "com.github.tomakehurst:wiremock-jre8:2.35.0"
   testImplementation("org.apache.httpcomponents.client5:httpclient5:5.0")
-
 }
