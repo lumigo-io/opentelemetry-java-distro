@@ -5,9 +5,12 @@
 
 package io.opentelemetry.instrumentation.lettuce.v5_1;
 
-import java.util.*;
-import java.util.regex.*;
-import javax.annotation.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 public final class LettuceArgSplitter {
   private static final Pattern KEY_PATTERN =

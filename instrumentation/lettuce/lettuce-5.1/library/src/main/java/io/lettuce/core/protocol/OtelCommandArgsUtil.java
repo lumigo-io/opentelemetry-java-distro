@@ -18,7 +18,7 @@ public final class OtelCommandArgsUtil {
 
   /**
    * Extract argument {@link List} from {@link CommandArgs} so that we wouldn't need to parse them
-   * from command {@link String} with {@link io.opentelemetry.instrumentation.lettuce.v5_1.LettuceArgSplitter#splitArgs}.
+   * from command {@link String}
    */
   public static List<String> getCommandArgs(CommandArgs<?, ?> commandArgs) {
     List<String> result = new ArrayList<>();
