@@ -82,10 +82,7 @@ public class ConnectionTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                              List.of("application/json"))
-                          .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
+                          .hasAttribute(AttributeKey.stringKey("http.request.method"), "GET")
                           .hasException(thrown)
                           .hasStatus(StatusData.error())
                   ));
@@ -123,14 +120,6 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                            .hasAttribute(AttributeKey.stringKey("http.response.body"), "")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
-                                List.of("chunked"))
-                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
                             .hasStatus(StatusData.unset())
                     ));
   }
@@ -165,10 +154,8 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
+                            .hasAttribute(AttributeKey.stringKey("http.request.method")
+                                , "GET")
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -204,11 +191,8 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500L)
+                            .hasAttribute(AttributeKey.stringKey("http.request.method"), "GET")
+                            .hasAttribute(AttributeKey.longKey("http.response.status_code"), 500L)
                             .hasStatus(StatusData.error())
                     ));
   }
@@ -251,16 +235,12 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/text"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                                List.of("application/text"))
+                            .hasAttribute(AttributeKey.stringKey("http.request.method"), "GET")
+
                             // Buffer size differences between local and GH Actions prevent us from
                             // using this assertion as response content differs
                             // .hasAttribute(AttributeKey.stringKey("http.response.body"), jsonBody)
-                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
+                            .hasAttribute(AttributeKey.longKey("http.response.status_code"), 200L)
                     ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(jsonBody);

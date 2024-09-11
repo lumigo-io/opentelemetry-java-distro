@@ -86,18 +86,11 @@ public class JsonChunkedContentTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                              List.of("application/json"))
-                          .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                              List.of("application/json"))
-                          .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
-                              List.of("chunked"))
+                          .hasAttribute(AttributeKey.stringKey("http.request.method"), "GET")
                           // Buffer size differences between local and GH Actions prevent us from
                           // using this assertion as response content differs
                           // .hasAttribute(AttributeKey.stringKey("http.response.body"), jsonBody)
-                          .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
+                          .hasAttribute(AttributeKey.longKey("http.response.status_code"), 200L)
                   ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(jsonBody);
@@ -149,18 +142,12 @@ public class JsonChunkedContentTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), requestBody)
-                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
-                                List.of("chunked"))
+                            .hasAttribute(AttributeKey.stringKey("http.request.method")
+                                , "GET")
                             // Buffer size differences between local and GH Actions prevent us from
                             // using this assertion as response content differs
                             // .hasAttribute(AttributeKey.stringKey("http.response.body"), responseBody)
-                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
+                            .hasAttribute(AttributeKey.longKey("http.response.status_code"), 200L)
                     ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(responseBody);

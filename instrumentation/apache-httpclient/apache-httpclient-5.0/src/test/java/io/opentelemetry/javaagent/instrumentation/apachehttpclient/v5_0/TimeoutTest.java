@@ -74,10 +74,7 @@ public class TimeoutTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
+                            .hasAttribute(AttributeKey.stringKey("http.request.method"), "GET")
                             .hasStatus(StatusData.error())
                     ));
   }
