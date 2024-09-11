@@ -17,7 +17,7 @@ import io.opentelemetry.instrumentation.api.incubator.builder.internal.*;
 public class JavaHttpClientInstrumenterBuilderFactory {
   private JavaHttpClientInstrumenterBuilderFactory() {}
 
-  private static final String INSTRUMENTATION_NAME = "io.opentelemetry.java-http-client";
+  private static final String INSTRUMENTATION_NAME = "io.opentelemetry.lumigo-java-http-client";
 
   public static DefaultHttpClientInstrumenterBuilder<HttpRequest, HttpResponse<?>> create(
       OpenTelemetry openTelemetry) {

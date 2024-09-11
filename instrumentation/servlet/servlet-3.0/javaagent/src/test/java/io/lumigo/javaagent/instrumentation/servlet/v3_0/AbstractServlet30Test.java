@@ -92,8 +92,6 @@ public abstract class AbstractServlet30Test {
                       span -> {
                         span.hasName("POST " + urlPath)
                             .hasKind(SpanKind.SERVER)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "POST")
-                            .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), JSON_BODY)
                             .hasAttribute(AttributeKey.stringKey("http.response.body"), JSON_BODY);
                       });

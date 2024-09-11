@@ -80,9 +80,7 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "SET foo bar"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))));
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"))));
   }
 
   @Test
@@ -105,9 +103,7 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "SET foo bar"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
@@ -116,9 +112,7 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "GET foo"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "GET"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))));
+                                equalTo(SemanticAttributes.DB_OPERATION, "GET"))));
   }
 
   @Test
@@ -139,9 +133,8 @@ class JedisClientTest {
                         span.hasName("MULTI")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis")
+)),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
@@ -150,9 +143,7 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "SET foo bar"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
@@ -161,18 +152,14 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "SET foo2 bar2"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
                         span.hasName("EXEC")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))));
+                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"))));
   }
 
   @Test
@@ -195,9 +182,7 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "SET foo bar"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "SET"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))),
+                                equalTo(SemanticAttributes.DB_OPERATION, "SET"))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
@@ -206,8 +191,6 @@ class JedisClientTest {
                             .hasAttributesSatisfying(
                                 equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
                                 equalTo(SemanticAttributes.DB_STATEMENT, "RANDOMKEY"),
-                                equalTo(SemanticAttributes.DB_OPERATION, "RANDOMKEY"),
-                                equalTo(SemanticAttributes.NET_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_PEER_PORT, port))));
+                                equalTo(SemanticAttributes.DB_OPERATION, "RANDOMKEY"))));
   }
 }

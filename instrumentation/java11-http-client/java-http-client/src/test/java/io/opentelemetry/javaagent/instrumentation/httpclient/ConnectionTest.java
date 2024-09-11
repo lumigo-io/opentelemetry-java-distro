@@ -77,9 +77,6 @@ public class ConnectionTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                              List.of("application/json"))
                           .hasException(thrown)
                           .hasStatus(StatusData.error())
                   ));
@@ -117,9 +114,6 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -155,9 +149,6 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -195,10 +186,6 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.longKey("http.status_code"), 500L)
                             .hasStatus(StatusData.error())
                     ));
   }

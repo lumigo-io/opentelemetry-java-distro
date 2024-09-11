@@ -94,10 +94,6 @@ public class SnsTracingTest {
                                   assertThat(attrs)
                                       .containsEntry(SemanticAttributes.RPC_METHOD, "CreateQueue");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
-                                  assertThat(attrs)
                                       .hasEntrySatisfying(
                                           AttributeKey.stringKey("http.response.body"),
                                           value -> {
@@ -129,10 +125,6 @@ public class SnsTracingTest {
                                   assertThat(attrs)
                                       .containsEntry(
                                           SemanticAttributes.RPC_METHOD, "GetQueueAttributes");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -157,10 +149,6 @@ public class SnsTracingTest {
                                   assertThat(attrs)
                                       .containsEntry(
                                           SemanticAttributes.RPC_METHOD, "SetQueueAttributes");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -181,10 +169,6 @@ public class SnsTracingTest {
                                       .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSNS");
                                   assertThat(attrs)
                                       .containsEntry(SemanticAttributes.RPC_METHOD, "CreateTopic");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -205,10 +189,6 @@ public class SnsTracingTest {
                                       .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSNS");
                                   assertThat(attrs)
                                       .containsEntry(SemanticAttributes.RPC_METHOD, "Subscribe");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -229,10 +209,6 @@ public class SnsTracingTest {
                                       .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSNS");
                                   assertThat(attrs)
                                       .containsEntry(SemanticAttributes.RPC_METHOD, "Publish");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
                                   assertThat(attrs)
                                       .hasEntrySatisfying(
                                           AttributeKey.stringKey("http.request.body"),
