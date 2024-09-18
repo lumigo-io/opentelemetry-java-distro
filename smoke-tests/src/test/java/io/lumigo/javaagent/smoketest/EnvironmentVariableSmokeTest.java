@@ -281,4 +281,18 @@ class EnvironmentVariableSmokeTest {
         client,
         (traceNodes) -> assertThat(getProcessEnvironment(traceNodes), is(SCRUBBED_VALUE)));
   }
+
+  @Test
+  public void testLumigoEnableLogs(
+      final @Configuration(
+              env = {
+                @EnvVar(key = "LUMIGO_ENABLE_LOGS", value = "true"),
+              }) TestAppExtension.TestApplication target,
+      final OkHttpClient client)
+      throws IOException {
+    executeTest(
+        target,
+        client,
+        (traceNodes) -> assertThat(target.getLogs(), containsString("Lumigo - enabling logs exporter")));
+  }
 }

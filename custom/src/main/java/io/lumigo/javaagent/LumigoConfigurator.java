@@ -123,7 +123,8 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     if (lumigoEnableLogs == null || !lumigoEnableLogs.equalsIgnoreCase("true")) {
       setIfNotSet(originalCfg, customizedCfg, "otel.logs.exporter", "none");
     } else {
-      setIfNotSet(originalCfg, customizedCfg, "otel.logs.exporter", "otlp");
+      LOGGER.info("Lumigo - enabling logs exporter");
+      customizedCfg.put("otel.logs.exporter", "otlp");
     }
 
     /*
