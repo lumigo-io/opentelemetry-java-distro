@@ -293,6 +293,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
-        (traceNodes) -> assertThat(target.getLogs(), containsString("Lumigo - enabling logs exporter")));
+        (traceNodes) ->
+            assertThat(target.getLogs(), containsString("Lumigo - enabling logs exporter")));
   }
 }
