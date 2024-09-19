@@ -82,7 +82,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
     String accessToken = originalCfg.getString(LUMIGO_TRACER_TOKEN);
     if (Strings.isBlank(accessToken)) {
       LOGGER.warning(
-          "Lumigo token not provided (env var 'LUMIGO_TRACER_TOKEN' not set); no data will be sent to Lumigo.");
+          "Lumigo token not provided (env var 'LUMIGO_TRACER_TOKEN' not set); no data will be sent to Lumigo...");
       return Collections.emptyMap();
     }
 
