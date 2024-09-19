@@ -22,7 +22,7 @@ Configure the `LUMIGO_TRACER_TOKEN` environment variable with the token value ge
 LUMIGO_TRACER_TOKEN=<token>
 ```
 
-Replace `<token>` below with the token generated for you by the Lumigo platform.
+Replace `<token>` below with the token generated for you by the Lumigo platform..
 
 It is also advised that you set the `OTEL_SERVICE_NAME` environment variable with, as value, the service name you have chosen for your application:
 
