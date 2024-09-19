@@ -43,6 +43,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
   public static final String LUMIGO_TRACER_TOKEN = "lumigo.tracer.token";
   public static final String LUMIGO_ENDPOINT = "lumigo.endpoint";
   public static final String LUMIGO_DEBUG_SPANDUMP = "lumigo.debug.spandump";
+  public static final String LUMIGO_ENABLE_LOGS = "lumigo.enable.logs";
 
   public static final Logger LOGGER = Logger.getLogger(LumigoConfigurator.class.getName());
 
@@ -118,11 +119,13 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
      */
     setIfNotSet(originalCfg, customizedCfg, "otel.metrics.exporter", "none");
 
-    /*
-     * Disable the metrics exporter, as Lumigo does not currently offer a /v1/logs endpoint
-     * for general use.
-     */
-    setIfNotSet(originalCfg, customizedCfg, "otel.logs.exporter", "none");
+    String lumigoEnableLogs = originalCfg.getString(LUMIGO_ENABLE_LOGS);
+    if (lumigoEnableLogs == null || !lumigoEnableLogs.equalsIgnoreCase("true")) {
+      setIfNotSet(originalCfg, customizedCfg, "otel.logs.exporter", "none");
+    } else {
+      LOGGER.info("Lumigo - enabling logs exporter");
+      customizedCfg.put("otel.logs.exporter", "otlp");
+    }
 
     /*
      * Set limits in terms of span attribute length to match those that we have
