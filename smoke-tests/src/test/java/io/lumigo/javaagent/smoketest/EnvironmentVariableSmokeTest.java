@@ -27,6 +27,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -69,6 +70,7 @@ class EnvironmentVariableSmokeTest {
   protected void executeTest(
       TestAppExtension.TestApplication target,
       final OkHttpClient client,
+      Boolean awaitTraces,
       Consumer<List<JsonNode>> assertions)
       throws IOException {
 
@@ -85,15 +87,17 @@ class EnvironmentVariableSmokeTest {
       assertThat(body.string(), is("Hi!"));
     }
 
-    Awaitility.await()
-        .atMost(Duration.ofSeconds(30))
-        .untilAsserted(
-            () -> {
-              List<JsonNode> traceData = target.getTraces();
+    if (awaitTraces) {
+      Awaitility.await()
+          .atMost(Duration.ofSeconds(30))
+          .untilAsserted(
+              () -> {
+                List<JsonNode> traceData = target.getTraces();
 
-              // Verify environment variables are masked
-              assertions.accept(traceData);
-            });
+                // Verify environment variables are masked
+                assertions.accept(traceData);
+              });
+    }
   }
 
   protected String getProcessEnvironment(List<JsonNode> traceData) {
@@ -182,6 +186,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
+        true,
         (traceNodes) -> assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE));
   }
 
@@ -199,6 +204,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
+        true,
         (traceNodes) -> {
           assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
 
@@ -220,6 +226,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
+        true,
         (traceNodes) -> {
           assertTestResults(traceNodes, SCRUBBED_VALUE, SCRUBBED_VALUE, MY_VALUE);
 
@@ -242,6 +249,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
+        true,
         (traceNodes) ->
             assertTestResults(traceNodes, SECRET_VALUE, CREDENTIAL_VALUE, SCRUBBED_VALUE));
   }
@@ -260,6 +268,7 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
+        true,
         (traceNodes) -> assertTestResults(traceNodes, SECRET_VALUE, CREDENTIAL_VALUE, MY_VALUE));
   }
 
@@ -279,6 +288,25 @@ class EnvironmentVariableSmokeTest {
     executeTest(
         target,
         client,
+        true,
         (traceNodes) -> assertThat(getProcessEnvironment(traceNodes), is(SCRUBBED_VALUE)));
+  }
+
+  @Test
+  public void testDisableTracing(
+      final @Configuration(
+              env = {
+                @EnvVar(key = "lumigo.enable.traces", value = "false"),
+              }) TestAppExtension.TestApplication target,
+      final OkHttpClient client)
+      throws IOException {
+    executeTest(
+        target,
+        client,
+        false,
+        (traceNodes) -> {
+          assertThat(target.getLogs(), containsString("Lumigo - disabling traces exporter"));
+          assertThat(traceNodes, empty());
+        });
   }
 }

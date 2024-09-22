@@ -44,6 +44,7 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
   public static final String LUMIGO_ENDPOINT = "lumigo.endpoint";
   public static final String LUMIGO_DEBUG_SPANDUMP = "lumigo.debug.spandump";
   public static final String LUMIGO_ENABLE_LOGS = "lumigo.enable.logs";
+  public static final String LUMIGO_ENABLE_TRACES = "lumigo.enable.traces";
 
   public static final Logger LOGGER = Logger.getLogger(LumigoConfigurator.class.getName());
 
@@ -113,6 +114,12 @@ public class LumigoConfigurator implements AutoConfigurationCustomizerProvider {
       setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.endpoint", LUMIGO_ENDPOINT_URL);
     }
     setIfNotSet(originalCfg, customizedCfg, "otel.exporter.otlp.protocol", "http/protobuf");
+
+    String lumigoEnableTraces = originalCfg.getString(LUMIGO_ENABLE_TRACES);
+    if (lumigoEnableTraces != null && lumigoEnableTraces.equalsIgnoreCase("false")) {
+      LOGGER.info("Lumigo - disabling traces exporter");
+      customizedCfg.put("otel.traces.exporter", "none");
+    }
 
     /*
      * Disable the metrics exporter, as Lumigo does not currently offer a /v1/metrics endpoint
