@@ -10,6 +10,7 @@ import static io.opentelemetry.instrumentation.api.instrumenter.http.HttpServerR
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpServerRoute;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpServerRouteGetter;
+import io.opentelemetry.javaagent.instrumentation.spring.webmvc.v3_1.util.CachedBodyHttpServletRequest;
 import io.opentelemetry.javaagent.instrumentation.spring.webmvc.v3_1.SpringWebMvcServerSpanNaming;
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
@@ -30,6 +31,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import io.opentelemetry.javaagent.instrumentation.spring.webmvc.v3_1.util.CachedBodyHttpServletResponse;
+import io.opentelemetry.javaagent.instrumentation.spring.webmvc.v3_1.util.HttpContextKeys;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
@@ -71,11 +74,27 @@ public class OpenTelemetryHandlerMappingFilter implements Filter, Ordered {
       return;
     }
 
+    CachedBodyHttpServletRequest wrappedRequest = new CachedBodyHttpServletRequest((HttpServletRequest) request);
+    CachedBodyHttpServletResponse wrappedResponse = new CachedBodyHttpServletResponse((HttpServletResponse) response);
+
     try {
-      filterChain.doFilter(request, response);
+      filterChain.doFilter(wrappedRequest, wrappedResponse);
     } finally {
       if (handlerMappings != null) {
         Context context = Context.current();
+
+        // Store the request body in the context
+        String requestBody = wrappedRequest.getRequestBody();
+        if (requestBody != null) {
+          context = context.with(HttpContextKeys.HTTP_REQUEST_BODY, requestBody);
+        }
+
+        // Store the response body in the context
+        String responseBody = wrappedResponse.getResponseBody();
+        if (responseBody != null) {
+          context = context.with(HttpContextKeys.HTTP_RESPONSE_BODY, responseBody);
+        }
+
         HttpServerRoute.update(context, CONTROLLER, serverSpanName, prepareRequest(request));
       }
     }
