@@ -1,0 +1,34 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("io.netty")
+    module.set("netty-codec-http")
+    versions.set("[4.0.0.Final,4.1.0.Final)")
+    assertInverse.set(true)
+  }
+  pass {
+    group.set("io.netty")
+    module.set("netty-all")
+    versions.set("[4.0.0.Final,4.1.0.Final)")
+    excludeDependency("io.netty:netty-tcnative")
+    assertInverse.set(true)
+  }
+  fail {
+    group.set("io.netty")
+    module.set("netty")
+    versions.set("[,]")
+  }
+}
+
+dependencies {
+  implementation("io.netty:netty-codec-http:4.0.0.Final")
+//  implementation(project(":instrumentation:netty:netty-4-common:javaagent"))
+//  implementation(project(":instrumentation:netty:netty-4-common:library"))
+//  implementation(project(":instrumentation:netty:netty-common:library"))
+
+//  testInstrumentation(project(":instrumentation:netty:netty-3.8:javaagent"))
+//  testInstrumentation(project(":instrumentation:netty:netty-4.1:javaagent"))
+
+//  latestDepTestLibrary("io.netty:netty-codec-http:4.0.+") // see netty-4.1 module
+}
