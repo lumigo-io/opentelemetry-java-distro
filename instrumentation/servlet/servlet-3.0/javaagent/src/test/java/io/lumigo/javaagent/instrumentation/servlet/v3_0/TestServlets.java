@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-class   TestServlets {
+class TestServlets {
   @WebServlet
   public static class EchoStream_single_byte_print extends HttpServlet {
     @Override
