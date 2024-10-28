@@ -1,3 +1,20 @@
+/*
+ * Copyright 2024 Lumigo LTD
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package io.lumigo.javaagent.instrumentation.netty.v4_0;
 
 import io.netty.bootstrap.Bootstrap;
@@ -31,32 +48,39 @@ public class NettyHttpClient {
     return sendRequest(HttpMethod.POST, content);
   }
 
-  private FullHttpResponse sendRequest(HttpMethod method, String content) throws InterruptedException {
+  private FullHttpResponse sendRequest(HttpMethod method, String content)
+      throws InterruptedException {
     ChannelFuture future = null;
     try {
       Bootstrap bootstrap = new Bootstrap();
-      bootstrap.group(clientGroup)
+      bootstrap
+          .group(clientGroup)
           .channel(NioSocketChannel.class)
-          .handler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            public void initChannel(SocketChannel ch) {
-              ch.pipeline().addLast(new HttpClientCodec());
-              ch.pipeline().addLast(new HttpObjectAggregator(8192));
-              ch.pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
+          .handler(
+              new ChannelInitializer<SocketChannel>() {
                 @Override
-                protected void channelRead0(ChannelHandlerContext ctx, FullHttpResponse msg) {
-                  response = msg.retain();  // Retain a copy of the response
-                  ctx.close();
-                }
+                public void initChannel(SocketChannel ch) {
+                  ch.pipeline().addLast(new HttpClientCodec());
+                  ch.pipeline().addLast(new HttpObjectAggregator(8192));
+                  ch.pipeline()
+                      .addLast(
+                          new SimpleChannelInboundHandler<FullHttpResponse>() {
+                            @Override
+                            protected void channelRead0(
+                                ChannelHandlerContext ctx, FullHttpResponse msg) {
+                              response = msg.retain(); // Retain a copy of the response
+                              ctx.close();
+                            }
 
-                @Override
-                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-                  cause.printStackTrace();  // Log the exception for debugging
-                  ctx.close();  // Close the context on error to free resources
+                            @Override
+                            public void exceptionCaught(
+                                ChannelHandlerContext ctx, Throwable cause) {
+                              cause.printStackTrace(); // Log the exception for debugging
+                              ctx.close(); // Close the context on error to free resources
+                            }
+                          });
                 }
               });
-            }
-          });
 
       future = bootstrap.connect(host, port).sync();
       System.out.println("Client connected to server at " + host + ":" + port);
@@ -64,7 +88,9 @@ public class NettyHttpClient {
       HttpRequest request;
       if (method == HttpMethod.POST && content != null) {
         byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, "/", Unpooled.copiedBuffer(contentBytes));
+        request =
+            new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, method, "/", Unpooled.copiedBuffer(contentBytes));
         request.headers().set(HttpHeaderNames.CONTENT_LENGTH, contentBytes.length);
       } else {
         request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, "/");
