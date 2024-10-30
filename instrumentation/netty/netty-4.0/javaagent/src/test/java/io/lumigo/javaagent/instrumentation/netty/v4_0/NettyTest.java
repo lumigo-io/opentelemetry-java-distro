@@ -20,9 +20,13 @@ package io.lumigo.javaagent.instrumentation.netty.v4_0;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.test.utils.PortUtils;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import java.nio.charset.StandardCharsets;
+import io.opentelemetry.sdk.testing.assertj.TracesAssert;
+import io.opentelemetry.semconv.SemanticAttributes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -53,6 +57,29 @@ public class NettyTest {
     assertEquals(HttpResponseStatus.OK, response.getStatus());
     String responseBody = response.content().toString(StandardCharsets.UTF_8);
     assertEquals("Hello, World!", responseBody);
+
+    TracesAssert.assertThat(instrumentation.waitForTraces(1))
+        .hasSize(1)
+        .hasTracesSatisfyingExactly(
+            trace ->
+                trace
+                    .hasSize(2)
+                    .hasSpansSatisfyingExactly(
+                        span -> {
+                          span.hasName("GET")
+                              .hasKind(SpanKind.CLIENT);
+                        },
+                        span -> {
+                          span.hasName("GET")
+                              .hasKind(SpanKind.SERVER)
+                              .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
+                              .hasAttribute(AttributeKey.longKey("http.response_content_length"), (long) responseBody.length())
+                              .hasAttribute(AttributeKey.longKey("http.status_code"), 200L);
+//                              .hasAttribute(
+//                                  AttributeKey.stringKey("http.request.body"), jsonRequestBody)
+//                              .hasAttribute(
+//                                  AttributeKey.stringKey("http.response.body"), jsonResponse);
+                        }));
   }
 
   @Test
@@ -65,6 +92,29 @@ public class NettyTest {
     assertEquals(HttpResponseStatus.OK, response.getStatus());
     String responseBody = response.content().toString(StandardCharsets.UTF_8);
     assertEquals(testContent, responseBody); // Should echo back the posted content
+
+    TracesAssert.assertThat(instrumentation.waitForTraces(1))
+        .hasSize(1)
+        .hasTracesSatisfyingExactly(
+            trace ->
+                trace
+                    .hasSize(2)
+                    .hasSpansSatisfyingExactly(
+                        span -> {
+                          span.hasName("POST")
+                              .hasKind(SpanKind.CLIENT);
+                        },
+                        span -> {
+                          span.hasName("POST")
+                              .hasKind(SpanKind.SERVER)
+                              .hasAttribute(SemanticAttributes.HTTP_METHOD, "POST")
+                              .hasAttribute(AttributeKey.longKey("http.response_content_length"), (long) responseBody.length())
+                              .hasAttribute(AttributeKey.longKey("http.status_code"), 200L);
+//                              .hasAttribute(
+//                                  AttributeKey.stringKey("http.request.body"), jsonRequestBody)
+//                              .hasAttribute(
+//                                  AttributeKey.stringKey("http.response.body"), jsonResponse);
+                        }));
   }
 
   @AfterAll
