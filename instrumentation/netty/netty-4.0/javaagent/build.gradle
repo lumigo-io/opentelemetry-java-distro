@@ -24,22 +24,16 @@ muzzle {
 dependencies {
   compileOnly project(":bootstrap")
   compileOnly("io.netty:netty-codec-http:4.0.0.Final")
+  compileOnly("io.netty:netty-transport:4.0.0.Final")
 
   implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.0:${versions.opentelemetryJavaagentAlpha}")
 
 // Instrumentations for testing
   testImplementation("io.netty:netty-codec-http:4.0.0.Final")
+  testImplementation("io.netty:netty-transport:4.0.0.Final")
 
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.0:${versions.opentelemetryJavaagentAlpha}")
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4-common:${versions.opentelemetryJavaagentAlpha}")
 
-//  From OTEL
-//  implementation(project(":instrumentation:netty:netty-4-common:javaagent"))
-//  implementation(project(":instrumentation:netty:netty-4-common:library"))
-//  implementation(project(":instrumentation:netty:netty-common:library"))
 
-//  testInstrumentation(project(":instrumentation:netty:netty-3.8:javaagent"))
-//  testInstrumentation(project(":instrumentation:netty:netty-4.1:javaagent"))
-
-//  latestDepTestLibrary("io.netty:netty-codec-http:4.0.+") // see netty-4.1 module
 }
