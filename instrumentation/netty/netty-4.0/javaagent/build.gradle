@@ -27,6 +27,7 @@ dependencies {
   compileOnly("io.netty:netty-transport:4.0.0.Final")
 
   implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.0:${versions.opentelemetryJavaagentAlpha}")
+  implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4-common:${versions.opentelemetryJavaagentAlpha}")
 
 // Instrumentations for testing
   testImplementation("io.netty:netty-codec-http:4.0.0.Final")

@@ -21,6 +21,7 @@ import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @AutoService(InstrumentationModule.class)
@@ -36,8 +37,9 @@ public class Netty40InstrumentationModule extends InstrumentationModule {
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
-    return Arrays.asList(
+    return Collections.singletonList(
 //        new NettyRequestBodyInstrumentation()
+        new NettyChannelPipelineInstrumentation()
     );
 
 

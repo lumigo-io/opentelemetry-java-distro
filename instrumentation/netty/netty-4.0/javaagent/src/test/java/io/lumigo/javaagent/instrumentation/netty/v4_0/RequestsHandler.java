@@ -48,7 +48,7 @@ public class RequestsHandler extends SimpleChannelInboundHandler<FullHttpRequest
           new DefaultFullHttpResponse(
               HttpVersion.HTTP_1_1,
               HttpResponseStatus.OK,
-              Unpooled.copiedBuffer(requestBody, StandardCharsets.UTF_8));
+              Unpooled.copiedBuffer("Hello, World!", StandardCharsets.UTF_8));
       response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
       response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
