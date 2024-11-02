@@ -24,13 +24,13 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.test.utils.PortUtils;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
-import java.nio.charset.StandardCharsets;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.semconv.SemanticAttributes;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class NettyTest {
@@ -68,19 +68,22 @@ public class NettyTest {
                     .hasSize(2)
                     .hasSpansSatisfyingExactly(
                         span -> {
-                          span.hasName("GET")
-                              .hasKind(SpanKind.CLIENT);
+                          span.hasName("GET").hasKind(SpanKind.CLIENT);
                         },
                         span -> {
                           span.hasName("GET")
                               .hasKind(SpanKind.SERVER)
                               .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                              .hasAttribute(AttributeKey.longKey("http.response_content_length"), (long) responseBody.length())
+                              .hasAttribute(
+                                  AttributeKey.longKey("http.response_content_length"),
+                                  (long) responseBody.length())
                               .hasAttribute(AttributeKey.longKey("http.status_code"), 200L);
-//                              .hasAttribute(
-//                                  AttributeKey.stringKey("http.request.body"), jsonRequestBody)
-//                              .hasAttribute(
-//                                  AttributeKey.stringKey("http.response.body"), jsonResponse);
+                          //                              .hasAttribute(
+                          //
+                          // AttributeKey.stringKey("http.request.body"), jsonRequestBody)
+                          //                              .hasAttribute(
+                          //
+                          // AttributeKey.stringKey("http.response.body"), jsonResponse);
                         }));
   }
 
@@ -103,20 +106,20 @@ public class NettyTest {
                     .hasSize(2)
                     .hasSpansSatisfyingExactly(
                         span -> {
-                          span.hasName("POST")
-                              .hasKind(SpanKind.CLIENT);
+                          span.hasName("POST").hasKind(SpanKind.CLIENT);
                         },
                         span -> {
                           span.hasName("POST")
                               .hasKind(SpanKind.SERVER)
                               .hasAttribute(SemanticAttributes.HTTP_METHOD, "POST")
-                              .hasAttribute(AttributeKey.longKey("http.response_content_length"), (long) responseBody.length())
+                              .hasAttribute(
+                                  AttributeKey.longKey("http.response_content_length"),
+                                  (long) responseBody.length())
                               .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
                               .hasAttribute(
                                   AttributeKey.stringKey("http.request.body"), requestBody)
                               .hasAttribute(
-                                  AttributeKey.stringKey("http.response.body"), responseBody)
-                          ;
+                                  AttributeKey.stringKey("http.response.body"), responseBody);
                         }));
   }
 
