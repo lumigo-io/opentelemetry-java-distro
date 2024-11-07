@@ -1,6 +1,6 @@
 apply from: "$rootDir/gradle/java-conventions.gradle"
 
 dependencies {
-  compileOnly("org.springframework.boot:spring-boot-starter-webflux:3.3.4")
-  compileOnly("org.springframework.boot:spring-boot-starter-test:3.3.4")
+  compileOnly("org.springframework.boot:spring-boot-starter-webflux:${versions.springboot}")
+  compileOnly("org.springframework.boot:spring-boot-starter-test:${versions.springboot}")
 }
