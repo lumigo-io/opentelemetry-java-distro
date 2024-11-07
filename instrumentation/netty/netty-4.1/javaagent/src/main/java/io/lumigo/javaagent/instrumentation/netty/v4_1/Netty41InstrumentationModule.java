@@ -15,23 +15,24 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent.instrumentation.netty.v4_0;
+package io.lumigo.javaagent.instrumentation.netty.v4_1;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
+
 import java.util.Collections;
 import java.util.List;
 
 @AutoService(InstrumentationModule.class)
-public class Netty40InstrumentationModule extends InstrumentationModule {
-  public Netty40InstrumentationModule() {
-    super("lumigo-netty", "lumigo-netty-4.0");
+public class Netty41InstrumentationModule extends InstrumentationModule {
+  public Netty41InstrumentationModule() {
+    super("lumigo-netty", "lumigo-netty-4.1");
   }
 
   @Override
   public boolean isHelperClass(String className) {
-    return className.startsWith("io.lumigo.javaagent.instrumentation.netty.v4_0.");
+    return className.startsWith("io.lumigo.javaagent.instrumentation.netty.v4_1.");
   }
 
   @Override

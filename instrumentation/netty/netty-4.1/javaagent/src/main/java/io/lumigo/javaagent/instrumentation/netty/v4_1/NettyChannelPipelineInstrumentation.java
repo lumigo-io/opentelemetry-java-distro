@@ -15,19 +15,17 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent.instrumentation.netty.v4_0;
+package io.lumigo.javaagent.instrumentation.netty.v4_1;
 
 import static net.bytebuddy.matcher.ElementMatchers.isMethod;
 import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 
-import io.lumigo.javaagent.instrumentation.netty.v4_0.client.HttpClientTracingHandler;
-import io.lumigo.javaagent.instrumentation.netty.v4_0.server.HttpServerTracingHandler;
+import io.lumigo.javaagent.instrumentation.netty.v4_1.client.HttpClientTracingHandler;
+import io.lumigo.javaagent.instrumentation.netty.v4_1.server.HttpServerTracingHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.opentelemetry.instrumentation.api.util.VirtualField;
 import io.opentelemetry.javaagent.bootstrap.CallDepth;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
@@ -44,11 +42,14 @@ public class NettyChannelPipelineInstrumentation
   public void transform(TypeTransformer transformer) {
     super.transform(transformer);
 
+    System.out.println("NettyChannelPipelineInstrumentation - transform");
     transformer.applyAdviceToMethod(
         isMethod()
             .and(nameStartsWith("add").or(named("replace")))
+            .and(takesArgument(1, String.class))
             .and(takesArgument(2, named("io.netty.channel.ChannelHandler"))),
-        NettyChannelPipelineInstrumentation.class.getName() + "$ChannelPipelineAddAdvice");
+        NettyChannelPipelineInstrumentation.class.getName()
+            + "$ChannelPipelineAddAdvice");
   }
 
   @SuppressWarnings("unused")
@@ -58,7 +59,9 @@ public class NettyChannelPipelineInstrumentation
     public static void trackCallDepth(
         @Advice.Argument(2) ChannelHandler handler,
         @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
-      System.out.println("ChannelPipelineAddAdvice - OnMethodEnter - trackCallDepth");
+      System.out.println(
+          "ChannelPipelineAddAdvice - OnMethodEnter - trackCallDepth - " + handler.getClass()
+              .getName());
 //      callDepth = CallDepth.forClass(handler.getClass());
 //      callDepth.getAndIncrement();
     }
@@ -66,27 +69,10 @@ public class NettyChannelPipelineInstrumentation
     @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
     public static void addHandler(
         @Advice.This ChannelPipeline pipeline,
+        @Advice.Argument(1) String handlerName,
         @Advice.Argument(2) ChannelHandler handler,
         @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
 
-      System.out.println(
-          "ChannelPipelineAddAdvice - OnMethodExit - addHandler - " + handler.getClass().getName());
-
-//      if (callDepth.decrementAndGet() > 0) {
-//        System.out.println(
-//            "ChannelPipelineAddAdvice - OnMethodExit - addHandler - callDepth.decrementAndGet() > 0");
-//        return;
-//      }
-
-//      VirtualField<ChannelHandler, ChannelHandler> instrumentationHandlerField =
-//          VirtualField.find(ChannelHandler.class, ChannelHandler.class);
-
-//      // don't add another instrumentation handler if there already is one attached
-//      if (instrumentationHandlerField.get(handler) != null) {
-//        System.out.println(
-//            "ChannelPipelineAddAdvice - OnMethodExit - addHandler - instrumentationHandlerField.get(handler) != null");
-//        return;
-//      }
       try {
         ChannelHandler ourHandler = null;
         // Server pipeline handlers
@@ -104,19 +90,6 @@ public class NettyChannelPipelineInstrumentation
           pipeline.addAfter(handler.getClass().getName(), ourHandler.getClass().getName(),
               ourHandler);
           // Client pipeline handlers
-        } else if (handler != null
-            && handler.getClass().getName()
-            .startsWith(IO_OPENTELEMETRY_JAVAAGENT)
-            && handler.getClass().getName()
-            .contains(INSTRUMENTATION_NETTY)
-            && handler.getClass().getSimpleName().equals("HttpClientTracingHandler")) {
-          System.out.println(
-              "ChannelPipelineAddAdvice - OnMethodExit - addHandler - HttpClientTracingHandler - "
-                  + handler.getClass().getName());
-          ourHandler = new HttpClientTracingHandler();
-
-          pipeline.addAfter(handler.getClass().getName(), ourHandler.getClass().getName(),
-              ourHandler);
         }
 
 //          pipeline.addLast(ourHandler.getClass().getName(), ourHandler);

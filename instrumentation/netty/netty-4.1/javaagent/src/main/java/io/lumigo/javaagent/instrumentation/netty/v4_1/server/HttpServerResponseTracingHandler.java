@@ -15,7 +15,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.lumigo.javaagent.instrumentation.netty.v4_0.server;
+package io.lumigo.javaagent.instrumentation.netty.v4_1.server;
 
 import io.lumigo.instrumentation.core.ByteBufferHolder;
 import io.netty.buffer.ByteBuf;
@@ -27,8 +27,11 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.util.Attribute;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.instrumentation.netty.v4_1.internal.AttributeKeys;
+import io.opentelemetry.instrumentation.netty.v4_1.internal.ServerContext;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
-import io.opentelemetry.javaagent.instrumentation.netty.v4_0.AttributeKeys;
+
+
 import java.io.ByteArrayOutputStream;
 import java.util.Deque;
 
@@ -37,13 +40,26 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
   @Override
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise prm) {
     Context context = null;
-//    Context context = ctx.channel().attr(AttributeKeys.SERVER_CONTEXT).get();
-    System.out.println("HttpServerResponseTracingHandler.write");
+    try {
+      System.out.println("HttpServerResponseTracingHandler.write - try - ctx.channel().attr(AttributeKeys.SERVER_CONTEXT)");
+      Attribute<Deque<ServerContext>> serverContextAttr =
+          ctx.channel().attr(AttributeKeys.SERVER_CONTEXT);
 
-//    if (context == null || !(msg instanceof HttpResponse)) {
-//      ctx.write(msg, prm);
-//      return;
-//    }
+      Deque<ServerContext> serverContexts = serverContextAttr.get();
+      ServerContext serverContext = serverContexts != null ? serverContexts.peekFirst() : null;
+
+      if (serverContext != null) {
+        context = serverContext.context();
+        System.out.println("HttpServerResponseTracingHandler.write - try - serverContext != null");
+      }
+      System.out.println("HttpServerResponseTracingHandler.write - try - serverContextAttr: " + serverContextAttr);
+
+    } catch (Exception e) {
+      System.out.println("HttpServerResponseTracingHandler.write - catch - ctx.channel().attr(AttributeKeys.SERVER_CONTEXT)");
+    }
+
+
+    System.out.println("HttpServerResponseTracingHandler.write");
 
     if (msg instanceof HttpResponse) {
       System.out.println("HttpServerResponseTracingHandler.write - HttpResponse");
@@ -61,12 +77,11 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
         ByteBuf copiedContent = content.copy();
         Span span;
         if (context != null) {
-          System.out.println("HttpServerResponseTracingHandler.write - HttpContent - isReadable - context: " + context);
           span = Java8BytecodeBridge.spanFromContext(context);
-        } else {
+          System.out.println("HttpServerResponseTracingHandler.write - HttpContent - isReadable - span: " + span);
+        }else {
           span = Java8BytecodeBridge.currentSpan();
         }
-
         ByteBufferHolder bufferHolder =
             new ByteBufferHolder(new ByteArrayOutputStream(), span, "UTF-8");
 
