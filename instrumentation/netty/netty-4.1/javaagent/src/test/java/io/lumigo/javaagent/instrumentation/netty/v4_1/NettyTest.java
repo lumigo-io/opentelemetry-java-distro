@@ -77,7 +77,7 @@ public class NettyTest {
                                   (long) responseBody.length())
                               .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
                               .hasAttribute(
-                              AttributeKey.stringKey("http.response.body"), responseBody);
+                                  AttributeKey.stringKey("http.response.body"), responseBody);
                         }));
   }
 

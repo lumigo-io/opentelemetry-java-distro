@@ -86,7 +86,6 @@ public class NettyHttpClient {
               });
 
       future = bootstrap.connect(host, port).sync();
-      System.out.println("Client connected to server at " + host + ":" + port);
 
       HttpRequest request;
       if (method == HttpMethod.POST && content != null) {

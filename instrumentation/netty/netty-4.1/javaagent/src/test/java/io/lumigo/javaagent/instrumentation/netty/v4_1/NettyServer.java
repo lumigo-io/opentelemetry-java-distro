@@ -49,7 +49,6 @@ public class NettyServer {
             new ChannelInitializer<SocketChannel>() {
               @Override
               public void initChannel(SocketChannel ch) {
-                System.out.println("Initializing channel pipeline");
                 ch.pipeline().addLast(new HttpServerCodec());
                 ch.pipeline().addLast(new HttpObjectAggregator(8192)); // Add this line
                 ch.pipeline().addLast(new RequestsHandler());
@@ -57,7 +56,6 @@ public class NettyServer {
             });
 
     channelFuture = serverBootstrap.bind(port).sync(); // Start the server
-    System.out.println("Server started on port: " + port);
   }
 
   public void stop() {

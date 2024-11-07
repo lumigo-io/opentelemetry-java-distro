@@ -23,15 +23,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.util.Attribute;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.netty.v4_1.internal.AttributeKeys;
 import io.opentelemetry.instrumentation.netty.v4_1.internal.ServerContext;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
-
-
 import java.io.ByteArrayOutputStream;
 import java.util.Deque;
 
@@ -41,7 +38,6 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise prm) {
     Context context = null;
     try {
-      System.out.println("HttpServerResponseTracingHandler.write - try - ctx.channel().attr(AttributeKeys.SERVER_CONTEXT)");
       Attribute<Deque<ServerContext>> serverContextAttr =
           ctx.channel().attr(AttributeKeys.SERVER_CONTEXT);
 
@@ -50,36 +46,23 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
 
       if (serverContext != null) {
         context = serverContext.context();
-        System.out.println("HttpServerResponseTracingHandler.write - try - serverContext != null");
       }
-      System.out.println("HttpServerResponseTracingHandler.write - try - serverContextAttr: " + serverContextAttr);
 
-    } catch (Exception e) {
-      System.out.println("HttpServerResponseTracingHandler.write - catch - ctx.channel().attr(AttributeKeys.SERVER_CONTEXT)");
-    }
-
-
-    System.out.println("HttpServerResponseTracingHandler.write");
-
-    if (msg instanceof HttpResponse) {
-      System.out.println("HttpServerResponseTracingHandler.write - HttpResponse");
+    } catch (Exception ignored) {
     }
 
     if (msg instanceof HttpContent) {
-      System.out.println("HttpServerResponseTracingHandler.write - HttpContent");
 
       HttpContent httpContent = (HttpContent) msg;
       ByteBuf content = httpContent.content();
 
       if (content.isReadable()) {
-        System.out.println("HttpServerResponseTracingHandler.write - HttpContent - isReadable");
 
         ByteBuf copiedContent = content.copy();
         Span span;
         if (context != null) {
           span = Java8BytecodeBridge.spanFromContext(context);
-          System.out.println("HttpServerResponseTracingHandler.write - HttpContent - isReadable - span: " + span);
-        }else {
+        } else {
           span = Java8BytecodeBridge.currentSpan();
         }
         ByteBufferHolder bufferHolder =
@@ -88,9 +71,7 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
         try {
           byte[] bytes = new byte[copiedContent.readableBytes()];
           copiedContent.readBytes(bytes);
-          System.out.println(
-              "HttpServerResponseTracingHandler.write - HttpContent - isReadable - bytes: "
-                  + new String(bytes));
+
           bufferHolder.append(bytes);
           bufferHolder.captureResponseBody(span);
         } finally {

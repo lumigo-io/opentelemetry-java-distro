@@ -22,11 +22,9 @@ import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 
-import io.lumigo.javaagent.instrumentation.netty.v4_1.client.HttpClientTracingHandler;
 import io.lumigo.javaagent.instrumentation.netty.v4_1.server.HttpServerTracingHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.opentelemetry.instrumentation.api.util.VirtualField;
 import io.opentelemetry.javaagent.bootstrap.CallDepth;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import io.opentelemetry.javaagent.instrumentation.netty.v4.common.AbstractNettyChannelPipelineInstrumentation;
@@ -42,14 +40,12 @@ public class NettyChannelPipelineInstrumentation
   public void transform(TypeTransformer transformer) {
     super.transform(transformer);
 
-    System.out.println("NettyChannelPipelineInstrumentation - transform");
     transformer.applyAdviceToMethod(
         isMethod()
             .and(nameStartsWith("add").or(named("replace")))
             .and(takesArgument(1, String.class))
             .and(takesArgument(2, named("io.netty.channel.ChannelHandler"))),
-        NettyChannelPipelineInstrumentation.class.getName()
-            + "$ChannelPipelineAddAdvice");
+        NettyChannelPipelineInstrumentation.class.getName() + "$ChannelPipelineAddAdvice");
   }
 
   @SuppressWarnings("unused")
@@ -58,13 +54,7 @@ public class NettyChannelPipelineInstrumentation
     @Advice.OnMethodEnter
     public static void trackCallDepth(
         @Advice.Argument(2) ChannelHandler handler,
-        @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
-      System.out.println(
-          "ChannelPipelineAddAdvice - OnMethodEnter - trackCallDepth - " + handler.getClass()
-              .getName());
-//      callDepth = CallDepth.forClass(handler.getClass());
-//      callDepth.getAndIncrement();
-    }
+        @Advice.Local("lumigoCallDepth") CallDepth callDepth) {}
 
     @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
     public static void addHandler(
@@ -74,33 +64,19 @@ public class NettyChannelPipelineInstrumentation
         @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
 
       try {
-        ChannelHandler ourHandler = null;
         // Server pipeline handlers
         if (handler != null
-            && handler.getClass().getName()
-            .startsWith(IO_OPENTELEMETRY_JAVAAGENT)
-            && handler.getClass().getName()
-            .contains(INSTRUMENTATION_NETTY)
+            && handler.getClass().getName().startsWith(IO_OPENTELEMETRY_JAVAAGENT)
+            && handler.getClass().getName().contains(INSTRUMENTATION_NETTY)
             && handler.getClass().getSimpleName().equals("HttpServerTracingHandler")) {
-          ourHandler = new HttpServerTracingHandler();
-          System.out.println(
-              "ChannelPipelineAddAdvice - OnMethodExit - addHandler - HttpServerTracingHandler - "
-                  + handler.getClass().getName());
+          ChannelHandler ourHandler = new HttpServerTracingHandler();
 
-          pipeline.addAfter(handler.getClass().getName(), ourHandler.getClass().getName(),
-              ourHandler);
-          // Client pipeline handlers
+          pipeline.addAfter(
+              handler.getClass().getName(), ourHandler.getClass().getName(), ourHandler);
         }
 
-//          pipeline.addLast(ourHandler.getClass().getName(), ourHandler);
+      } catch (IllegalArgumentException ignored) {
 
-        // associate our handle with original handler so they could be removed together
-//          instrumentationHandlerField.set(handler, ourHandler);
-      } catch (IllegalArgumentException e) {
-        System.out.println(
-            "ChannelPipelineAddAdvice - OnMethodExit - addHandler - IllegalArgumentException - "
-                + e.getMessage());
-        // Prevented adding duplicate handlers.
       }
     }
   }
