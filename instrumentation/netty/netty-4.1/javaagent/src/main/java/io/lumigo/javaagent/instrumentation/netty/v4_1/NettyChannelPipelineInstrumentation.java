@@ -56,7 +56,18 @@ public class NettyChannelPipelineInstrumentation
     @Advice.OnMethodEnter
     public static void trackCallDepth(
         @Advice.Argument(2) ChannelHandler handler,
-        @Advice.Local("lumigoCallDepth") CallDepth callDepth) {}
+        @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
+      // With Java 21 we have error from Muzzle:
+      // Missing method io.netty.channel.ChannelHandler#getClass()Ljava/lang/Class;
+      // This is probably, because the class is not loaded by the same classloader as the agent.
+      // so we can't use handler.getClass() method on it.
+      // Similar to
+      // io.opentelemetry.javaagent.instrumentation.netty.v4_1.NettyChannelPipelineInstrumentation.ChannelPipelineAddAdvice.trackCallDepth
+      //      if (callDepth == null) {
+      //        callDepth = CallDepth.forClass(ChannelPipeline.class);
+      //        callDepth.getAndIncrement();
+      //      }
+    }
 
     @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
     public static void addHandler(
@@ -65,6 +76,12 @@ public class NettyChannelPipelineInstrumentation
         @Advice.Argument(2) ChannelHandler handler,
         @Advice.Local("lumigoCallDepth") CallDepth callDepth) {
 
+      // Here we have to check if the call depth is greater than 1, because the handler is added
+      // together with
+      // io.opentelemetry.javaagent.instrumentation.netty.v4_1.NettyChannelPipelineInstrumentation.ChannelPipelineAddAdvice.addHandler
+      //      if (callDepth.decrementAndGet() > 1) {
+      //        return;
+      //      }
       try {
         // Server pipeline handlers
         if (handler
