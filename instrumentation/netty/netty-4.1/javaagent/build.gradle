@@ -32,11 +32,11 @@ dependencies {
   implementation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.1:${versions.opentelemetryJavaagentAlpha}")
 
 // Instrumentations for testing
-  testImplementation("io.netty:netty-codec-http:${versions.netty41}")
-  testImplementation("io.netty:netty-transport:${versions.netty41}")
-
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.1:${versions.opentelemetryJavaagentAlpha}")
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4-common:${versions.opentelemetryJavaagentAlpha}")
+
+  testImplementation("io.netty:netty-codec-http:${versions.netty41}")
+  testImplementation("io.netty:netty-transport:${versions.netty41}")
 
 
 }
