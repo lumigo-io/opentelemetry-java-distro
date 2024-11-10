@@ -33,8 +33,10 @@ import net.bytebuddy.asm.Advice;
 public class NettyChannelPipelineInstrumentation
     extends AbstractNettyChannelPipelineInstrumentation {
 
-  public static final String IO_OPENTELEMETRY_JAVAAGENT = "io.opentelemetry.javaagent.";
-  public static final String INSTRUMENTATION_NETTY = "instrumentation.netty.";
+  public static final String OPENTELEMETRY_HANDLER_CLASS_NAME =
+      "io.opentelemetry.instrumentation.netty.v4_1.internal.server.HttpServerTracingHandler";
+  public static final String LUMIGO_HANDLER_CLASS_NAME =
+      "io.lumigo.javaagent.instrumentation.netty.v4_1.server.HttpServerTracingHandler";
 
   @Override
   public void transform(TypeTransformer transformer) {
@@ -65,14 +67,18 @@ public class NettyChannelPipelineInstrumentation
 
       try {
         // Server pipeline handlers
-        if (handler != null
-            && handler.getClass().getName().startsWith(IO_OPENTELEMETRY_JAVAAGENT)
-            && handler.getClass().getName().contains(INSTRUMENTATION_NETTY)
-            && handler.getClass().getSimpleName().equals("HttpServerTracingHandler")) {
-          ChannelHandler ourHandler = new HttpServerTracingHandler();
+        if (handler
+            instanceof
+            io.opentelemetry.instrumentation.netty.v4_1.internal.server.HttpServerTracingHandler) {
 
+          ChannelHandler ourHandler = new HttpServerTracingHandler();
+          // With Java 21 we have error from Muzzle:
+          // Missing method io.netty.channel.ChannelHandler#getClass()Ljava/lang/Class;
+          // This is probably, because the class is not loaded by the same classloader as the agent
+          // so we can't use getClass() method on it.
+          // This is a workaround to avoid the error, until we find a better solution.
           pipeline.addAfter(
-              handler.getClass().getName(), ourHandler.getClass().getName(), ourHandler);
+              OPENTELEMETRY_HANDLER_CLASS_NAME, LUMIGO_HANDLER_CLASS_NAME, ourHandler);
         }
 
       } catch (IllegalArgumentException ignored) {
