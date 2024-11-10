@@ -42,8 +42,8 @@ dependencies {
 //  javaagentLibs(project(":instrumentation:rabbitmq-2.7:javaagent"))
   javaagentLibs(project(":instrumentation:servlet:servlet-3.0:javaagent"))
   javaagentLibs(project(":instrumentation:spring:spring-webmvc:spring-webmvc-3.1:javaagent"))
-//  javaagentLibs(project(":instrumentation:spring:spring-webflux:spring-webflux-5.0:javaagent"))
-//  javaagentLibs(project(":instrumentation:netty:netty-4.1:javaagent"))
+  javaagentLibs(project(":instrumentation:spring:spring-webflux:spring-webflux-5.0:javaagent"))
+  javaagentLibs(project(":instrumentation:netty:netty-4.1:javaagent"))
   javaagentLibs(project(":instrumentation:storm:javaagent"))
   javaagentLibs(project(":instrumentation:lettuce:lettuce-5.1:javaagent"))
 
