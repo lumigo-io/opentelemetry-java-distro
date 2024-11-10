@@ -329,3 +329,5 @@ The Lumigo OpenTelemetry Java distro automatically configures a [`BatchSpanProce
 * `otel.bsp.export.timeout`: `1s` (timeout for flushing data to Lumigo)
 
 The metrics and logs exporters are disabled (`otel.logs.exporter` and `otel.metrics.exporter` are set to `none`) as [Lumigo OpenTelemetry endpoint](https://docs.lumigo.io/docs/lumigo-opentelemetry-endpoint) currently does not provide support for the `/v1/metrics` and `/v1/logs` endpoints.
+
+
