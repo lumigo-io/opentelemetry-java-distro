@@ -32,22 +32,25 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
 
   @Override
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise prm) {
+    // Extract the context from the channel
     Context context = TracingHandlerUtils.extractContext(ctx);
 
-    System.out.println("HttpServerResponseTracingHandler.write");
+    // Capture the response body
     if (msg instanceof HttpContent) {
 
-      System.out.println("HttpServerResponseTracingHandler.write HttpContent");
       HttpContent httpContent = (HttpContent) msg;
+      // Copy the content to avoid releasing the buffer
       ByteBuf content = httpContent.content();
 
+      // Capture the response body
       if (content.isReadable()) {
-        System.out.println("HttpServerResponseTracingHandler.write HttpContent isReadable");
         ByteBuf copiedContent = content.copy();
         Span span;
         if (context != null) {
+          // Get the span from the context
           span = Java8BytecodeBridge.spanFromContext(context);
         } else {
+          // otherwise, get the current span
           span = Java8BytecodeBridge.currentSpan();
         }
         ByteBufferHolder bufferHolder =
@@ -58,8 +61,6 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
           copiedContent.readBytes(bytes);
 
           bufferHolder.append(bytes);
-          System.out.println(
-              "HttpServerResponseTracingHandler.write bufferHolder.captureResponseBody");
           bufferHolder.captureResponseBody(span);
         } finally {
           copiedContent.release(); // Release the copied buffer
