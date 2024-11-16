@@ -23,41 +23,26 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpContent;
-import io.netty.util.Attribute;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.instrumentation.netty.v4_1.internal.AttributeKeys;
-import io.opentelemetry.instrumentation.netty.v4_1.internal.ServerContext;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import java.io.ByteArrayOutputStream;
-import java.util.Deque;
 
 public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdapter {
 
   @Override
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise prm) {
-    Context context = null;
-    try {
-      Attribute<Deque<ServerContext>> serverContextAttr =
-          ctx.channel().attr(AttributeKeys.SERVER_CONTEXT);
+    Context context = TracingHandlerUtils.extractContext(ctx);
 
-      Deque<ServerContext> serverContexts = serverContextAttr.get();
-      ServerContext serverContext = serverContexts != null ? serverContexts.peekFirst() : null;
-
-      if (serverContext != null) {
-        context = serverContext.context();
-      }
-
-    } catch (Exception ignored) {
-    }
-
+    System.out.println("HttpServerResponseTracingHandler.write");
     if (msg instanceof HttpContent) {
 
+      System.out.println("HttpServerResponseTracingHandler.write HttpContent");
       HttpContent httpContent = (HttpContent) msg;
       ByteBuf content = httpContent.content();
 
       if (content.isReadable()) {
-
+        System.out.println("HttpServerResponseTracingHandler.write HttpContent isReadable");
         ByteBuf copiedContent = content.copy();
         Span span;
         if (context != null) {
@@ -73,6 +58,8 @@ public class HttpServerResponseTracingHandler extends ChannelOutboundHandlerAdap
           copiedContent.readBytes(bytes);
 
           bufferHolder.append(bytes);
+          System.out.println(
+              "HttpServerResponseTracingHandler.write bufferHolder.captureResponseBody");
           bufferHolder.captureResponseBody(span);
         } finally {
           copiedContent.release(); // Release the copied buffer
