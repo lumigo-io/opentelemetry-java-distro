@@ -1,0 +1,64 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    name.set("webflux_5.0.0+_with_netty_0.8.0")
+    group.set("org.springframework")
+    module.set("spring-webflux")
+    versions.set("[5.0.0.RELEASE,)")
+    assertInverse.set(true)
+    extraDependency("io.projectreactor.netty:reactor-netty:0.8.0.RELEASE")
+  }
+
+  pass {
+    name.set("webflux_5.0.0_with_ipc_0.7.0")
+    group.set("org.springframework")
+    module.set("spring-webflux")
+    versions.set("[5.0.0.RELEASE,)")
+    assertInverse.set(true)
+    extraDependency("io.projectreactor.ipc:reactor-netty:0.7.0.RELEASE")
+  }
+
+  pass {
+    name.set("netty_0.8.0+_with_spring-webflux:5.1.0")
+    group.set("io.projectreactor.netty")
+    module.set("reactor-netty")
+    versions.set("[0.8.0.RELEASE,)")
+    extraDependency("org.springframework:spring-webflux:5.1.0.RELEASE")
+  }
+
+  pass {
+    name.set("ipc_0.7.0+_with_spring-webflux:5.0.0")
+    group.set("io.projectreactor.ipc")
+    module.set("reactor-netty")
+    versions.set("[0.7.0.RELEASE,)")
+    extraDependency("org.springframework:spring-webflux:5.0.0.RELEASE")
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+
+  //implementation
+
+  testImplementation project(":instrumentation:spring:spring-webflux:testing")
+  testImplementation("org.springframework.boot:spring-boot-starter-webflux:${versions.springboot}")
+  testImplementation("org.springframework.boot:spring-boot-starter-test:${versions.springboot}")
+  testImplementation("org.springframework.boot:spring-boot-starter-reactor-netty:${versions.springboot}")
+
+  // Instrumentations for testing
+  testInstrumentation project(":instrumentation:netty:netty-4.1:javaagent")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.1:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4-common:${versions.opentelemetryJavaagentAlpha}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-spring-webflux-5.0:${versions.opentelemetryJavaagentAlpha}")
+
+}
+
+configurations.testRuntimeClasspath {
+  resolutionStrategy {
+    // requires old logback (and therefore also old slf4j)
+    force("ch.qos.logback:logback-classic:1.2.11")
+    force("org.slf4j:slf4j-api:1.7.36")
+  }
+}

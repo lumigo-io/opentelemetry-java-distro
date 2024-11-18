@@ -28,6 +28,7 @@ subprojects {
       && it.name != "library"
       && !it.path.contains("aws-sdk-2.2")
       && !it.path.contains("spring-webmvc-3.1")
+      && !it.path.contains("spring-webflux-5.0")
       && !it.path.contains("rabbitmq-2.7")
       && !it.path.contains("lettuce-5.1")
   ) {
@@ -70,6 +71,7 @@ subprojects {
       springboot                 : "2.7.14",
       storm                      : "2.6.0",
       lettuce51                  : "6.3.2.RELEASE",
+      netty41                    : "4.1.0.Final",
 
       jackson                    : "2.15.2",
       bytebuddy                  : "1.14.5",
