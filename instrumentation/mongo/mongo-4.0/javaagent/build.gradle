@@ -1,0 +1,27 @@
+apply from: "$rootDir/gradle/instrumentation.gradle"
+
+muzzle {
+  pass {
+    group.set("org.mongodb")
+    module.set("mongo-java-driver")
+    versions.set("[3.1,)")
+    assertInverse.set(true)
+  }
+}
+
+dependencies {
+  compileOnly project(":bootstrap")
+
+  testImplementation("org.mongodb:mongodb-driver-sync:${versions.mongo40}")
+  testImplementation("org.testcontainers:mongodb:${versions.testcontainers}")
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-mongo-4.0:${versions.opentelemetryJavaagentAlpha}")
+
+}
+
+configurations.testRuntimeClasspath {
+  resolutionStrategy {
+    // requires old logback (and therefore also old slf4j)
+    force("ch.qos.logback:logback-classic:1.2.11")
+    force("org.slf4j:slf4j-api:1.7.36")
+  }
+}
