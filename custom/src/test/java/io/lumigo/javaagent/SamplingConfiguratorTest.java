@@ -29,12 +29,10 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class SamplingConfiguratorTest {
+public class SamplingConfiguratorTest extends AbstractSamplingConfiguratorTest {
   @Test
   public void testCustomize() {
     System.setProperty(
@@ -43,14 +41,7 @@ public class SamplingConfiguratorTest {
     AutoConfiguredOpenTelemetrySdkBuilder builder = AutoConfiguredOpenTelemetrySdk.builder();
 
     new SamplingConfigurer().customize(builder);
-    builder.addPropertiesCustomizer(
-        config -> {
-          Map<String, String> overrides = new HashMap<>();
-          overrides.put("otel.traces.exporter", "none");
-          overrides.put("otel.metrics.exporter", "none");
-          overrides.put("otel.logs.exporter", "none");
-          return overrides;
-        });
+    addPropertiesCustomizer(builder);
 
     AutoConfiguredOpenTelemetrySdk sdk = builder.build();
 

@@ -80,9 +80,7 @@ subprojects {
       junit                      : "5.9.3",
       mockito                    : "5.4.0",
       testcontainers             : "1.17.6",
-      hamcrest                   : "2.2",
-
-      mongo40                   : "4.0.0"
+      hamcrest                   : "2.2"
     ]
 
     deps = [
