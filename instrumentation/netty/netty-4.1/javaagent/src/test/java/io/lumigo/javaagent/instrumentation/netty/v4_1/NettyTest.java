@@ -48,7 +48,6 @@ public class NettyTest {
     server = new NettyServer(serverPort);
     server.start();
     await().atMost(5, TimeUnit.SECONDS).until(() -> server.isReady());
-    //    Thread.sleep(1000); // Wait briefly to ensure the server is fully initialized
   }
 
   @Test
