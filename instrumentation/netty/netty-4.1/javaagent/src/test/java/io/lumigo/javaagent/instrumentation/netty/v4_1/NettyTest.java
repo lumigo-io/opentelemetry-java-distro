@@ -61,6 +61,7 @@ public class NettyTest {
     String responseBody = response.content().toString(StandardCharsets.UTF_8);
     assertEquals("Hello, World!", responseBody);
 
+    Thread.sleep(1000); // Wait briefly to ensure the spans are captured
     TracesAssert.assertThat(instrumentation.waitForTraces(1))
         .hasSize(1)
         .hasTracesSatisfyingExactly(
