@@ -225,8 +225,8 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.4-alpha1 |
 | | | 5.4-alpha2 |
 | | | 5.4-beta1 |
-| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.778 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.29.15 |
+| aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.779 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.29.21 |
 | grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.68.1 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
 | | | 17 |
@@ -258,7 +258,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | rabbitmq-2.7 | [rabbitmq-2.7](https://central.sonatype.com/artifact/com.rabbitmq/amqp-client) | 2.7.0 |
 | | | 3.1.2~3.6.6 |
 | | | 4.0.0~4.12.0 |
-| | | 5.0.0~5.22.0 |
+| | | 5.0.0~5.23.0 |
 | servlet-3.0 | [servlet-3.0](https://central.sonatype.com/artifact/javax.servlet/javax.servlet-api) | 3.0.1~3.1.0 |
 | | | 4.0.0~4.0.1 |
 | | | 3.1-b01 |
