@@ -17,6 +17,7 @@
  */
 package io.lumigo.javaagent.instrumentation.netty.v4_1;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -27,6 +28,7 @@ import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtens
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.semconv.SemanticAttributes;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,7 @@ public class NettyTest {
     serverPort = PortUtils.findOpenPort();
     server = new NettyServer(serverPort);
     server.start();
-    Thread.sleep(1000); // Wait briefly to ensure the server is fully initialized
+    await().atMost(5, TimeUnit.SECONDS).until(() -> server.isReady());
   }
 
   @Test
@@ -58,6 +60,7 @@ public class NettyTest {
     String responseBody = response.content().toString(StandardCharsets.UTF_8);
     assertEquals("Hello, World!", responseBody);
 
+    Thread.sleep(1000); // Wait briefly to ensure the spans are captured
     TracesAssert.assertThat(instrumentation.waitForTraces(1))
         .hasSize(1)
         .hasTracesSatisfyingExactly(
