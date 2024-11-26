@@ -65,4 +65,8 @@ public class NettyServer {
     bossGroup.shutdownGracefully();
     workerGroup.shutdownGracefully();
   }
+
+  public boolean isReady() {
+    return channelFuture != null && channelFuture.channel().isActive();
+  }
 }
