@@ -48,12 +48,31 @@ public class MongoSamplingConfigurer implements AutoConfigurationCustomizerProvi
 
     String reduceMongoInstrumentation =
         configProperties.getString(LUMIGO_REDUCED_MONGO_INSTRUMENTATION);
-    boolean isReducedMongoInstrumentationEnabled =
-        reduceMongoInstrumentation == null || !reduceMongoInstrumentation.equalsIgnoreCase("false");
+    boolean isReducedMongoInstrumentationEnabled;
+
+    if (reduceMongoInstrumentation == null || reduceMongoInstrumentation.isEmpty()) {
+      isReducedMongoInstrumentationEnabled = true; // Default to true
+    } else if (reduceMongoInstrumentation.equalsIgnoreCase("true")) {
+      isReducedMongoInstrumentationEnabled = true;
+    } else if (reduceMongoInstrumentation.equalsIgnoreCase("false")) {
+      isReducedMongoInstrumentationEnabled = false;
+    } else {
+      LOGGER.warning(
+          "Invalid value for LUMIGO_REDUCED_MONGO_INSTRUMENTATION: "
+              + reduceMongoInstrumentation
+              + ". Defaulting to true.");
+      isReducedMongoInstrumentationEnabled = true;
+    }
 
     if (isReducedMongoInstrumentationEnabled) {
 
-      LOGGER.finest("Filtering Mongo spans");
+      // Log that Lumigo reduces Mongo instrumentation by omitting certain attributes, like
+      // `db.operation`
+      // For example, the `isMaster` operation is not collected by default to optimize performance.
+      // Setting the environment variable `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=false` will disable
+      // this optimization.
+      LOGGER.finest(
+          "Lumigo reduces Mongo instrumentation. The `db.operation` attribute (e.g., `isMaster`) is excluded by default. Set `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=false` to disable this behavior.");
 
       // Define attribute keys
       AttributeKey<String> dbSystemKey = AttributeKey.stringKey("db.system");
