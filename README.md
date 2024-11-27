@@ -93,7 +93,8 @@ The Lumigo OpenTelemetry Distro for Java additionally supports the following con
   * `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_CLIENT` applies the filter to client spans only. Matching is performed against the following attributes on a span: `url.full`, and `http.url`[^2].
 * `LUMIGO_ENABLE_LOGS=true`: Turns on the logging instrumentation to capture log-records, for logging libraries that support open-telemetry (e.g. Logback). By default, the logging instrumentation is disabled.
 * `LUMIGO_ENABLE_TRACES=true`: Turns on the tracing instrumentation. By default, the tracing instrumentation is enabled.
-* `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=true`: Reduces the amount of data collected by the MongoDB instrumentation, such as not collecting the `db.operation` attribute `isMaster`. By default, the MongoDB instrumentation reduces the amount of data collected.
+* `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=true`: Reduces the amount of data collected by the MongoDB [instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/mongo), such as not collecting the `db.operation` attribute `isMaster`. By default, the MongoDB instrumentation reduces the amount of data collected.
+* `LUMIGO_REDUCED_REDIS_INSTRUMENTATION=true`: Reduces the amount of data collected by the Redis [instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/jedis), such as not collecting the `db.statement` attribute `INFO server`. By default, the Redis instrumentation reduces the amount of data collected.
 
 For more configuration options, see the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
 
