@@ -78,6 +78,7 @@ public class TestStorm {
         param,
         (cluster) -> {
           WordCountTopologyLocal.runLocalClusterTest(cluster);
+          Thread.sleep(1000); // Storm test is flaky and sometime doesn't wait for all spans
           // Test we generate the expected spans
           TracesAssert.assertThat(instrumentation.waitForTraces(28))
               .hasSizeGreaterThanOrEqualTo(28)
