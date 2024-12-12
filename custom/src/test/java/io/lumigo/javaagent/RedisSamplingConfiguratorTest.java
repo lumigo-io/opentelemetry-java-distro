@@ -55,24 +55,24 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
         sampler.shouldSample(
             Context.root(),
             IdGenerator.random().generateTraceId(),
-            "name",
-            SpanKind.CLIENT,
-            Attributes.of(
-                AttributeKey.stringKey("db.system"), "redis",
-                AttributeKey.stringKey("db.statement"), "INFO server"),
-            Collections.emptyList());
-    Assertions.assertEquals(SamplingResult.drop(), infoServerResult);
-
-    // Test that the default behavior is to drop "server" commands
-    SamplingResult serverResult =
-        sampler.shouldSample(
-            Context.root(),
-            IdGenerator.random().generateTraceId(),
-            "name",
+            "INFO",
             SpanKind.CLIENT,
             Attributes.of(
                 AttributeKey.stringKey("db.system"), "redis",
                 AttributeKey.stringKey("db.statement"), "server"),
+            Collections.emptyList());
+    Assertions.assertEquals(SamplingResult.drop(), infoServerResult);
+
+    // Test that the default behavior is to drop other INFO commands
+    SamplingResult serverResult =
+        sampler.shouldSample(
+            Context.root(),
+            IdGenerator.random().generateTraceId(),
+            "INFO",
+            SpanKind.CLIENT,
+            Attributes.of(
+                AttributeKey.stringKey("db.system"), "redis",
+                AttributeKey.stringKey("db.statement"), "other"),
             Collections.emptyList());
     Assertions.assertEquals(SamplingResult.drop(), serverResult);
   }
@@ -93,12 +93,12 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
     Attributes attributes =
         Attributes.of(
             AttributeKey.stringKey("db.system"), "redis",
-            AttributeKey.stringKey("db.statement"), "INFO server");
+            AttributeKey.stringKey("db.statement"), "server");
     SamplingResult result =
         sampler.shouldSample(
             Context.root(),
             IdGenerator.random().generateTraceId(),
-            "name",
+            "INFO",
             SpanKind.CLIENT,
             attributes,
             Collections.emptyList());
@@ -125,7 +125,7 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
         sampler.shouldSample(
             Context.root(),
             IdGenerator.random().generateTraceId(),
-            "name",
+            "Other",
             SpanKind.CLIENT,
             attributes,
             Collections.emptyList());

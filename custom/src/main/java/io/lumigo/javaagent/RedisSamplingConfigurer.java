@@ -19,19 +19,22 @@ package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
-import io.opentelemetry.contrib.sampler.RuleBasedRoutingSampler;
-import io.opentelemetry.contrib.sampler.RuleBasedRoutingSamplerBuilder;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
+import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
+import io.opentelemetry.sdk.trace.samplers.SamplingResult;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 @AutoService(AutoConfigurationCustomizerProvider.class)
 public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvider {
   private static final Logger LOGGER = Logger.getLogger(RedisSamplingConfigurer.class.getName());
-
   public static final String LUMIGO_REDUCED_REDIS_INSTRUMENTATION =
       "lumigo.reduced.redis.instrumentation";
 
@@ -42,10 +45,6 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
 
   private static Sampler customizeRedisSpans(
       Sampler defaultSampler, ConfigProperties configProperties) {
-
-    RuleBasedRoutingSamplerBuilder samplerBuilder =
-        RuleBasedRoutingSampler.builder(SpanKind.CLIENT, defaultSampler);
-
     String reduceRedisInstrumentation =
         configProperties.getString(LUMIGO_REDUCED_REDIS_INSTRUMENTATION);
     boolean isReducedRedisInstrumentationEnabled;
@@ -65,26 +64,51 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
     }
 
     if (isReducedRedisInstrumentationEnabled) {
-
-      // Setting the environment variable `LUMIGO_REDUCED_REDIS_INSTRUMENTATION=false` will disable
-      // this optimization.
       LOGGER.finest(
-          "Lumigo reduces Redis instrumentation. The `db.statement` attribute (e.g., `INFO server`) is excluded by default. Set `LUMIGO_REDUCED_REDIS_INSTRUMENTATION=false` to disable this behavior.");
-
-      // Define attribute keys
-      AttributeKey<String> dbSystemKey = AttributeKey.stringKey("db.system");
-      AttributeKey<String> dbStatementKey = AttributeKey.stringKey("db.statement");
-
-      samplerBuilder.customize(
-          dbSystemKey,
-          "redis",
-          RuleBasedRoutingSampler.builder(SpanKind.CLIENT, defaultSampler)
-              // have to use regex to match the db.statement attribute, that can be "INFO server" or
-              // "server", depending on the Redis configuration
-              .drop(dbStatementKey, "(INFO\\s+)?server")
-              .build());
+          "Lumigo reduces Redis instrumentation. Redis spans are sampled based on span name using regex. Set `LUMIGO_REDUCED_REDIS_INSTRUMENTATION=false` to disable this behavior.");
+      return new RedisReduceInfoSpanSampler(defaultSampler);
     }
 
-    return samplerBuilder.build();
+    // Use the default sampler if reduced instrumentation is disabled
+    return defaultSampler;
+  }
+
+  // Custom Sampler Implementation with Regex
+  static class RedisReduceInfoSpanSampler implements Sampler {
+    private static final AttributeKey<String> DB_SYSTEM_KEY = AttributeKey.stringKey("db.system");
+    private final Sampler delegateSampler;
+
+    // Regex pattern to match span names containing "INFO," (case insensitive)
+    private final Pattern spanNamePattern = Pattern.compile("INFO.*", Pattern.CASE_INSENSITIVE);
+
+    public RedisReduceInfoSpanSampler(Sampler delegateSampler) {
+      this.delegateSampler = delegateSampler;
+    }
+
+    @Override
+    public SamplingResult shouldSample(
+        Context parentContext,
+        String traceId,
+        String spanName,
+        SpanKind spanKind,
+        Attributes attributes,
+        List<LinkData> parentLinks) {
+      // Check if the db.system attribute is "redis"
+      String dbSystem = attributes.get(DB_SYSTEM_KEY);
+      if ("redis".equalsIgnoreCase(dbSystem)) {
+        // Match the span name against the regex
+        if (spanNamePattern.matcher(spanName).matches()) {
+          return SamplingResult.drop();
+        }
+      }
+      // Fallback to the delegate sampler
+      return delegateSampler.shouldSample(
+          parentContext, traceId, spanName, spanKind, attributes, parentLinks);
+    }
+
+    @Override
+    public String getDescription() {
+      return "RedisReduceInfoSpanSampler";
+    }
   }
 }
