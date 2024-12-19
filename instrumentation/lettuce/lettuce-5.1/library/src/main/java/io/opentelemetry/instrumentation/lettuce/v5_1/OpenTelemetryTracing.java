@@ -215,13 +215,18 @@ final class OpenTelemetryTracing implements Tracing {
         @CanIgnoreReturnValue
         @SuppressWarnings("UnusedMethod")
         public synchronized Tracer.Span start(RedisCommand<?, ?, ?> command) {
+          // Here we would like to set db.statement before starting the span, because Sampler may use it.
+          // At that point db.statement having only command name is fine, command args will be added later.
+            String commandName = command.getType().name();
+            this.spanBuilder.setAttribute(SemanticAttributes.DB_STATEMENT, commandName);
+
             start();
 
             Span span = this.span;
             if (span == null) {
                 throw new IllegalStateException("Span started but null, this is a programming error.");
             }
-            span.updateName(command.getType().name());
+            span.updateName(commandName);
 
             if (command.getArgs() != null) {
                 argsList = OtelCommandArgsUtil.getCommandArgs(command.getArgs());
