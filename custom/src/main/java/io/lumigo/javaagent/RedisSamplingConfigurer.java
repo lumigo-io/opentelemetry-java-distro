@@ -28,6 +28,7 @@ import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -79,7 +80,7 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
     private final Sampler delegateSampler;
 
     // Regex pattern to match span names containing "INFO," (case insensitive)
-    private final Pattern spanNamePattern = Pattern.compile("INFO.*", Pattern.CASE_INSENSITIVE);
+    private final Pattern infoCommandPattern = Pattern.compile("INFO.*", Pattern.CASE_INSENSITIVE);
 
     public RedisReduceInfoSpanSampler(Sampler delegateSampler) {
       this.delegateSampler = delegateSampler;
@@ -97,7 +98,14 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
       String dbSystem = attributes.get(DB_SYSTEM_KEY);
       if ("redis".equalsIgnoreCase(dbSystem)) {
         // Match the span name against the regex
-        if (spanNamePattern.matcher(spanName).matches()) {
+        if (infoCommandPattern.matcher(spanName).matches()) {
+          LOGGER.finest("Dropping Redis INFO span because of span name: " + spanName);
+          return SamplingResult.drop();
+        }
+        // Math the span attribute db.statement against the regex
+        String dbStatement = attributes.get(SemanticAttributes.DB_STATEMENT);
+        if (dbStatement != null && infoCommandPattern.matcher(dbStatement).matches()) {
+          LOGGER.finest("Dropping Redis INFO span because of db.statement: " + dbStatement);
           return SamplingResult.drop();
         }
       }

@@ -39,7 +39,7 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
   }
 
   @Test
-  public void shouldDropByDefaultInfoServer() {
+  public void shouldDropByInfoCommand() {
     AutoConfiguredOpenTelemetrySdkBuilder builder = AutoConfiguredOpenTelemetrySdk.builder();
 
     new RedisSamplingConfigurer().customize(builder);
@@ -50,8 +50,9 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
     SdkTracerProvider tracerProvider = sdk.getOpenTelemetrySdk().getSdkTracerProvider();
     Sampler sampler = tracerProvider.getSampler();
 
-    // Test that the default behavior is to drop "INFO server" commands
-    SamplingResult infoServerResult =
+    // Test that the default behavior is to drop "INFO" command in the span name
+    Assertions.assertEquals(
+        SamplingResult.drop(),
         sampler.shouldSample(
             Context.root(),
             IdGenerator.random().generateTraceId(),
@@ -60,11 +61,11 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             Attributes.of(
                 AttributeKey.stringKey("db.system"), "redis",
                 AttributeKey.stringKey("db.statement"), "server"),
-            Collections.emptyList());
-    Assertions.assertEquals(SamplingResult.drop(), infoServerResult);
+            Collections.emptyList()));
 
     // Test that the default behavior is to drop other INFO commands
-    SamplingResult serverResult =
+    Assertions.assertEquals(
+        SamplingResult.drop(),
         sampler.shouldSample(
             Context.root(),
             IdGenerator.random().generateTraceId(),
@@ -73,8 +74,20 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             Attributes.of(
                 AttributeKey.stringKey("db.system"), "redis",
                 AttributeKey.stringKey("db.statement"), "other"),
-            Collections.emptyList());
-    Assertions.assertEquals(SamplingResult.drop(), serverResult);
+            Collections.emptyList()));
+
+    // Test that the default behavior is to drop other INFO commands
+    Assertions.assertEquals(
+        SamplingResult.drop(),
+        sampler.shouldSample(
+            Context.root(),
+            IdGenerator.random().generateTraceId(),
+            "redis",
+            SpanKind.CLIENT,
+            Attributes.of(
+                AttributeKey.stringKey("db.system"), "redis",
+                AttributeKey.stringKey("db.statement"), "INFO"),
+            Collections.emptyList()));
   }
 
   @Test
