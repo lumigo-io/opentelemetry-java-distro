@@ -27,7 +27,8 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-// Semantic attributes removed - using string literals instead
+import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.ThreadIncubatingAttributes;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -67,16 +68,16 @@ public class StormExecutorTransferInstrumentation implements TypeInstrumentation
         final Span span = Java8BytecodeBridge.spanFromContext(context);
         span.setAttribute(StormUtils.COMPONENT_NAME_KEY, StormUtils.getComponentName());
         span.setAttribute(StormUtils.STORM_TYPE_KEY, "bolt");
-        span.setAttribute(AttributeKey.stringKey("thread.name"), StormUtils.getThreadName());
-        span.setAttribute(AttributeKey.stringKey("messaging.system"), "storm");
+        span.setAttribute(ThreadIncubatingAttributes.THREAD_NAME, StormUtils.getThreadName());
+        span.setAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "storm");
         span.setAttribute(
-            AttributeKey.stringKey("messaging.message.id"),
+            MessagingIncubatingAttributes.MESSAGING_MESSAGE_ID,
             StormUtils.getMessageId(addressedTuple.tuple));
         span.setAttribute(
             AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY),
             StormUtils.getValues(addressedTuple.tuple));
         span.setAttribute(
-            AttributeKey.stringKey("messaging.destination.name"),
+            MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME,
             StormUtils.getDestComponent(addressedTuple));
         stormExecutorInstrumenter().end(context, addressedTuple, null, null);
       }

@@ -26,7 +26,6 @@ import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtens
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.api.common.AttributeKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -181,7 +180,8 @@ public class KafkaClientTest {
         equalTo(AttributeKey.stringKey("messaging.system"), "kafka"),
         equalTo(AttributeKey.stringKey("messaging.destination.name"), TOPIC),
         satisfies(
-            AttributeKey.stringKey("messaging.client_id"), (value) -> value.startsWith(clientPrefix)));
+            AttributeKey.stringKey("messaging.client_id"),
+            (value) -> value.startsWith(clientPrefix)));
   }
 
   private static List<AttributeAssertion> sendAttributes(String messageKey, String messageValue) {
@@ -222,7 +222,8 @@ public class KafkaClientTest {
             AbstractStringAssert::isNotNull));
     assertions.add(
         satisfies(
-            AttributeKey.longKey("messaging.kafka.message.offset"), AbstractLongAssert::isNotNegative));
+            AttributeKey.longKey("messaging.kafka.message.offset"),
+            AbstractLongAssert::isNotNegative));
 
     if (null != messageKey) {
       assertions.add(equalTo(AttributeKey.stringKey("messaging.kafka.message.key"), messageKey));

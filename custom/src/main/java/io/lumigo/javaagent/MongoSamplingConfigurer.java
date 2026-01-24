@@ -18,7 +18,6 @@
 package io.lumigo.javaagent;
 
 import com.google.auto.service.AutoService;
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.contrib.sampler.RuleBasedRoutingSampler;
 import io.opentelemetry.contrib.sampler.RuleBasedRoutingSamplerBuilder;
@@ -26,6 +25,7 @@ import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
+import io.opentelemetry.semconv.incubating.DbIncubatingAttributes;
 import java.util.logging.Logger;
 
 @AutoService(AutoConfigurationCustomizerProvider.class)
@@ -75,10 +75,10 @@ public class MongoSamplingConfigurer implements AutoConfigurationCustomizerProvi
           "Lumigo reduces Mongo instrumentation. The `db.operation` attribute (e.g., `isMaster`) is excluded by default. Set `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=false` to disable this behavior.");
 
       samplerBuilder.customize(
-          AttributeKey.stringKey("db.system"),
+          DbIncubatingAttributes.DB_SYSTEM,
           "mongodb",
           RuleBasedRoutingSampler.builder(SpanKind.CLIENT, defaultSampler)
-              .drop(AttributeKey.stringKey("db.operation"), "isMaster")
+              .drop(DbIncubatingAttributes.DB_OPERATION, "isMaster")
               .build());
     }
 

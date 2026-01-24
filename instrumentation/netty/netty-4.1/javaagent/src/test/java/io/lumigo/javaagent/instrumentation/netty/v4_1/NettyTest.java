@@ -75,7 +75,8 @@ public class NettyTest {
                           span.hasName("GET")
                               .hasKind(SpanKind.SERVER)
                               .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                              // http.response_content_length no longer captured by default in OTel 2.x
+                              // http.response_content_length no longer captured by default in OTel
+                              // 2.x
                               .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L)
                               .hasAttribute(
                                   AttributeKey.stringKey("http.response.body"), responseBody);
@@ -107,7 +108,8 @@ public class NettyTest {
                           span.hasName("POST")
                               .hasKind(SpanKind.SERVER)
                               .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "POST")
-                              // http.response_content_length no longer captured by default in OTel 2.x
+                              // http.response_content_length no longer captured by default in OTel
+                              // 2.x
                               .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L)
                               .hasAttribute(
                                   AttributeKey.stringKey("http.request.body"), requestBody)

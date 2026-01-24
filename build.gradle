@@ -58,6 +58,7 @@ subprojects {
       opentelemetryJavaagent     : "2.10.0",
       opentelemetryJavaagentAlpha: "2.10.0-alpha",
       opentelemetrySemconv       : "1.30.0",
+      opentelemetrySemconvIncubating: "1.30.0-alpha",
 
       // Instrumentation versions
       apachehttpclient50         : "5.0",
@@ -105,6 +106,7 @@ subprojects {
     resolutionStrategy {
       // Force semconv 1.30.0 to override BOM's 1.28.0-alpha
       force "io.opentelemetry.semconv:opentelemetry-semconv:${versions.opentelemetrySemconv}"
+      force "io.opentelemetry.semconv:opentelemetry-semconv-incubating:${versions.opentelemetrySemconvIncubating}"
     }
   }
 

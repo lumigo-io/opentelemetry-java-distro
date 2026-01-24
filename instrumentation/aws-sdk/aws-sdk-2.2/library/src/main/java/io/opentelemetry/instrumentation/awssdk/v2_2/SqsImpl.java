@@ -5,15 +5,16 @@
 
 package io.opentelemetry.instrumentation.awssdk.v2_2;
 
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
+import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import io.opentelemetry.api.common.AttributeKey;
 import software.amazon.awssdk.core.SdkRequest;
 import software.amazon.awssdk.core.SdkResponse;
 import software.amazon.awssdk.core.interceptor.Context;
@@ -85,7 +86,7 @@ final class SqsImpl {
 
       if (message != null) {
         final Span span = Span.fromContext(context);
-        span.setAttribute(AttributeKey.stringKey("messaging.message.id"), message.messageId());
+        span.setAttribute(MessagingIncubatingAttributes.MESSAGING_MESSAGE_ID, message.messageId());
         span.setAttribute(AttributeKey.stringKey("messaging.message.body"), message.toString());
       }
 

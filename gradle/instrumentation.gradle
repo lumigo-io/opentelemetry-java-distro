@@ -18,6 +18,7 @@ configurations {
 
 dependencies {
   compileOnly("io.opentelemetry:opentelemetry-sdk")
+  compileOnly("io.opentelemetry.semconv:opentelemetry-semconv-incubating:${versions.opentelemetrySemconvIncubating}")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
 
   compileOnly deps.bytebuddy
@@ -28,6 +29,7 @@ dependencies {
   testAgent(project(path: ":testing:agent-for-testing", configuration: "shadow"))
   // test dependencies
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
+  testImplementation("io.opentelemetry.semconv:opentelemetry-semconv-incubating:${versions.opentelemetrySemconvIncubating}")
   testImplementation("org.assertj:assertj-core:3.19.0")
 
   // Exclude Spock from test runtime - incompatible with OTel gradle-plugins 2.10.0-alpha JUnit platform
