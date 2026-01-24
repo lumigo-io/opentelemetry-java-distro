@@ -7,11 +7,11 @@ package io.opentelemetry.instrumentation.awssdk.v2_2;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.instrumentation.api.incubator.semconv.rpc.RpcClientAttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanKindExtractor;
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractor;
-import io.opentelemetry.instrumentation.api.semconv.rpc.RpcClientAttributesExtractor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;

@@ -2,8 +2,10 @@ apply plugin: 'java-library'
 
 dependencies {
   compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator:${versions.opentelemetryJavaagentAlpha}")
   // New semantic conventions artifact (replaces deprecated SemanticAttributes class)
   compileOnly("io.opentelemetry.semconv:opentelemetry-semconv:${versions.opentelemetrySemconv}")
+  compileOnly("io.opentelemetry.semconv:opentelemetry-semconv-incubating:${versions.opentelemetrySemconvIncubating}")
 
   // Used by byte-buddy but not brought in as a transitive dependency
   compileOnly("com.google.code.findbugs:annotations:3.0.1u2")
@@ -11,4 +13,5 @@ dependencies {
 
   testImplementation("io.opentelemetry.javaagent:opentelemetry-testing-common")
   testImplementation("io.opentelemetry.semconv:opentelemetry-semconv:${versions.opentelemetrySemconv}")
+  testImplementation("io.opentelemetry.semconv:opentelemetry-semconv-incubating:${versions.opentelemetrySemconvIncubating}")
 }

@@ -23,7 +23,10 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.test.utils.PortUtils;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
+import io.opentelemetry.semconv.ServerAttributes;
+import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.RpcIncubatingAttributes;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -128,20 +131,20 @@ public class Aws2SqsTracingTest {
                                           AttributeKey.stringKey("aws.requestId"),
                                           "00000000-0000-0000-0000-000000000000");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SYSTEM, "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "Sqs");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SERVICE, "Sqs");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_METHOD, "CreateQueue");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_METHOD, "CreateQueue");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.NET_PEER_NAME, "localhost");
+                                      .containsEntry(ServerAttributes.SERVER_ADDRESS, "localhost");
                                   assertThat(attrs)
                                       .containsEntry(
-                                          SemanticAttributes.NET_PEER_PORT, sqsServerPort);
+                                          ServerAttributes.SERVER_PORT, sqsServerPort);
                                   assertThat(attrs)
                                       .containsEntry(
                                           TracingExecutionInterceptor.HTTP_RESPONSE_BODY_KEY,
@@ -168,20 +171,20 @@ public class Aws2SqsTracingTest {
                                           AttributeKey.stringKey("aws.requestId"),
                                           "00000000-0000-0000-0000-000000000000");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SYSTEM, "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "Sqs");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SERVICE, "Sqs");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_METHOD, "SendMessage");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_METHOD, "SendMessage");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.NET_PEER_NAME, "localhost");
+                                      .containsEntry(ServerAttributes.SERVER_ADDRESS, "localhost");
                                   assertThat(attrs)
                                       .containsEntry(
-                                          SemanticAttributes.NET_PEER_PORT, sqsServerPort);
+                                          ServerAttributes.SERVER_PORT, sqsServerPort);
                                   assertThat(attrs)
                                       .hasEntrySatisfying(
                                           AttributeKey.stringKey(
@@ -218,26 +221,26 @@ public class Aws2SqsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.agent"), "java-aws-sdk");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SYSTEM, "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "Sqs");
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          SemanticAttributes.RPC_METHOD, "ReceiveMessage");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.NET_PEER_NAME, "localhost");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SERVICE, "Sqs");
                                   assertThat(attrs)
                                       .containsEntry(
-                                          SemanticAttributes.NET_PEER_PORT, sqsServerPort);
+                                          RpcIncubatingAttributes.RPC_METHOD, "ReceiveMessage");
                                   assertThat(attrs)
-                                      .containsKey(SemanticAttributes.MESSAGING_MESSAGE_ID);
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
+                                  assertThat(attrs)
+                                      .containsEntry(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
+                                  assertThat(attrs)
+                                      .containsEntry(ServerAttributes.SERVER_ADDRESS, "localhost");
+                                  assertThat(attrs)
+                                      .containsEntry(
+                                          ServerAttributes.SERVER_PORT, sqsServerPort);
+                                  assertThat(attrs)
+                                      .containsKey(MessagingIncubatingAttributes.MESSAGING_MESSAGE_ID);
                                   assertThat(attrs)
                                       .hasEntrySatisfying(
-                                          AttributeKey.stringKey("messaging.message.payload"),
+                                          AttributeKey.stringKey("messaging.message.body"),
                                           value -> {
                                             assertThat(value).contains("MessageId=");
                                             assertThat(value).contains("ReceiptHandle=");
@@ -272,21 +275,21 @@ public class Aws2SqsTracingTest {
                                           AttributeKey.stringKey("aws.requestId"),
                                           "00000000-0000-0000-0000-000000000000");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SYSTEM, "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "Sqs");
-                                  assertThat(attrs)
-                                      .containsEntry(
-                                          SemanticAttributes.RPC_METHOD, "ReceiveMessage");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.NET_PEER_NAME, "localhost");
+                                      .containsEntry(RpcIncubatingAttributes.RPC_SERVICE, "Sqs");
                                   assertThat(attrs)
                                       .containsEntry(
-                                          SemanticAttributes.NET_PEER_PORT, sqsServerPort);
+                                          RpcIncubatingAttributes.RPC_METHOD, "ReceiveMessage");
+                                  assertThat(attrs)
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
+                                  assertThat(attrs)
+                                      .containsEntry(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
+                                  assertThat(attrs)
+                                      .containsEntry(ServerAttributes.SERVER_ADDRESS, "localhost");
+                                  assertThat(attrs)
+                                      .containsEntry(
+                                          ServerAttributes.SERVER_PORT, sqsServerPort);
                                   assertThat(attrs)
                                       .containsEntry(
                                           TracingExecutionInterceptor.HTTP_REQUEST_BODY_KEY,

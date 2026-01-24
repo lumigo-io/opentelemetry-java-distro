@@ -17,9 +17,8 @@ include "instrumentation"
 include "instrumentation:apache-httpclient:apache-httpclient-5.0"
 include "instrumentation:apache-httpclient:javaagent-unit-tests"
 include "instrumentation:aws-sdk:aws-sdk-1.11:javaagent"
-// TODO: Re-enable after fixing RPC AttributesGetter interface changes in OTel 2.x
-// include "instrumentation:aws-sdk:aws-sdk-2.2:library"
-// include "instrumentation:aws-sdk:aws-sdk-2.2:javaagent"
+include "instrumentation:aws-sdk:aws-sdk-2.2:library"
+include "instrumentation:aws-sdk:aws-sdk-2.2:javaagent"
 include "instrumentation:grpc-1.6:javaagent"
 include "instrumentation:grpc-1.6:testing"
 include "instrumentation:java11-http-client:java-http-client-config"
@@ -38,9 +37,8 @@ include 'instrumentation:netty:netty-4.1:library'
 include "instrumentation:netty:netty-4.1:javaagent"
 include "instrumentation:storm:javaagent"
 include 'instrumentation:storm:testing'
-// TODO: Re-enable after fixing Network/DB AttributesGetter interface changes in OTel 2.x
-// include 'instrumentation:lettuce:lettuce-5.1:library'
-// include 'instrumentation:lettuce:lettuce-5.1:javaagent'
+include 'instrumentation:lettuce:lettuce-5.1:library'
+include 'instrumentation:lettuce:lettuce-5.1:javaagent'
 include "smoke-tests"
 include "testing:agent-for-testing"
 include "test-utils"
