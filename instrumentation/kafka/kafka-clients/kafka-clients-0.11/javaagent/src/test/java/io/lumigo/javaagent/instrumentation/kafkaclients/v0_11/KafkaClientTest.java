@@ -26,7 +26,7 @@ import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtens
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.api.common.AttributeKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -55,6 +55,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.AbstractLongAssert;
+import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -177,10 +178,10 @@ public class KafkaClientTest {
 
   private static List<AttributeAssertion> commonAttributes(String clientPrefix) {
     return Arrays.asList(
-        equalTo(SemanticAttributes.MESSAGING_SYSTEM, "kafka"),
-        equalTo(SemanticAttributes.MESSAGING_DESTINATION_NAME, TOPIC),
+        equalTo(AttributeKey.stringKey("messaging.system"), "kafka"),
+        equalTo(AttributeKey.stringKey("messaging.destination.name"), TOPIC),
         satisfies(
-            SemanticAttributes.MESSAGING_CLIENT_ID, (value) -> value.startsWith(clientPrefix)));
+            AttributeKey.stringKey("messaging.client_id"), (value) -> value.startsWith(clientPrefix)));
   }
 
   private static List<AttributeAssertion> sendAttributes(String messageKey, String messageValue) {
@@ -188,16 +189,16 @@ public class KafkaClientTest {
         new ArrayList<>(
             Arrays.asList(
                 satisfies(
-                    SemanticAttributes.MESSAGING_KAFKA_DESTINATION_PARTITION,
-                    AbstractLongAssert::isNotNegative),
+                    AttributeKey.stringKey("messaging.destination.partition.id"),
+                    AbstractStringAssert::isNotNull),
                 satisfies(
-                    SemanticAttributes.MESSAGING_KAFKA_MESSAGE_OFFSET,
+                    AttributeKey.longKey("messaging.kafka.message.offset"),
                     AbstractLongAssert::isNotNegative)));
 
     assertions.addAll(commonAttributes("producer"));
 
     if (null != messageKey) {
-      assertions.add(equalTo(SemanticAttributes.MESSAGING_KAFKA_MESSAGE_KEY, messageKey));
+      assertions.add(equalTo(AttributeKey.stringKey("messaging.kafka.message.key"), messageKey));
     }
     if (null != messageValue) {
       assertions.add(
@@ -214,17 +215,17 @@ public class KafkaClientTest {
       String messageKey, String messageValue) {
     List<AttributeAssertion> assertions = new ArrayList<>(commonAttributes("consumer"));
 
-    assertions.add(equalTo(SemanticAttributes.MESSAGING_OPERATION, "process"));
+    assertions.add(equalTo(AttributeKey.stringKey("messaging.operation"), "process"));
     assertions.add(
         satisfies(
-            SemanticAttributes.MESSAGING_KAFKA_DESTINATION_PARTITION,
-            AbstractLongAssert::isNotNegative));
+            AttributeKey.stringKey("messaging.destination.partition.id"),
+            AbstractStringAssert::isNotNull));
     assertions.add(
         satisfies(
-            SemanticAttributes.MESSAGING_KAFKA_MESSAGE_OFFSET, AbstractLongAssert::isNotNegative));
+            AttributeKey.longKey("messaging.kafka.message.offset"), AbstractLongAssert::isNotNegative));
 
     if (null != messageKey) {
-      assertions.add(equalTo(SemanticAttributes.MESSAGING_KAFKA_MESSAGE_KEY, messageKey));
+      assertions.add(equalTo(AttributeKey.stringKey("messaging.kafka.message.key"), messageKey));
     }
     if (null != messageValue) {
       assertions.add(
@@ -234,7 +235,7 @@ public class KafkaClientTest {
       assertions.add(equalTo(AttributeKey.stringKey("messaging.message.payload"), JSON_BODY));
       assertions.add(
           equalTo(
-              SemanticAttributes.MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES,
+              AttributeKey.longKey("messaging.message.body.size"),
               messageValue.getBytes(StandardCharsets.UTF_8).length));
     }
 

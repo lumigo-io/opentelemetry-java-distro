@@ -29,7 +29,7 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import io.opentelemetry.semconv.SemanticAttributes;
+// Semantic attributes removed - using string literals instead
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -66,9 +66,10 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
       final Span span = currentSpan();
       span.setAttribute(StormUtils.STORM_TYPE_KEY, "bolt");
       span.setAttribute(StormUtils.COMPONENT_NAME_KEY, StormUtils.getComponentName());
-      span.setAttribute(SemanticAttributes.THREAD_NAME, StormUtils.getThreadName());
-      span.setAttribute(SemanticAttributes.MESSAGING_SYSTEM, "storm");
-      span.setAttribute(SemanticAttributes.MESSAGING_MESSAGE_ID, StormUtils.getMessageId(tuple));
+      span.setAttribute(AttributeKey.stringKey("thread.name"), StormUtils.getThreadName());
+      span.setAttribute(AttributeKey.stringKey("messaging.system"), "storm");
+      span.setAttribute(
+          AttributeKey.stringKey("messaging.message.id"), StormUtils.getMessageId(tuple));
       span.setAttribute(
           AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY),
           StormUtils.getValues(tuple));

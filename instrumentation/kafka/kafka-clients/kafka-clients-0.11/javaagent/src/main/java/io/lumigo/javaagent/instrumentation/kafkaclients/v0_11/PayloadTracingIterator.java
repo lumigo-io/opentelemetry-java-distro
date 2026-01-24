@@ -18,10 +18,10 @@
 package io.lumigo.javaagent.instrumentation.kafkaclients.v0_11;
 
 import io.lumigo.instrumentation.core.LumigoSemanticAttributes;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.bootstrap.kafka.KafkaClientsConsumerProcessTracing;
-import io.opentelemetry.semconv.SemanticAttributes;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -64,7 +64,7 @@ public class PayloadTracingIterator<K, V> implements Iterator<ConsumerRecord<K, 
       Header messageIdHeader = next.headers().lastHeader(LUMIGO_MESSAGE_ID_KEY);
       if (messageIdHeader != null) {
         span.setAttribute(
-            SemanticAttributes.MESSAGING_MESSAGE_ID,
+            AttributeKey.stringKey("messaging.message.id"),
             new String(messageIdHeader.value(), StandardCharsets.UTF_8));
       }
     }

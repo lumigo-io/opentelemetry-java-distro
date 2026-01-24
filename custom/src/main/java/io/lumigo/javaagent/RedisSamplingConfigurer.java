@@ -28,7 +28,6 @@ import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
-import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -76,7 +75,8 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
 
   // Custom Sampler Implementation with Regex
   static class RedisReduceInfoSpanSampler implements Sampler {
-    private static final AttributeKey<String> DB_SYSTEM_KEY = AttributeKey.stringKey("db.system");
+    private static final AttributeKey<String> DB_SYSTEM = AttributeKey.stringKey("db.system");
+    private static final AttributeKey<String> DB_STATEMENT = AttributeKey.stringKey("db.statement");
     private final Sampler delegateSampler;
 
     // Regex pattern to match span names containing "INFO," (case insensitive)
@@ -95,7 +95,7 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
         Attributes attributes,
         List<LinkData> parentLinks) {
       // Check if the db.system attribute is "redis"
-      String dbSystem = attributes.get(DB_SYSTEM_KEY);
+      String dbSystem = attributes.get(DB_SYSTEM);
       if ("redis".equalsIgnoreCase(dbSystem)) {
         // Match the span name against the regex
         if (infoCommandPattern.matcher(spanName).matches()) {
@@ -103,7 +103,7 @@ public class RedisSamplingConfigurer implements AutoConfigurationCustomizerProvi
           return SamplingResult.drop();
         }
         // Math the span attribute db.statement against the regex
-        String dbStatement = attributes.get(SemanticAttributes.DB_STATEMENT);
+        String dbStatement = attributes.get(DB_STATEMENT);
         if (dbStatement != null && infoCommandPattern.matcher(dbStatement).matches()) {
           LOGGER.finest("Dropping Redis INFO span because of db.statement: " + dbStatement);
           return SamplingResult.drop();

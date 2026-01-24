@@ -18,12 +18,12 @@
 package io.lumigo.javaagent.resources;
 
 import com.google.auto.service.AutoService;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider;
 import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.semconv.ResourceAttributes;
 
 @AutoService(ResourceProvider.class)
 public class LumigoContainerNameResource implements ResourceProvider {
@@ -34,7 +34,7 @@ public class LumigoContainerNameResource implements ResourceProvider {
     String containerName = System.getenv(LUMIGO_CONTAINER_NAME_ENV_VAR);
     if (containerName != null && !containerName.isEmpty()) {
       AttributesBuilder ab = Attributes.builder();
-      ab.put(ResourceAttributes.K8S_CONTAINER_NAME, containerName);
+      ab.put(AttributeKey.stringKey("k8s.container.name"), containerName);
       return Resource.create(ab.build());
     }
 

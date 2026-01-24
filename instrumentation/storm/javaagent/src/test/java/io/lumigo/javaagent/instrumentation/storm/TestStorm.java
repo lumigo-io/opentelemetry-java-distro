@@ -24,7 +24,7 @@ import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtens
 import io.opentelemetry.sdk.testing.assertj.SpanDataAssert;
 import io.opentelemetry.sdk.testing.assertj.TraceAssert;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.SemanticAttributes;
+// Semantic attributes removed - using string literals instead
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -43,11 +43,12 @@ public class TestStorm {
     span.hasName("Storm Executor")
         .hasKind(SpanKind.INTERNAL)
         .hasAttribute(AttributeKey.stringKey(StormUtils.COMPONENT_NAME_KEY), serviceName)
-        .hasAttribute(SemanticAttributes.MESSAGING_DESTINATION_NAME, destinationName)
+        .hasAttribute(AttributeKey.stringKey("messaging.destination.name"), destinationName)
         .hasAttribute(AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY), values)
         .hasAttributesSatisfying(
             attributes ->
-                Objects.requireNonNull(attributes.get(SemanticAttributes.MESSAGING_MESSAGE_ID)));
+                Objects.requireNonNull(
+                    attributes.get(AttributeKey.stringKey("messaging.message.id"))));
   }
 
   void assertWordCount(TraceAssert trace, List<String> inputValues) {
@@ -65,7 +66,7 @@ public class TestStorm {
                   .hasAttributesSatisfying(
                       attributes ->
                           Objects.requireNonNull(
-                              attributes.get(SemanticAttributes.MESSAGING_MESSAGE_ID)));
+                              attributes.get(AttributeKey.stringKey("messaging.message.id"))));
             },
             span -> {});
   }
@@ -142,8 +143,8 @@ public class TestStorm {
                                                   attributes ->
                                                       Objects.requireNonNull(
                                                           attributes.get(
-                                                              SemanticAttributes
-                                                                  .MESSAGING_MESSAGE_ID)));
+                                                              AttributeKey.stringKey(
+                                                                  "messaging.message.id"))));
                                         },
                                         span -> {
                                           assertExecutor(

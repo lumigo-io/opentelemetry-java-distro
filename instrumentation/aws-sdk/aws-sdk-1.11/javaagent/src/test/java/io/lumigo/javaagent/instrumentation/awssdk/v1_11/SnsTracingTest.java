@@ -24,7 +24,8 @@ import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
+// RpcAttributes removed in semconv 1.30.0
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.assertj.core.api.Assertions;
@@ -88,15 +89,19 @@ public class SnsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.queue.name"), queueName);
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.system"), "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSQS");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.service"), "AmazonSQS");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_METHOD, "CreateQueue");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.method"), "CreateQueue");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(
+                                          HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                   assertThat(attrs)
                                       .hasEntrySatisfying(
                                           AttributeKey.stringKey("http.response.body"),
@@ -123,16 +128,20 @@ public class SnsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.queue.url"), queueUrl);
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSQS");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.system"), "aws-api");
                                   assertThat(attrs)
                                       .containsEntry(
-                                          SemanticAttributes.RPC_METHOD, "GetQueueAttributes");
+                                          AttributeKey.stringKey("rpc.service"), "AmazonSQS");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.method"),
+                                          "GetQueueAttributes");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
+                                  assertThat(attrs)
+                                      .containsEntry(
+                                          HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -151,16 +160,20 @@ public class SnsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.queue.url"), queueUrl);
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
-                                  assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSQS");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.system"), "aws-api");
                                   assertThat(attrs)
                                       .containsEntry(
-                                          SemanticAttributes.RPC_METHOD, "SetQueueAttributes");
+                                          AttributeKey.stringKey("rpc.service"), "AmazonSQS");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.method"),
+                                          "SetQueueAttributes");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
+                                  assertThat(attrs)
+                                      .containsEntry(
+                                          HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -176,15 +189,19 @@ public class SnsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.agent"), "java-aws-sdk");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.system"), "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSNS");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.service"), "AmazonSNS");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_METHOD, "CreateTopic");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.method"), "CreateTopic");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(
+                                          HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -200,15 +217,19 @@ public class SnsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.agent"), "java-aws-sdk");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.system"), "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSNS");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.service"), "AmazonSNS");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_METHOD, "Subscribe");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.method"), "Subscribe");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(
+                                          HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                 })),
         trace ->
             trace
@@ -224,15 +245,19 @@ public class SnsTracingTest {
                                       .containsEntry(
                                           AttributeKey.stringKey("aws.agent"), "java-aws-sdk");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SYSTEM, "aws-api");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.system"), "aws-api");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_SERVICE, "AmazonSNS");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.service"), "AmazonSNS");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.RPC_METHOD, "Publish");
+                                      .containsEntry(
+                                          AttributeKey.stringKey("rpc.method"), "Publish");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_METHOD, "POST");
+                                      .containsEntry(HttpAttributes.HTTP_REQUEST_METHOD, "POST");
                                   assertThat(attrs)
-                                      .containsEntry(SemanticAttributes.HTTP_STATUS_CODE, 200L);
+                                      .containsEntry(
+                                          HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
                                   assertThat(attrs)
                                       .hasEntrySatisfying(
                                           AttributeKey.stringKey("http.request.body"),

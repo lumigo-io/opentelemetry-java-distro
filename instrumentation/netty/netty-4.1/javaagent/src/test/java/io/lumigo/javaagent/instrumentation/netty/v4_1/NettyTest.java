@@ -26,7 +26,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.test.utils.PortUtils;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
@@ -74,11 +74,9 @@ public class NettyTest {
                         span -> {
                           span.hasName("GET")
                               .hasKind(SpanKind.SERVER)
-                              .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                              .hasAttribute(
-                                  AttributeKey.longKey("http.response_content_length"),
-                                  (long) responseBody.length())
-                              .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
+                              .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                              // http.response_content_length no longer captured by default in OTel 2.x
+                              .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L)
                               .hasAttribute(
                                   AttributeKey.stringKey("http.response.body"), responseBody);
                         }));
@@ -108,11 +106,9 @@ public class NettyTest {
                         span -> {
                           span.hasName("POST")
                               .hasKind(SpanKind.SERVER)
-                              .hasAttribute(SemanticAttributes.HTTP_METHOD, "POST")
-                              .hasAttribute(
-                                  AttributeKey.longKey("http.response_content_length"),
-                                  (long) responseBody.length())
-                              .hasAttribute(AttributeKey.longKey("http.status_code"), 200L)
+                              .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "POST")
+                              // http.response_content_length no longer captured by default in OTel 2.x
+                              .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L)
                               .hasAttribute(
                                   AttributeKey.stringKey("http.request.body"), requestBody)
                               .hasAttribute(

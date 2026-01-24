@@ -59,8 +59,10 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             "INFO",
             SpanKind.CLIENT,
             Attributes.of(
-                AttributeKey.stringKey("db.system"), "redis",
-                AttributeKey.stringKey("db.statement"), "server"),
+                AttributeKey.stringKey("db.system"),
+                "redis",
+                AttributeKey.stringKey("db.statement"),
+                "server"),
             Collections.emptyList()));
 
     // Test that the default behavior is to drop other INFO commands
@@ -72,8 +74,10 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             "INFO",
             SpanKind.CLIENT,
             Attributes.of(
-                AttributeKey.stringKey("db.system"), "redis",
-                AttributeKey.stringKey("db.statement"), "other"),
+                AttributeKey.stringKey("db.system"),
+                "redis",
+                AttributeKey.stringKey("db.statement"),
+                "other"),
             Collections.emptyList()));
 
     // Test that the default behavior is to drop other INFO commands
@@ -85,8 +89,10 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             "redis",
             SpanKind.CLIENT,
             Attributes.of(
-                AttributeKey.stringKey("db.system"), "redis",
-                AttributeKey.stringKey("db.statement"), "INFO"),
+                AttributeKey.stringKey("db.system"),
+                "redis",
+                AttributeKey.stringKey("db.statement"),
+                "INFO"),
             Collections.emptyList()));
   }
 
@@ -105,8 +111,10 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
 
     Attributes attributes =
         Attributes.of(
-            AttributeKey.stringKey("db.system"), "redis",
-            AttributeKey.stringKey("db.statement"), "server");
+            AttributeKey.stringKey("db.system"),
+            "redis",
+            AttributeKey.stringKey("db.statement"),
+            "server");
     SamplingResult result =
         sampler.shouldSample(
             Context.root(),
@@ -132,8 +140,10 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
 
     Attributes attributes =
         Attributes.of(
-            AttributeKey.stringKey("db.system"), "redis",
-            AttributeKey.stringKey("db.statement"), "other");
+            AttributeKey.stringKey("db.system"),
+            "redis",
+            AttributeKey.stringKey("db.statement"),
+            "other");
     SamplingResult result =
         sampler.shouldSample(
             Context.root(),

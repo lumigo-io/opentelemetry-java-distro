@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-  id("com.github.johnrengelman.shadow")
+  id("com.gradleup.shadow")
 }
 
 apply from: "$rootDir/gradle/shadow.gradle"
@@ -32,7 +32,8 @@ dependencies {
   javaagentLibs(project(":custom"))
   javaagentLibs(project(":instrumentation:apache-httpclient:apache-httpclient-5.0"))
   javaagentLibs(project(":instrumentation:aws-sdk:aws-sdk-1.11:javaagent"))
-  javaagentLibs(project(":instrumentation:aws-sdk:aws-sdk-2.2:javaagent"))
+  // TODO: Re-enable after fixing RPC AttributesGetter interface changes in OTel 2.x
+  // javaagentLibs(project(":instrumentation:aws-sdk:aws-sdk-2.2:javaagent"))
   javaagentLibs(project(":instrumentation:grpc-1.6:javaagent"))
   javaagentLibs(project(":instrumentation:java11-http-client:java-http-client"))
   javaagentLibs(project(":instrumentation:jdbc:javaagent"))
@@ -45,7 +46,8 @@ dependencies {
   javaagentLibs(project(":instrumentation:netty:netty-4.1:javaagent"))
   javaagentLibs(project(":instrumentation:spring:spring-webflux:spring-webflux-5.0:javaagent"))
   javaagentLibs(project(":instrumentation:storm:javaagent"))
-  javaagentLibs(project(":instrumentation:lettuce:lettuce-5.1:javaagent"))
+  // TODO: Re-enable after fixing Network/DB AttributesGetter interface changes in OTel 2.x
+  // javaagentLibs(project(":instrumentation:lettuce:lettuce-5.1:javaagent"))
 
   upstreamAgent("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
 }
@@ -93,7 +95,7 @@ tasks {
       exclude("io.opentelemetry:opentelemetry-context")
       exclude("io.opentelemetry.semconv:opentelemetry-semconv")
       // metrics advice API
-      exclude("io.opentelemetry:opentelemetry-extension-incubator")
+      exclude("io.opentelemetry:opentelemetry-api-incubator")
     }
   }
 

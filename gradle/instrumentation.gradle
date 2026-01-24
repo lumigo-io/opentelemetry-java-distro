@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 apply plugin: 'io.opentelemetry.instrumentation.muzzle-generation'
 apply plugin: 'io.opentelemetry.instrumentation.muzzle-check'
 
@@ -30,10 +30,14 @@ dependencies {
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("org.assertj:assertj-core:3.19.0")
 
+  // Exclude Spock from test runtime - incompatible with OTel gradle-plugins 2.10.0-alpha JUnit platform
+  testRuntimeOnly("org.spockframework:spock-core") {
+    exclude group: "*", module: "*"
+  }
+
   add("codegen", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
 
   add("muzzleBootstrap", "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:${versions.opentelemetryJavaagent}")
-  add("muzzleBootstrap", "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv:${versions.opentelemetryJavaagentAlpha}")
   add("muzzleBootstrap", "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations-support:${versions.opentelemetryJavaagentAlpha}")
   add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:${versions.opentelemetryJavaagentAlpha}")
   add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
@@ -62,6 +66,11 @@ tasks.withType(Test).configureEach {
   // prevent sporadic gradle deadlocks, see SafeLogger for more details
   jvmArgs "-Dotel.javaagent.testing.transform-safe-logging.enabled=true"
   jvmArgs "-Dotel.metrics.exporter=otlp"
+
+  // Exclude Spock test engine - incompatible with OTel gradle-plugins 2.10.0-alpha JUnit platform
+  useJUnitPlatform {
+    excludeEngines 'spock'
+  }
 
   dependsOn shadowJar
   dependsOn configurations.testAgent.buildDependencies

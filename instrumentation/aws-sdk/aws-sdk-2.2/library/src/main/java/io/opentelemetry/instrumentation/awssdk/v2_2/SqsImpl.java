@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.api.common.AttributeKey;
 import software.amazon.awssdk.core.SdkRequest;
 import software.amazon.awssdk.core.SdkResponse;
 import software.amazon.awssdk.core.interceptor.Context;
@@ -85,8 +85,8 @@ final class SqsImpl {
 
       if (message != null) {
         final Span span = Span.fromContext(context);
-        span.setAttribute(SemanticAttributes.MESSAGING_MESSAGE_ID, message.messageId());
-        span.setAttribute("messaging.message.payload", message.toString());
+        span.setAttribute(AttributeKey.stringKey("messaging.message.id"), message.messageId());
+        span.setAttribute(AttributeKey.stringKey("messaging.message.body"), message.toString());
       }
 
       // TODO: Even if we keep HTTP attributes (see afterMarshalling), does it make sense here

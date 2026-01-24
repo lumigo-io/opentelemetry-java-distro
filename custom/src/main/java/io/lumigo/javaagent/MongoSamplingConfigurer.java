@@ -74,15 +74,11 @@ public class MongoSamplingConfigurer implements AutoConfigurationCustomizerProvi
       LOGGER.finest(
           "Lumigo reduces Mongo instrumentation. The `db.operation` attribute (e.g., `isMaster`) is excluded by default. Set `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=false` to disable this behavior.");
 
-      // Define attribute keys
-      AttributeKey<String> dbSystemKey = AttributeKey.stringKey("db.system");
-      AttributeKey<String> dbOperationKey = AttributeKey.stringKey("db.operation");
-
       samplerBuilder.customize(
-          dbSystemKey,
+          AttributeKey.stringKey("db.system"),
           "mongodb",
           RuleBasedRoutingSampler.builder(SpanKind.CLIENT, defaultSampler)
-              .drop(dbOperationKey, "isMaster")
+              .drop(AttributeKey.stringKey("db.operation"), "isMaster")
               .build());
     }
 

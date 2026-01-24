@@ -5,7 +5,7 @@ plugins {
 dependencies {
   compileOnly(project(":bootstrap"))
   compileOnly("io.opentelemetry:opentelemetry-exporter-otlp-common")
-  compileOnly("io.opentelemetry.semconv:opentelemetry-semconv")
+  compileOnly("io.opentelemetry.semconv:opentelemetry-semconv:${versions.opentelemetrySemconv}")
   compileOnly("io.opentelemetry:opentelemetry-sdk")
   compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
@@ -35,6 +35,7 @@ dependencies {
   testImplementation(project(":bootstrap"))
   testImplementation("io.opentelemetry:opentelemetry-sdk")
   testImplementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
+  testImplementation("io.opentelemetry.semconv:opentelemetry-semconv:${versions.opentelemetrySemconv}")
   testImplementation("org.hamcrest:hamcrest:${versions.hamcrest}")
   testImplementation("org.mockito:mockito-core:${versions.mockito}")
   testImplementation("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")

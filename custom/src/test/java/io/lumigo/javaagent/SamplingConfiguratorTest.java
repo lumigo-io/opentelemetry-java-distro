@@ -18,7 +18,6 @@
 package io.lumigo.javaagent;
 
 import io.lumigo.javaagent.common.HttpEndpointFilter;
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.context.Context;
@@ -28,6 +27,7 @@ import io.opentelemetry.sdk.trace.IdGenerator;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
+import io.opentelemetry.semconv.UrlAttributes;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ public class SamplingConfiguratorTest extends AbstractSamplingConfiguratorTest {
     SdkTracerProvider tracerProvider = sdk.getOpenTelemetrySdk().getSdkTracerProvider();
     Sampler sampler = tracerProvider.getSampler();
 
-    Attributes attributes = Attributes.of(AttributeKey.stringKey("http.target"), "/version");
+    Attributes attributes = Attributes.of(UrlAttributes.URL_PATH, "/version");
     SamplingResult result =
         sampler.shouldSample(
             Context.root(),
