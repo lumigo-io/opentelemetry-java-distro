@@ -87,14 +87,13 @@ public class JsonChunkedContentTest {
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
                           .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                          // HTTP header capture requires explicit configuration in OTel 2.x
-                          // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                          //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                           .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                          // .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                          //     List.of("application/json"))
-                          // .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
-                          //     List.of("chunked"))
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("transfer-encoding"),
+                              List.of("chunked"))
                           // Buffer size differences between local and GH Actions prevent us from
                           // using this assertion as response content differs
                           // .hasAttribute(AttributeKey.stringKey("http.response.body"), jsonBody)
@@ -151,14 +150,13 @@ public class JsonChunkedContentTest {
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                            // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                                List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), requestBody)
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                            //     List.of("application/json"))
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
-                            //     List.of("chunked"))
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("content-type"),
+                                List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("transfer-encoding"),
+                                List.of("chunked"))
                             // Buffer size differences between local and GH Actions prevent us from
                             // using this assertion as response content differs
                             // .hasAttribute(AttributeKey.stringKey("http.response.body"), responseBody)

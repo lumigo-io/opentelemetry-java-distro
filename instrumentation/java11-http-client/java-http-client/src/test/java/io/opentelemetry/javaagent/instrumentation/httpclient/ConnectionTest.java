@@ -79,9 +79,8 @@ public class ConnectionTest {
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
                           .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                          // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                           .hasException(thrown)
                           .hasStatus(StatusData.error())
                   ));
@@ -120,9 +119,8 @@ public class ConnectionTest {
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                            // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -159,9 +157,8 @@ public class ConnectionTest {
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                            // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -200,9 +197,8 @@ public class ConnectionTest {
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                            // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 500L)
                             .hasStatus(StatusData.error())
                     ));

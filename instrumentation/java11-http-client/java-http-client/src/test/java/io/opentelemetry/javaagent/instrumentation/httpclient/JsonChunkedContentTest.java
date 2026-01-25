@@ -89,11 +89,10 @@ public class JsonChunkedContentTest {
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                            // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
 
                         // Java 11 fails to process the response body before span end
@@ -147,12 +146,11 @@ public class JsonChunkedContentTest {
                               .hasName("POST")
                               .hasKind(SpanKind.CLIENT)
                               .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "POST")
-                              // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                               .hasAttribute(AttributeKey.stringKey("http.request.body"), requestBody)
-                              // .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                               .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L);
 
                           // Java 11 fails to process the response body before span end

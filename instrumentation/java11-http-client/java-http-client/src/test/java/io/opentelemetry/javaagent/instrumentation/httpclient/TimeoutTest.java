@@ -74,9 +74,8 @@ public class TimeoutTest {
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
-                            // HTTP header capture requires explicit configuration in OTel 2.x
-                            // .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                            //     List.of("application/json"))
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasStatus(StatusData.error())
                     ));
   }
