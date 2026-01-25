@@ -32,11 +32,6 @@ dependencies {
   testImplementation("io.opentelemetry.semconv:opentelemetry-semconv-incubating:${versions.opentelemetrySemconvIncubating}")
   testImplementation("org.assertj:assertj-core:3.19.0")
 
-  // Exclude Spock from test runtime - incompatible with OTel gradle-plugins 2.10.0-alpha JUnit platform
-  testRuntimeOnly("org.spockframework:spock-core") {
-    exclude group: "*", module: "*"
-  }
-
   add("codegen", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
 
   add("muzzleBootstrap", "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:${versions.opentelemetryJavaagent}")
@@ -69,10 +64,7 @@ tasks.withType(Test).configureEach {
   jvmArgs "-Dotel.javaagent.testing.transform-safe-logging.enabled=true"
   jvmArgs "-Dotel.metrics.exporter=otlp"
 
-  // Exclude Spock test engine - incompatible with OTel gradle-plugins 2.10.0-alpha JUnit platform
-  useJUnitPlatform {
-    excludeEngines 'spock'
-  }
+  useJUnitPlatform()
 
   dependsOn shadowJar
   dependsOn configurations.testAgent.buildDependencies

@@ -79,7 +79,7 @@ subprojects {
       bytebuddy                  : "1.14.5",
       autoservice                : "1.1.1",
       autovalue                  : "1.10.1",
-      junit                      : "5.9.3",
+      junit                      : "5.11.3",
       mockito                    : "5.4.0",
       testcontainers             : "1.17.6",
       hamcrest                   : "2.2"
