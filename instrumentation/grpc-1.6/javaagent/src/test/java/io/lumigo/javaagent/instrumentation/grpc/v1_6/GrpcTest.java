@@ -35,6 +35,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.instrumentation.testing.util.ThrowingRunnable;
+import io.opentelemetry.semconv.incubating.RpcIncubatingAttributes;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -101,9 +102,9 @@ class GrpcTest extends AbstractGrpcTest {
                   span.hasName("example.Greeter/SayHello")
                       .hasKind(SpanKind.CLIENT)
                       .hasParent(trace.getSpan(0))
-                      .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                      .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                      .hasAttribute(AttributeKey.stringKey("rpc.method"), "SayHello")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "SayHello")
                       .hasAttribute(
                           AttributeKey.stringKey("rpc.grpc.request.payload"),
                           String.format(REQUEST_BODY_TEMPLATE, paramName))
@@ -179,9 +180,9 @@ class GrpcTest extends AbstractGrpcTest {
                   span.hasName("example.Greeter/SayHello")
                       .hasKind(SpanKind.CLIENT)
                       .hasParent(trace.getSpan(0))
-                      .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                      .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                      .hasAttribute(AttributeKey.stringKey("rpc.method"), "SayHello")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "SayHello")
                       .hasAttribute(
                           AttributeKey.stringKey("rpc.grpc.request.payload"),
                           String.format(REQUEST_BODY_TEMPLATE, "a name"))
@@ -192,9 +193,9 @@ class GrpcTest extends AbstractGrpcTest {
                   span.hasName("example.Greeter/SayHello")
                       .hasKind(SpanKind.SERVER)
                       .hasParent(trace.getSpan(1))
-                      .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                      .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                      .hasAttribute(AttributeKey.stringKey("rpc.method"), "SayHello")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "SayHello")
                       .hasAttribute(
                           AttributeKey.stringKey("rpc.grpc.request.payload"),
                           String.format(REQUEST_BODY_TEMPLATE, "a name"))
@@ -266,9 +267,9 @@ class GrpcTest extends AbstractGrpcTest {
                   span.hasName("example.Greeter/SayHello")
                       .hasKind(SpanKind.CLIENT)
                       .hasParent(trace.getSpan(0))
-                      .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                      .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                      .hasAttribute(AttributeKey.stringKey("rpc.method"), "SayHello")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "SayHello")
                       .hasAttribute(
                           AttributeKey.stringKey("rpc.grpc.request.payload"),
                           String.format(REQUEST_BODY_TEMPLATE, "test"))
@@ -279,9 +280,9 @@ class GrpcTest extends AbstractGrpcTest {
                   span.hasName("example.Greeter/SayHello")
                       .hasKind(SpanKind.SERVER)
                       .hasParent(trace.getSpan(1))
-                      .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                      .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                      .hasAttribute(AttributeKey.stringKey("rpc.method"), "SayHello")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                      .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "SayHello")
                       .hasAttribute(
                           AttributeKey.stringKey("rpc.grpc.request.payload"),
                           String.format(REQUEST_BODY_TEMPLATE, "test"))

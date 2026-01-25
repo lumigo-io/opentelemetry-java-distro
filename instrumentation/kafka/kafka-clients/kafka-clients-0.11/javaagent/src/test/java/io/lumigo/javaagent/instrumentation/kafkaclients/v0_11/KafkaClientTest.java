@@ -26,6 +26,7 @@ import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtens
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.sdk.trace.data.SpanData;
+import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -177,8 +178,8 @@ public class KafkaClientTest {
 
   private static List<AttributeAssertion> commonAttributes(String clientPrefix) {
     return Arrays.asList(
-        equalTo(AttributeKey.stringKey("messaging.system"), "kafka"),
-        equalTo(AttributeKey.stringKey("messaging.destination.name"), TOPIC),
+        equalTo(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "kafka"),
+        equalTo(MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, TOPIC),
         satisfies(
             AttributeKey.stringKey("messaging.client_id"),
             (value) -> value.startsWith(clientPrefix)));
@@ -215,7 +216,7 @@ public class KafkaClientTest {
       String messageKey, String messageValue) {
     List<AttributeAssertion> assertions = new ArrayList<>(commonAttributes("consumer"));
 
-    assertions.add(equalTo(AttributeKey.stringKey("messaging.operation"), "process"));
+    assertions.add(equalTo(MessagingIncubatingAttributes.MESSAGING_OPERATION, "process"));
     assertions.add(
         satisfies(
             AttributeKey.stringKey("messaging.destination.partition.id"),
@@ -236,7 +237,7 @@ public class KafkaClientTest {
       assertions.add(equalTo(AttributeKey.stringKey("messaging.message.payload"), JSON_BODY));
       assertions.add(
           equalTo(
-              AttributeKey.longKey("messaging.message.body.size"),
+              MessagingIncubatingAttributes.MESSAGING_MESSAGE_BODY_SIZE,
               messageValue.getBytes(StandardCharsets.UTF_8).length));
     }
 

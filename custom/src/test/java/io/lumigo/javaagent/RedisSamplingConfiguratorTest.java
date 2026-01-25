@@ -27,6 +27,7 @@ import io.opentelemetry.sdk.trace.IdGenerator;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
+import io.opentelemetry.semconv.incubating.DbIncubatingAttributes;
 import java.util.Collections;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -59,9 +60,9 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             "INFO",
             SpanKind.CLIENT,
             Attributes.of(
-                AttributeKey.stringKey("db.system"),
+                DbIncubatingAttributes.DB_SYSTEM,
                 "redis",
-                AttributeKey.stringKey("db.statement"),
+                DbIncubatingAttributes.DB_STATEMENT,
                 "server"),
             Collections.emptyList()));
 
@@ -74,9 +75,9 @@ public class RedisSamplingConfiguratorTest extends AbstractSamplingConfiguratorT
             "INFO",
             SpanKind.CLIENT,
             Attributes.of(
-                AttributeKey.stringKey("db.system"),
+                DbIncubatingAttributes.DB_SYSTEM,
                 "redis",
-                AttributeKey.stringKey("db.statement"),
+                DbIncubatingAttributes.DB_STATEMENT,
                 "other"),
             Collections.emptyList()));
 

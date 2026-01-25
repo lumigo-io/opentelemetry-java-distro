@@ -26,6 +26,7 @@ import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtens
 import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
 import io.opentelemetry.semconv.ServerAttributes;
+import io.opentelemetry.semconv.incubating.DbIncubatingAttributes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,8 +80,8 @@ class JedisClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "SET foo bar"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "SET foo bar"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "SET"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))));
@@ -104,8 +105,8 @@ class JedisClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "SET foo bar"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "SET foo bar"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "SET"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))),
@@ -115,8 +116,8 @@ class JedisClientTest {
                         span.hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "GET foo"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "GET foo"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "GET"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))));
@@ -140,7 +141,7 @@ class JedisClientTest {
                         span.hasName("MULTI")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))),
             trace ->
@@ -149,8 +150,8 @@ class JedisClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "SET foo bar"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "SET foo bar"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "SET"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))),
@@ -160,8 +161,8 @@ class JedisClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "SET foo2 bar2"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "SET foo2 bar2"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "SET"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))),
@@ -171,7 +172,7 @@ class JedisClientTest {
                         span.hasName("EXEC")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))));
   }
@@ -194,8 +195,8 @@ class JedisClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "SET foo bar"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "SET foo bar"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "SET"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))),
@@ -205,8 +206,8 @@ class JedisClientTest {
                         span.hasName("RANDOMKEY")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(AttributeKey.stringKey("db.system"), "redis"),
-                                equalTo(AttributeKey.stringKey("db.statement"), "RANDOMKEY"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "RANDOMKEY"),
                                 equalTo(AttributeKey.stringKey("db.operation"), "RANDOMKEY"),
                                 equalTo(ServerAttributes.SERVER_ADDRESS, "localhost"),
                                 equalTo(ServerAttributes.SERVER_PORT, port))));

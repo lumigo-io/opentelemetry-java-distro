@@ -32,6 +32,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.instrumentation.testing.util.ThrowingRunnable;
+import io.opentelemetry.semconv.incubating.RpcIncubatingAttributes;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -157,9 +158,9 @@ class GrpcStreamingTest extends AbstractGrpcTest {
                     span.hasName("example.Greeter/Conversation")
                         .hasKind(SpanKind.CLIENT)
                         .hasNoParent()
-                        .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                        .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                        .hasAttribute(AttributeKey.stringKey("rpc.method"), "Conversation")
+                        .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                        .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                        .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "Conversation")
                         .hasAttribute(
                             AttributeKey.stringKey("rpc.grpc.request.payload"),
                             constructRequestBody(clientMessageCount))
@@ -170,9 +171,9 @@ class GrpcStreamingTest extends AbstractGrpcTest {
                     span.hasName("example.Greeter/Conversation")
                         .hasKind(SpanKind.SERVER)
                         .hasParent(trace.getSpan(0))
-                        .hasAttribute(AttributeKey.stringKey("rpc.system"), "grpc")
-                        .hasAttribute(AttributeKey.stringKey("rpc.service"), "example.Greeter")
-                        .hasAttribute(AttributeKey.stringKey("rpc.method"), "Conversation")
+                        .hasAttribute(RpcIncubatingAttributes.RPC_SYSTEM, "grpc")
+                        .hasAttribute(RpcIncubatingAttributes.RPC_SERVICE, "example.Greeter")
+                        .hasAttribute(RpcIncubatingAttributes.RPC_METHOD, "Conversation")
                         .hasAttribute(
                             AttributeKey.stringKey("rpc.grpc.request.payload"),
                             constructRequestBody(clientMessageCount))
