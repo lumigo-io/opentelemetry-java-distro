@@ -133,7 +133,8 @@ class SpringBootSmokeTest {
         .untilAsserted(
             () -> {
               List<SpanDumpEntry> entries = target.getSpanDump();
-              assertThat(entries.size(), is(2));
+              // Controller spans are disabled by default in OTel 2.x
+              assertThat(entries.size(), is(1));
 
               TypeSafeMatcher<SpanDumpEntry> hasSpanName = hasSpanName("GET /greeting");
               assertThrows(NoSuchElementException.class, () -> findSpan(entries, hasSpanName));
@@ -175,7 +176,8 @@ class SpringBootSmokeTest {
         .untilAsserted(
             () -> {
               List<SpanDumpEntry> entries = target.getSpanDump();
-              assertThat(entries.size(), is(3));
+              // Controller spans are disabled by default in OTel 2.x
+              assertThat(entries.size(), is(2));
 
               TypeSafeMatcher<SpanDumpEntry> hasSpanName = hasSpanName("GET /greeting");
               assertNotNull(findSpan(entries, hasSpanName));
@@ -207,16 +209,16 @@ class SpringBootSmokeTest {
               SpanDumpEntry serverSpan = findSpan(entries, hasSpanName("GET /greeting"));
               assertThat(serverSpan, hasSpanKind(SERVER));
               assertThat(serverSpan, hasSpanStatus(StatusData.unset()));
-              assertThat(serverSpan, hasAttribute("http.target", "/greeting"));
+              assertThat(serverSpan, hasAttribute("url.path", "/greeting"));
               assertThat(serverSpan, hasAttribute("http.route", "/greeting"));
-              assertThat(serverSpan, hasAttribute("http.status_code", 200L));
+              assertThat(serverSpan, hasAttribute("http.response.status_code", 200L));
               assertThat(serverSpan, hasAttribute("http.response.body", "Hi!"));
               assertThat(serverSpan, hasAttributeOfTypeString("thread.name"));
               assertThat(serverSpan, hasAttributeOfTypeLong("thread.id"));
               assertThat(serverSpan, hasResourceAttributeOfTypeString("lumigo.distro.version"));
               assertThat(serverSpan, hasResourceAttributeOfTypeString("container.id"));
 
-              SpanDumpEntry internalSpan = findSpan(entries, hasSpanName("WebController.greeting"));
+              SpanDumpEntry internalSpan = findSpan(entries, hasSpanName("WebController.withSpan"));
               assertThat(internalSpan, hasSpanKind(INTERNAL));
               assertThat(internalSpan, hasTraceId(serverSpan.getSpan().getTraceId()));
               assertThat(internalSpan, hasParentSpanId(serverSpan.getSpan().getSpanId()));
