@@ -41,10 +41,7 @@ func TestSpringboot(t *testing.T) {
 			assert.Greater(t, CountSpansByName(tracesFromContext(ctx), "GET /greeting"), 0)
 			return ctx
 		}).
-		Assess("Check if there's a greeting span", func(ctx context.Context, t *testing.T, c *envconf.Config) context.Context {
-			assert.Greater(t, CountSpansByName(tracesFromContext(ctx), "WebController.greeting"), 0)
-			return ctx
-		}).
+		// Controller spans are disabled by default in OTel 2.x, so we only check for @WithSpan
 		Assess("Check if there's a withSpan span", func(ctx context.Context, t *testing.T, c *envconf.Config) context.Context {
 			assert.Greater(t, CountSpansByName(tracesFromContext(ctx), "WebController.withSpan"), 0)
 			return ctx
