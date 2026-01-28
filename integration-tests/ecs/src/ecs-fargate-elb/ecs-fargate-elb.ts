@@ -82,7 +82,10 @@ export class EcsFargateElbStack extends Stack {
       environment: {
         AWS_REGION: props.env?.region || 'unknown_region',
         SERVER_PORT: String(serverPort),
-        LUMIGO_DEBUG_SPANDUMP: '/dev/stdout'
+        LUMIGO_DEBUG_SPANDUMP: '/dev/stdout',
+        LUMIGO_DEBUG: 'true',
+        OTEL_JAVAAGENT_DEBUG: 'true',
+        OTEL_LOG_LEVEL: 'debug'
       },
       secrets: {
         LUMIGO_TRACER_TOKEN: lumigoTokenSecret,
