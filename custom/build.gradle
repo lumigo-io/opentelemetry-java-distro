@@ -15,12 +15,8 @@ dependencies {
 
   implementation(project(":utils"))
 
-  implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}") {
-    exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
-    exclude group: "io.opentelemetry", module: "opentelemetry-api"
-    exclude group: "io.opentelemetry", module: "opentelemetry-semconv"
-    exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure"
-  }
+  // opentelemetry-aws-resources is already included in upstream agent JAR
+  // No need to include it here as it causes duplicate ServiceLoader entries
 
   implementation("io.opentelemetry.contrib:opentelemetry-samplers:${versions.opentelemetryContrib}") {
     exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
