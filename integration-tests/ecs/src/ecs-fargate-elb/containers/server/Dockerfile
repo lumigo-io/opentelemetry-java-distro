@@ -1,5 +1,9 @@
 FROM ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-spring-boot:jdk8-20211213.1570880324
 
+# Install curl if not present (for metadata endpoint testing)
+USER root
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 COPY ./distro/lumigo-opentelemetry-distro.jar /opt/lumigo/lumigo-opentelemetry-distro.jar
 COPY ./test-metadata.sh /usr/local/bin/test-metadata.sh
 
