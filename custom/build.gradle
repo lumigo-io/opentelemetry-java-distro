@@ -15,8 +15,15 @@ dependencies {
 
   implementation(project(":utils"))
 
-  // opentelemetry-aws-resources is already included in upstream agent JAR
-  // No need to include it here as it causes duplicate ServiceLoader entries
+  // Upstream javaagent 2.10.0 bundles aws-resources 1.40.0-alpha
+  // But we need 1.44.0-alpha to match our SDK version and fix ECS detection
+  // The shadowJar will use EXCLUDE strategy, so we need to prevent duplicates
+  implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}") {
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
+    exclude group: "io.opentelemetry", module: "opentelemetry-api"
+    exclude group: "io.opentelemetry", module: "opentelemetry-semconv"
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure"
+  }
 
   implementation("io.opentelemetry.contrib:opentelemetry-samplers:${versions.opentelemetryContrib}") {
     exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
