@@ -120,16 +120,10 @@ tasks {
   // 3. the relocated and isolated javaagent libs are merged together with the bootstrap libs (which undergo relocation
   // in this task) and the upstream javaagent jar; duplicates are removed
   shadowJar {
-    configurations = [project.configurations.bootstrapLibs]
+    configurations = [project.configurations.bootstrapLibs, project.configurations.upstreamAgent]
 
     dependsOn(tasks.isolateJavaagentLibs)
     from(tasks.isolateJavaagentLibs.outputs)
-
-    // Add upstream agent but exclude its bundled aws-resources (1.40.0-alpha)
-    // We use our own 1.44.0-alpha version from custom module instead
-    from(project.configurations.upstreamAgent.collect { zipTree(it) }) {
-      exclude("inst/io/opentelemetry/contrib/aws/**")
-    }
 
     archiveClassifier.set("all")
 
