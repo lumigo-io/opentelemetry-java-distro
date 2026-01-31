@@ -85,7 +85,8 @@ export class EcsFargateElbStack extends Stack {
         LUMIGO_DEBUG_SPANDUMP: '/dev/stdout',
         LUMIGO_DEBUG: 'true',
         OTEL_JAVAAGENT_DEBUG: 'true',
-        OTEL_LOG_LEVEL: 'debug'
+        OTEL_LOG_LEVEL: 'debug',
+        OTEL_RESOURCE_PROVIDERS_AWS_ENABLED: 'true'
       },
       secrets: {
         LUMIGO_TRACER_TOKEN: lumigoTokenSecret,
