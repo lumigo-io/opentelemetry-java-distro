@@ -12,14 +12,17 @@ dependencies {
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
   compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
   compileOnly("com.fasterxml.jackson.core:jackson-core:${versions.jackson}")
-  // Add aws-resources as compileOnly for IntelliJ navigation/autocomplete
-  // Runtime version comes from upstream agent 2.11.0 (which bundles 1.42.0-alpha)
-  compileOnly("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}")
 
   implementation(project(":utils"))
 
-  // aws-resources is bundled in upstream agent 2.11.0+ with compatible version
-  // No need to include it explicitly
+  // Explicitly include aws-resources - upstream agent's version is in isolated classloader
+  // and not accessible to ServiceLoader, so we need our own copy
+  implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}") {
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
+    exclude group: "io.opentelemetry", module: "opentelemetry-api"
+    exclude group: "io.opentelemetry", module: "opentelemetry-semconv"
+    exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure"
+  }
 
   implementation("io.opentelemetry.contrib:opentelemetry-samplers:${versions.opentelemetryContrib}") {
     exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
