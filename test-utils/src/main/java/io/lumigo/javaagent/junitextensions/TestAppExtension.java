@@ -183,12 +183,12 @@ public class TestAppExtension
         parameterContext
             .findAnnotation(Configuration.class)
             .map(Configuration::jdkVersion)
-            .orElse("8");
+            .orElse("17");
 
     final String testAppImage =
         "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-spring-boot:jdk"
             + jdkVersion
-            + "-20211213.1570880324";
+            + "-20260126.21350382958";
 
     this.testApp =
         new GenericContainer<>(testAppImage)
