@@ -15,15 +15,6 @@ dependencies {
 
   implementation(project(":utils"))
 
-  // Explicitly include aws-resources - upstream agent's version is in isolated classloader
-  // and not accessible to ServiceLoader, so we need our own copy
-  implementation("io.opentelemetry.contrib:opentelemetry-aws-resources:${versions.opentelemetryContrib}") {
-    exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
-    exclude group: "io.opentelemetry", module: "opentelemetry-api"
-    exclude group: "io.opentelemetry", module: "opentelemetry-semconv"
-    exclude group: "io.opentelemetry", module: "opentelemetry-sdk-extension-autoconfigure"
-  }
-
   implementation("io.opentelemetry.contrib:opentelemetry-samplers:${versions.opentelemetryContrib}") {
     exclude group: "io.opentelemetry", module: "opentelemetry-sdk"
     exclude group: "io.opentelemetry", module: "opentelemetry-api"
