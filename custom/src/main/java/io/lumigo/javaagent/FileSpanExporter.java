@@ -62,7 +62,9 @@ public final class FileSpanExporter implements SpanExporter {
           out.write(System.lineSeparator());
         }
       }
+      out.flush();
     } catch (Exception e) {
+      LOGGER.log(java.util.logging.Level.SEVERE, "Failed to export spans", e);
       return CompletableResultCode.ofFailure();
     }
 
