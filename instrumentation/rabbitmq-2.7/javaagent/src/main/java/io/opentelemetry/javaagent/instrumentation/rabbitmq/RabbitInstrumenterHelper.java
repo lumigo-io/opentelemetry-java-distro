@@ -13,6 +13,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.javaagent.bootstrap.internal.AgentInstrumentationConfig;
 import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
 import java.util.Map;
 
@@ -20,9 +21,8 @@ public class RabbitInstrumenterHelper {
   static final AttributeKey<String> RABBITMQ_COMMAND = AttributeKey.stringKey("rabbitmq.command");
 
   private static final boolean CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES =
-      Boolean.parseBoolean(
-          System.getenv()
-              .getOrDefault("OTEL_INSTRUMENTATION_RABBITMQ_EXPERIMENTAL_SPAN_ATTRIBUTES", "false"));
+      AgentInstrumentationConfig.get()
+          .getBoolean("otel.instrumentation.rabbitmq.experimental-span-attributes", false);
 
   private static final RabbitInstrumenterHelper INSTRUMENTER_HELPER =
       new RabbitInstrumenterHelper();

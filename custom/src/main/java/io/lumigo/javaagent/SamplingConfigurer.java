@@ -20,6 +20,7 @@ package io.lumigo.javaagent;
 import com.google.auto.service.AutoService;
 import io.lumigo.javaagent.common.HttpEndpointFilter;
 import io.lumigo.javaagent.common.ParseExpressionResult;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.contrib.sampler.RuleBasedRoutingSampler;
 import io.opentelemetry.contrib.sampler.RuleBasedRoutingSamplerBuilder;
@@ -58,6 +59,9 @@ public class SamplingConfigurer implements AutoConfigurationCustomizerProvider {
 
     for (Pattern pattern : parseResult.getExpressionPatterns()) {
       samplerBuilder.drop(UrlAttributes.URL_PATH, pattern.pattern());
+
+      // Deprecated in favor of url.path, kept for backward compatibility
+      samplerBuilder.drop(AttributeKey.stringKey("http.target"), pattern.pattern());
     }
 
     return samplerBuilder.build();
@@ -79,6 +83,9 @@ public class SamplingConfigurer implements AutoConfigurationCustomizerProvider {
 
     for (Pattern pattern : parseResult.getExpressionPatterns()) {
       samplerBuilder.drop(UrlAttributes.URL_FULL, pattern.pattern());
+
+      // Deprecated in favor of url.full, kept for backward compatibility
+      samplerBuilder.drop(AttributeKey.stringKey("http.url"), pattern.pattern());
     }
 
     return samplerBuilder.build();

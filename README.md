@@ -100,7 +100,7 @@ For more configuration options, see the [Upstream Agent Configuration](https://o
 
 ## OpenTelemetry 2.x Breaking Changes
 
-Starting from version X.Y.Z, this distro is based on OpenTelemetry Java Instrumentation 2.11.0, which includes breaking changes from upstream OpenTelemetry 2.0.
+Starting from version 0.20.0, this distro is based on OpenTelemetry Java Instrumentation 2.11.0, which includes breaking changes from upstream OpenTelemetry 2.0.
 
 ### HTTP Semantic Convention Changes
 
