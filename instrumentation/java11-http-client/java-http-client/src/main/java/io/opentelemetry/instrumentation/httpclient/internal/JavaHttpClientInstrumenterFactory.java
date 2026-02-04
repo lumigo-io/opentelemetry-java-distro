@@ -10,14 +10,11 @@ import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.InstrumenterBuilder;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanKindExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesExtractorBuilder;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientExperimentalMetrics;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientMetrics;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpExperimentalAttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanNameExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanNameExtractorBuilder;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanStatusExtractor;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractor;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractorBuilder;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractor;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractorBuilder;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanStatusExtractor;
 import io.opentelemetry.javaagent.instrumentation.httpclient.HttpPayloadExtractor;
 import io.opentelemetry.javaagent.instrumentation.httpclient.ResponsePayloadBridge;
 import java.net.http.HttpRequest;
@@ -58,13 +55,7 @@ public final class JavaHttpClientInstrumenterFactory {
             .addAttributesExtractor(httpAttributesExtractorBuilder.build())
             .addAttributesExtractors(additionalExtractors)
             .addAttributesExtractor(new HttpPayloadExtractor())
-            .addContextCustomizer((context, request, attributes) -> new ResponsePayloadBridge.Builder().init(context))
-            .addOperationMetrics(HttpClientMetrics.get());
-    if (emitExperimentalHttpClientMetrics) {
-      builder
-          .addAttributesExtractor(HttpExperimentalAttributesExtractor.create(httpAttributesGetter))
-          .addOperationMetrics(HttpClientExperimentalMetrics.get());
-    }
+            .addContextCustomizer((context, request, attributes) -> new ResponsePayloadBridge.Builder().init(context));
     return builder.buildInstrumenter(SpanKindExtractor.alwaysClient());
   }
 

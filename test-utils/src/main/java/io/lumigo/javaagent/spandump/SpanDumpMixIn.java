@@ -215,7 +215,11 @@ final class AttributesDeserializer extends JsonDeserializer<Attributes> {
       } else if (valueNode.has("doubleValue")) {
         attributesBuilder.put(keyName, valueNode.get("doubleValue").asDouble());
       } else if (valueNode.has("arrayValue")) {
-        final JsonNode arrayNode = valueNode.get("arrayValue");
+        JsonNode arrayNode = valueNode.get("arrayValue");
+        // OTel 2.11.0 wraps arrays in {"values": [...]} structure
+        if (arrayNode.has("values")) {
+          arrayNode = arrayNode.get("values");
+        }
         final List<Object> values = new ArrayList<>(arrayNode.size());
         final AtomicReference<Class<?>> valueType = new AtomicReference<>();
 
@@ -232,21 +236,21 @@ final class AttributesDeserializer extends JsonDeserializer<Attributes> {
               }
             };
 
-        for (final JsonNode arrayValue : arrayNode) {
-          if (valueNode.has("stringValue")) {
+        for (final JsonNode arrayElement : arrayNode) {
+          if (arrayElement.has("stringValue")) {
             updateValueTypeOrThrow.accept(String.class);
-            values.add(valueNode.get("stringValue").textValue());
-          } else if (valueNode.has("boolValue")) {
+            values.add(arrayElement.get("stringValue").textValue());
+          } else if (arrayElement.has("boolValue")) {
             updateValueTypeOrThrow.accept(Boolean.class);
-            values.add(valueNode.get("boolValue").booleanValue());
-          } else if (valueNode.has("intValue")) {
+            values.add(arrayElement.get("boolValue").booleanValue());
+          } else if (arrayElement.has("intValue")) {
             updateValueTypeOrThrow.accept(Long.class);
-            values.add(valueNode.get("intValue").intValue());
-          } else if (valueNode.has("doubleValue")) {
+            values.add(arrayElement.get("intValue").intValue());
+          } else if (arrayElement.has("doubleValue")) {
             updateValueTypeOrThrow.accept(Double.class);
-            values.add(valueNode.get("doubleValue").doubleValue());
+            values.add(arrayElement.get("doubleValue").doubleValue());
           } else {
-            throw new IllegalArgumentException("Unexpected value type in array: " + arrayValue);
+            throw new IllegalArgumentException("Unexpected value type in array: " + arrayElement);
           }
         }
 

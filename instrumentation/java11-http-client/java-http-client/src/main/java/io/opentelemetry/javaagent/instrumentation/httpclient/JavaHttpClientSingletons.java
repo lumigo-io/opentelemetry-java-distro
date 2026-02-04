@@ -5,17 +5,20 @@
 
 package io.opentelemetry.javaagent.instrumentation.httpclient;
 
-import static java.util.Collections.singletonList;
-
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.instrumentation.api.incubator.config.internal.CommonConfig;
+import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientPeerServiceAttributesExtractor;
+import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpExperimentalAttributesExtractor;
+import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientPeerServiceAttributesExtractor;
 import io.opentelemetry.instrumentation.httpclient.internal.HttpHeadersSetter;
 import io.opentelemetry.instrumentation.httpclient.internal.JavaHttpClientAttributesGetter;
 import io.opentelemetry.instrumentation.httpclient.internal.JavaHttpClientInstrumenterFactory;
-import io.opentelemetry.javaagent.bootstrap.internal.CommonConfig;
+import io.opentelemetry.javaagent.bootstrap.internal.AgentInstrumentationConfig;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JavaHttpClientSingletons {
 
@@ -25,20 +28,29 @@ public class JavaHttpClientSingletons {
   static {
     SETTER = new HttpHeadersSetter(GlobalOpenTelemetry.getPropagators());
 
+    CommonConfig config = new CommonConfig(AgentInstrumentationConfig.get());
+
+    List<AttributesExtractor<? super HttpRequest, ? super HttpResponse<?>>> additionalExtractors =
+        new ArrayList<>();
+    additionalExtractors.add(
+        HttpClientPeerServiceAttributesExtractor.create(
+            JavaHttpClientAttributesGetter.INSTANCE, config.getPeerServiceResolver()));
+
+    if (config.shouldEmitExperimentalHttpClientTelemetry()) {
+      additionalExtractors.add(
+          HttpExperimentalAttributesExtractor.create(JavaHttpClientAttributesGetter.INSTANCE));
+    }
+
     INSTRUMENTER =
         JavaHttpClientInstrumenterFactory.createInstrumenter(
             GlobalOpenTelemetry.get(),
-            builder ->
-                builder
-                    .setCapturedRequestHeaders(CommonConfig.get().getClientRequestHeaders())
-                    .setCapturedResponseHeaders(CommonConfig.get().getClientResponseHeaders())
-                    .setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
-            builder -> builder.setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods()),
-            singletonList(
-                HttpClientPeerServiceAttributesExtractor.create(
-                    JavaHttpClientAttributesGetter.INSTANCE,
-                    CommonConfig.get().getPeerServiceResolver())),
-            CommonConfig.get().shouldEmitExperimentalHttpClientTelemetry());
+            builder -> builder
+                .setCapturedRequestHeaders(config.getClientRequestHeaders())
+                .setCapturedResponseHeaders(config.getClientResponseHeaders())
+                .setKnownMethods(config.getKnownHttpRequestMethods()),
+            builder -> builder.setKnownMethods(config.getKnownHttpRequestMethods()),
+            additionalExtractors,
+            config.shouldEmitExperimentalHttpClientTelemetry());
   }
 
   public static Instrumenter<HttpRequest, HttpResponse<?>> instrumenter() {

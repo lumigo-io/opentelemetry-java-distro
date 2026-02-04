@@ -71,6 +71,8 @@ public abstract class Span {
 
   public abstract List<LinkData> getLinks();
 
+  public abstract Optional<Integer> getFlags();
+
   @AutoValue.Builder
   public abstract static class Builder {
 
@@ -110,6 +112,9 @@ public abstract class Span {
 
     @JsonProperty("links")
     public abstract Builder setLinks(List<LinkData> links);
+
+    @JsonProperty("flags")
+    public abstract Builder setFlags(Integer flags);
 
     abstract Span autoBuild();
 

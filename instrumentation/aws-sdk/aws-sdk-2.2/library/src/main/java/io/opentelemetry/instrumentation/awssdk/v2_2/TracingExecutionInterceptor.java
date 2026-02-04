@@ -13,7 +13,6 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.contrib.awsxray.propagator.AwsXrayPropagator;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
-import io.opentelemetry.semconv.SemanticAttributes;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -35,6 +34,7 @@ import software.amazon.awssdk.core.interceptor.ExecutionInterceptor;
 import software.amazon.awssdk.core.interceptor.SdkExecutionAttribute;
 import software.amazon.awssdk.http.SdkHttpRequest;
 import software.amazon.awssdk.http.SdkHttpResponse;
+import io.opentelemetry.semconv.HttpAttributes;
 
 /** AWS request execution interceptor. */
 final class TracingExecutionInterceptor implements ExecutionInterceptor {
@@ -257,10 +257,10 @@ final class TracingExecutionInterceptor implements ExecutionInterceptor {
     fieldMapper.mapToAttributes(sdkRequest, awsSdkRequest, span);
 
     if (awsSdkRequest.type() == AwsSdkRequestType.DYNAMODB) {
-      span.setAttribute(SemanticAttributes.DB_SYSTEM, "dynamodb");
+      span.setAttribute(AttributeKey.stringKey("db.system"), "dynamodb");
       String operation = attributes.getAttribute(SdkExecutionAttribute.OPERATION_NAME);
       if (operation != null) {
-        span.setAttribute(SemanticAttributes.DB_OPERATION, operation);
+        span.setAttribute(AttributeKey.stringKey("db.operation"), operation);
       }
     }
   }
@@ -298,7 +298,7 @@ final class TracingExecutionInterceptor implements ExecutionInterceptor {
     List<String> userAgent =
         AwsSdkInstrumenterFactory.httpAttributesGetter.getHttpRequestHeader(request, "User-Agent");
     if (!userAgent.isEmpty()) {
-      span.setAttribute(SemanticAttributes.USER_AGENT_ORIGINAL, userAgent.get(0));
+      span.setAttribute(AttributeKey.stringKey("user_agent.original"), userAgent.get(0));
     }
   }
 
@@ -334,7 +334,7 @@ final class TracingExecutionInterceptor implements ExecutionInterceptor {
                   .collect(Collectors.joining("\n"));
           Attributes attributes =
               Attributes.of(
-                  SemanticAttributes.HTTP_RESPONSE_STATUS_CODE,
+                  HttpAttributes.HTTP_RESPONSE_STATUS_CODE,
                   Long.valueOf(errorCode),
                   HTTP_ERROR_MSG,
                   errorMsg);

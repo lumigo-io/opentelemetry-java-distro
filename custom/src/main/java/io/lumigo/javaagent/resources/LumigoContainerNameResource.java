@@ -23,7 +23,7 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider;
 import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.semconv.ResourceAttributes;
+import io.opentelemetry.semconv.incubating.K8sIncubatingAttributes;
 
 @AutoService(ResourceProvider.class)
 public class LumigoContainerNameResource implements ResourceProvider {
@@ -34,7 +34,7 @@ public class LumigoContainerNameResource implements ResourceProvider {
     String containerName = System.getenv(LUMIGO_CONTAINER_NAME_ENV_VAR);
     if (containerName != null && !containerName.isEmpty()) {
       AttributesBuilder ab = Attributes.builder();
-      ab.put(ResourceAttributes.K8S_CONTAINER_NAME, containerName);
+      ab.put(K8sIncubatingAttributes.K8S_CONTAINER_NAME, containerName);
       return Resource.create(ab.build());
     }
 

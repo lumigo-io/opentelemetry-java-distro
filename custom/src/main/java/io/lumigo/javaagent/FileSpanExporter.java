@@ -17,14 +17,14 @@
  */
 package io.lumigo.javaagent;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import io.opentelemetry.exporter.internal.otlp.traces.SpanDumpMarshaler;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -32,9 +32,6 @@ import javax.annotation.Nonnull;
 
 /** A Span Exporter that logs every span at INFO level using java.util.logging. */
 public final class FileSpanExporter implements SpanExporter {
-
-  static final JsonFactory JSON_FACTORY =
-      new JsonFactory().disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
 
   private static final Logger LOGGER = Logger.getLogger(FileSpanExporter.class.getName());
 
@@ -56,13 +53,18 @@ public final class FileSpanExporter implements SpanExporter {
       return CompletableResultCode.ofFailure();
     }
 
-    try (JsonGenerator gen = JSON_FACTORY.createGenerator(out)) {
+    try {
       for (final SpanData span : spans) {
         final SpanDumpMarshaler spanDumpMarshaler = SpanDumpMarshaler.create(span);
-        spanDumpMarshaler.writeJsonTo(gen);
-        out.write(System.lineSeparator());
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+          spanDumpMarshaler.writeJsonTo(baos);
+          out.write(baos.toString(StandardCharsets.UTF_8.name()));
+          out.write(System.lineSeparator());
+        }
       }
+      out.flush();
     } catch (Exception e) {
+      LOGGER.log(java.util.logging.Level.SEVERE, "Failed to export spans", e);
       return CompletableResultCode.ofFailure();
     }
 

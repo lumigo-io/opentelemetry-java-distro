@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.semconv.HttpAttributes;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.trace.data.StatusData;
@@ -77,8 +78,8 @@ public class ConnectionTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
                               List.of("application/json"))
                           .hasException(thrown)
                           .hasStatus(StatusData.error())
@@ -117,9 +118,9 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
+                            .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -155,9 +156,9 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
+                            .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasException(thrown)
                             .hasStatus(StatusData.error())
                     ));
@@ -195,10 +196,10 @@ public class ConnectionTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(AttributeKey.stringKey("http.method"), "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
-                            .hasAttribute(AttributeKey.longKey("http.status_code"), 500L)
+                            .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
+                            .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 500L)
                             .hasStatus(StatusData.error())
                     ));
   }

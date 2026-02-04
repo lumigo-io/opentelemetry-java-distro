@@ -22,11 +22,11 @@ import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.instrumentation.api.db.RedisCommandSanitizer;
+import io.opentelemetry.instrumentation.api.incubator.semconv.db.RedisCommandSanitizer;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.network.NetworkAttributesExtractor;
-import io.opentelemetry.semconv.SemanticAttributes;
-import io.opentelemetry.semconv.SemanticAttributes.DbSystemValues;
+import io.opentelemetry.instrumentation.api.semconv.network.NetworkAttributesExtractor;
+import io.opentelemetry.semconv.incubating.DbIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.DbIncubatingAttributes.DbSystemIncubatingValues;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.time.Instant;
@@ -150,7 +150,7 @@ final class OpenTelemetryTracing implements Tracing {
                             .spanBuilder("redis")
                             .setSpanKind(SpanKind.CLIENT)
                             .setParent(context)
-                            .setAttribute(SemanticAttributes.DB_SYSTEM, DbSystemValues.REDIS);
+                            .setAttribute(DbIncubatingAttributes.DB_SYSTEM, DbSystemIncubatingValues.REDIS);
             return new OpenTelemetrySpan(context, spanBuilder, sanitizer);
         }
     }
@@ -218,7 +218,7 @@ final class OpenTelemetryTracing implements Tracing {
           // Here we would like to set db.statement before starting the span, because Sampler may use it.
           // At that point db.statement having only command name is fine, command args will be added later.
             String commandName = command.getType().name();
-            this.spanBuilder.setAttribute(SemanticAttributes.DB_STATEMENT, commandName);
+            this.spanBuilder.setAttribute(DbIncubatingAttributes.DB_STATEMENT, commandName);
 
             start();
 
@@ -335,7 +335,7 @@ final class OpenTelemetryTracing implements Tracing {
             if (name != null) {
                 String statement = argsList != null ?  String.join(" ", argsList) : argsString;
                 if (statement != null) {
-                    span.setAttribute(SemanticAttributes.DB_STATEMENT, statement);
+                    span.setAttribute(DbIncubatingAttributes.DB_STATEMENT, statement);
                 }
             }
           span.end();

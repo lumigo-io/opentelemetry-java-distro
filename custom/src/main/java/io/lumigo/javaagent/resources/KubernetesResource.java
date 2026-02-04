@@ -23,7 +23,7 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.autoconfigure.spi.ResourceProvider;
 import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.semconv.ResourceAttributes;
+import io.opentelemetry.semconv.incubating.K8sIncubatingAttributes;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -106,7 +106,7 @@ public class KubernetesResource implements ResourceProvider {
     }
 
     AttributesBuilder ab = Attributes.builder();
-    ab.put(ResourceAttributes.K8S_POD_UID, KUBERNETES_POD_UID);
+    ab.put(K8sIncubatingAttributes.K8S_POD_UID, KUBERNETES_POD_UID);
     return Resource.create(ab.build());
   }
 }

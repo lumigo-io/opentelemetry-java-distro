@@ -28,7 +28,7 @@ import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.UrlAttributes;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -58,10 +58,10 @@ public class SamplingConfigurer implements AutoConfigurationCustomizerProvider {
             + "' regex");
 
     for (Pattern pattern : parseResult.getExpressionPatterns()) {
-      samplerBuilder.drop(AttributeKey.stringKey("url.path"), pattern.pattern());
+      samplerBuilder.drop(UrlAttributes.URL_PATH, pattern.pattern());
 
-      // Deprecated in favor of url.path
-      samplerBuilder.drop(SemanticAttributes.HTTP_TARGET, pattern.pattern());
+      // Deprecated in favor of url.path, kept for backward compatibility
+      samplerBuilder.drop(AttributeKey.stringKey("http.target"), pattern.pattern());
     }
 
     return samplerBuilder.build();
@@ -82,10 +82,10 @@ public class SamplingConfigurer implements AutoConfigurationCustomizerProvider {
             + "' regex");
 
     for (Pattern pattern : parseResult.getExpressionPatterns()) {
-      samplerBuilder.drop(AttributeKey.stringKey("url.full"), pattern.pattern());
+      samplerBuilder.drop(UrlAttributes.URL_FULL, pattern.pattern());
 
-      // Deprecated in favor of url.path
-      samplerBuilder.drop(SemanticAttributes.HTTP_URL, pattern.pattern());
+      // Deprecated in favor of url.full, kept for backward compatibility
+      samplerBuilder.drop(AttributeKey.stringKey("http.url"), pattern.pattern());
     }
 
     return samplerBuilder.build();

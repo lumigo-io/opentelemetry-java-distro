@@ -23,10 +23,10 @@ import static io.opentelemetry.sdk.testing.assertj.TracesAssert.assertThat;
 import com.github.tomakehurst.wiremock.core.Options;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.semconv.HttpAttributes;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.trace.data.StatusData;
-import io.opentelemetry.semconv.SemanticAttributes;
 import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -74,9 +74,9 @@ public class TimeoutTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
-                                List.of("application/json"))
+                            .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
+                              List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
                             .hasStatus(StatusData.error())
                     ));

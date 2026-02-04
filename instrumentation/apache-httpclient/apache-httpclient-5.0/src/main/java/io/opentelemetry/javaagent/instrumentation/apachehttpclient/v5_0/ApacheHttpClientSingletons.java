@@ -6,16 +6,15 @@
 package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v5_0;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.instrumentation.api.incubator.config.internal.CommonConfig;
+import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientPeerServiceAttributesExtractor;
+import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpExperimentalAttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.InstrumenterBuilder;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientExperimentalMetrics;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientMetrics;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientPeerServiceAttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpExperimentalAttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanNameExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanStatusExtractor;
-import io.opentelemetry.javaagent.bootstrap.internal.CommonConfig;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractor;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractor;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanStatusExtractor;
+import io.opentelemetry.javaagent.bootstrap.internal.AgentInstrumentationConfig;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 
@@ -28,34 +27,34 @@ public final class ApacheHttpClientSingletons {
     ApacheHttpClientHttpAttributesGetter httpAttributesGetter =
         new ApacheHttpClientHttpAttributesGetter();
 
+    CommonConfig config = new CommonConfig(AgentInstrumentationConfig.get());
+
     InstrumenterBuilder<HttpRequest, HttpResponse> builder =
         Instrumenter.<HttpRequest, HttpResponse>builder(
                 GlobalOpenTelemetry.get(),
                 INSTRUMENTATION_NAME,
                 HttpSpanNameExtractor.builder(httpAttributesGetter)
-                    .setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods())
+                    .setKnownMethods(config.getKnownHttpRequestMethods())
                     .build())
             .setSpanStatusExtractor(HttpSpanStatusExtractor.create(httpAttributesGetter))
             .addAttributesExtractor(
                 HttpClientAttributesExtractor.builder(httpAttributesGetter)
-                    .setCapturedRequestHeaders(CommonConfig.get().getClientRequestHeaders())
-                    .setCapturedResponseHeaders(CommonConfig.get().getClientResponseHeaders())
-                    .setKnownMethods(CommonConfig.get().getKnownHttpRequestMethods())
+                    .setCapturedRequestHeaders(config.getClientRequestHeaders())
+                    .setCapturedResponseHeaders(config.getClientResponseHeaders())
+                    .setKnownMethods(config.getKnownHttpRequestMethods())
                     .build())
             .addAttributesExtractor(
                 HttpClientPeerServiceAttributesExtractor.create(
-                    httpAttributesGetter, CommonConfig.get().getPeerServiceResolver()))
+                    httpAttributesGetter, config.getPeerServiceResolver()))
             // Custom HTTP payload extractor
             .addAttributesExtractor(new HttpPayloadExtractor())
             // Custom Context customizer for holding response payload
-            .addContextCustomizer((context, request, attributes) -> new ResponsePayloadBridge.Builder().init(context))
-            .addOperationMetrics(HttpClientMetrics.get());
+            .addContextCustomizer((context, request, attributes) -> new ResponsePayloadBridge.Builder().init(context));
 
-    if (CommonConfig.get().shouldEmitExperimentalHttpClientTelemetry()) {
-      builder
-          .addAttributesExtractor(HttpExperimentalAttributesExtractor.create(httpAttributesGetter))
-          .addOperationMetrics(HttpClientExperimentalMetrics.get());
+    if (config.shouldEmitExperimentalHttpClientTelemetry()) {
+      builder.addAttributesExtractor(HttpExperimentalAttributesExtractor.create(httpAttributesGetter));
     }
+
     INSTRUMENTER = builder.buildClientInstrumenter(HttpHeaderSetter.INSTANCE);
   }
 

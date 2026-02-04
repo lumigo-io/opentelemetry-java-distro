@@ -12,22 +12,22 @@ import com.rabbitmq.client.GetResponse;
 import io.lumigo.javaagent.instrumentation.rabbitmq.GetResponseBodyAttributeExtractor;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.context.ContextKey;
+import io.opentelemetry.instrumentation.api.incubator.semconv.messaging.MessageOperation;
+import io.opentelemetry.instrumentation.api.incubator.semconv.messaging.MessagingAttributesExtractor;
+import io.opentelemetry.instrumentation.api.incubator.semconv.messaging.MessagingAttributesGetter;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanKindExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.messaging.MessageOperation;
-import io.opentelemetry.instrumentation.api.instrumenter.messaging.MessagingAttributesExtractor;
-import io.opentelemetry.instrumentation.api.instrumenter.messaging.MessagingAttributesGetter;
 import io.opentelemetry.instrumentation.api.internal.PropagatorBasedSpanLinksExtractor;
+import io.opentelemetry.javaagent.bootstrap.internal.AgentInstrumentationConfig;
 import io.opentelemetry.javaagent.bootstrap.internal.ExperimentalConfig;
-import io.opentelemetry.javaagent.bootstrap.internal.InstrumentationConfig;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class RabbitSingletons {
 
   private static final boolean CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES =
-      InstrumentationConfig.get()
+      AgentInstrumentationConfig.get()
           .getBoolean("otel.instrumentation.rabbitmq.experimental-span-attributes", false);
   private static final String instrumentationName = "io.opentelemetry.rabbitmq-2.7";
   private static final Instrumenter<ChannelAndMethod, Void> channelInstrumenter =
@@ -51,7 +51,6 @@ public final class RabbitSingletons {
     return deliverInstrumenter;
   }
 
-  @SuppressWarnings("deprecation") // have to use the deprecated Net*AttributesExtractor for now
   private static Instrumenter<ChannelAndMethod, Void> createChannelInstrumenter() {
     return Instrumenter.<ChannelAndMethod, Void>builder(
             GlobalOpenTelemetry.get(), instrumentationName, ChannelAndMethod::getMethod)
@@ -59,7 +58,7 @@ public final class RabbitSingletons {
             buildMessagingAttributesExtractor(
                 RabbitChannelAttributesGetter.INSTANCE, MessageOperation.PUBLISH))
         .addAttributesExtractor(
-            io.opentelemetry.instrumentation.api.instrumenter.net.NetClientAttributesExtractor.create(new RabbitChannelNetAttributesGetter()))
+            io.opentelemetry.instrumentation.api.semconv.network.NetworkAttributesExtractor.create(new RabbitChannelNetAttributesGetter()))
         .addContextCustomizer(
             (context, request, startAttributes) ->
                 context.with(CHANNEL_AND_METHOD_CONTEXT_KEY, new RabbitChannelAndMethodHolder()))
@@ -68,13 +67,12 @@ public final class RabbitSingletons {
                 channelAndMethod.getMethod().equals("Channel.basicPublish") ? PRODUCER : CLIENT);
   }
 
-  @SuppressWarnings("deprecation") // have to use the deprecated Net*AttributesExtractor for now
   private static Instrumenter<ReceiveRequest, GetResponse> createReceiveInstrumenter() {
     List<AttributesExtractor<ReceiveRequest, GetResponse>> extractors = new ArrayList<>();
     extractors.add(
         buildMessagingAttributesExtractor(
             RabbitReceiveAttributesGetter.INSTANCE, MessageOperation.RECEIVE));
-    extractors.add(io.opentelemetry.instrumentation.api.instrumenter.net.NetClientAttributesExtractor.create(new RabbitReceiveNetAttributesGetter()));
+    extractors.add(io.opentelemetry.instrumentation.api.semconv.network.NetworkAttributesExtractor.create(new RabbitReceiveNetAttributesGetter()));
     if (CAPTURE_EXPERIMENTAL_SPAN_ATTRIBUTES) {
       extractors.add(new RabbitReceiveExperimentalAttributesExtractor());
     }

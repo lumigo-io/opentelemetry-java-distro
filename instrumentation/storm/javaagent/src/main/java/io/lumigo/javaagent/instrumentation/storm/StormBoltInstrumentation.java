@@ -29,7 +29,8 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.ThreadIncubatingAttributes;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -66,9 +67,10 @@ public class StormBoltInstrumentation implements TypeInstrumentation {
       final Span span = currentSpan();
       span.setAttribute(StormUtils.STORM_TYPE_KEY, "bolt");
       span.setAttribute(StormUtils.COMPONENT_NAME_KEY, StormUtils.getComponentName());
-      span.setAttribute(SemanticAttributes.THREAD_NAME, StormUtils.getThreadName());
-      span.setAttribute(SemanticAttributes.MESSAGING_SYSTEM, "storm");
-      span.setAttribute(SemanticAttributes.MESSAGING_MESSAGE_ID, StormUtils.getMessageId(tuple));
+      span.setAttribute(ThreadIncubatingAttributes.THREAD_NAME, StormUtils.getThreadName());
+      span.setAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "storm");
+      span.setAttribute(
+          MessagingIncubatingAttributes.MESSAGING_MESSAGE_ID, StormUtils.getMessageId(tuple));
       span.setAttribute(
           AttributeKey.stringArrayKey(StormUtils.STORM_TUPLE_VALUES_KEY),
           StormUtils.getValues(tuple));

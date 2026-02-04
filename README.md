@@ -89,8 +89,8 @@ The Lumigo OpenTelemetry Distro for Java additionally supports the following con
   * `LUMIGO_SECRET_MASKING_REGEX_ENVIRONMENT` applies secret redaction to process environment variables (that is, the content of `System.getenv()`)
 * `LUMIGO_TAG=<value>`: Adds the tag value as an attribute to all spans; this is useful to identify the source of the telemetry in Lumigo. See [here](https://docs.lumigo.io/docs/tags) for details.
 * `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX='["regex1", "regex2"]'`: This option enables the filtering of client and server endpoints that match the supplied regular expressions. By default, this distribution applies the following regular expressions: `[".*/health.*", ".*/actuator.*"]`. More fine-grained settings can be applied via the following environment variables, which will override `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX` for a specific span type:
-  * `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_SERVER` applies the filter to server spans only. Matching is performed against the following attributes on a span: `url.path`, and `http.target`[^1].
-  * `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_CLIENT` applies the filter to client spans only. Matching is performed against the following attributes on a span: `url.full`, and `http.url`[^2].
+  * `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_SERVER` applies the filter to server spans only. Matching is performed against the following attributes on a span: `url.path` (stable in OTel 2.x), and `http.target` (deprecated, for backward compatibility)[^1].
+  * `LUMIGO_FILTER_HTTP_ENDPOINTS_REGEX_CLIENT` applies the filter to client spans only. Matching is performed against the following attributes on a span: `url.full` (stable in OTel 2.x), and `http.url` (deprecated, for backward compatibility)[^2].
 * `LUMIGO_ENABLE_LOGS=true`: Turns on the logging instrumentation to capture log-records, for logging libraries that support open-telemetry (e.g. Logback). By default, the logging instrumentation is disabled.
 * `LUMIGO_ENABLE_TRACES=true`: Turns on the tracing instrumentation. By default, the tracing instrumentation is enabled.
 * `LUMIGO_REDUCED_MONGO_INSTRUMENTATION=true`: Reduces the amount of data collected by the MongoDB [instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/mongo), such as not collecting the `db.operation` attribute `isMaster`. By default, the MongoDB instrumentation reduces the amount of data collected.
@@ -98,8 +98,54 @@ The Lumigo OpenTelemetry Distro for Java additionally supports the following con
 
 For more configuration options, see the [Upstream Agent Configuration](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/).
 
-[^1] The `http.target` attribute in the Trace HTTP Semantic Conventions is deprecated and replaced by `url.path`.
-[^2] The `http.url` attribute in the Trace HTTP Semantic Conventions is deprecated and replaced by `url.full`.
+## OpenTelemetry 2.x Breaking Changes
+
+Starting from version 0.20.0, this distro is based on OpenTelemetry Java Instrumentation 2.11.0, which includes breaking changes from upstream OpenTelemetry 2.0.
+
+### HTTP Semantic Convention Changes
+
+Span attribute names have changed. If you have custom dashboards or queries, update them:
+
+| Old Attribute (1.x) | New Attribute (2.x) |
+|---------------------|---------------------|
+| `http.method` | `http.request.method` |
+| `http.status_code` | `http.response.status_code` |
+| `http.url` | `url.full` |
+| `http.target` | `url.path` |
+| `http.scheme` | `url.scheme` |
+| `net.peer.name` / `net.peer.port` | `server.address` / `server.port` |
+
+Database attributes: `db.statement` is now `db.query.text` or `db.operation.name`.
+
+### Controller Spans Disabled by Default
+
+Spring WebMVC and similar frameworks now generate fewer spans. To restore previous behavior:
+
+```bash
+OTEL_INSTRUMENTATION_COMMON_EXPERIMENTAL_CONTROLLER_TELEMETRY_ENABLED=true
+OTEL_INSTRUMENTATION_COMMON_EXPERIMENTAL_VIEW_TELEMETRY_ENABLED=true
+```
+
+### JVM Metrics Renamed
+
+| Old Metric (1.x) | New Metric (2.x) |
+|------------------|------------------|
+| `process.runtime.jvm.memory.usage` | `jvm.memory.used` |
+| `process.runtime.jvm.gc.duration` | `jvm.gc.duration` |
+| `process.runtime.jvm.threads.count` | `jvm.threads.count` |
+
+Full list: [OpenTelemetry 2.0 Release Notes](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v2.0.0)
+
+### Lettuce Connection Spans
+
+Redis connection spans are now disabled by default. To enable:
+
+```bash
+OTEL_INSTRUMENTATION_LETTUCE_CONNECTION_TELEMETRY_ENABLED=true
+```
+
+[^1]: The `http.target` attribute was deprecated in OpenTelemetry 1.x and is no longer emitted in 2.x. Use `url.path` instead. The Lumigo distro filters check both attributes for backward compatibility.
+[^2]: The `http.url` attribute was deprecated in OpenTelemetry 1.x and is no longer emitted in 2.x. Use `url.full` instead. The Lumigo distro filters check both attributes for backward compatibility.
 
 ### Execution Tags
 
@@ -290,7 +336,7 @@ The Lumigo OpenTelemetry Distro will automatically create the following OpenTele
 * The attributes from the default resource:
   * `telemetry.sdk.language`: `java`
   * `telemetry.sdk.name`: `opentelemetry`
-  * `telemetry.sdk.version`: depends on the version of the `io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom` included in the [dependencies](./build.gradle)
+  * `telemetry.sdk.version`: depends on the version of the `io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom` included in the [dependencies](./build.gradle) (currently 1.45.0 for SDK, 2.11.0 for Java agent)
 
 * The `lumigo.distro.version` containing the version of the Lumigo OpenTelemetry Distro for Java
 
@@ -343,4 +389,4 @@ The Lumigo OpenTelemetry Java distro automatically configures a [`BatchSpanProce
 * `otel.bsp.max.export.batch.size`: `100` (maximum amount of spans queued before flushing; when the limit is passed, a flush will occur) 
 * `otel.bsp.export.timeout`: `1s` (timeout for flushing data to Lumigo)
 
-The metrics and logs exporters are disabled (`otel.logs.exporter` and `otel.metrics.exporter` are set to `none`) as [Lumigo OpenTelemetry endpoint](https://docs.lumigo.io/docs/lumigo-opentelemetry-endpoint) currently does not provide support for the `/v1/metrics` and `/v1/logs` endpoints.
+The metrics and logs exporters are disabled (`otel.logs.exporter` and `otel.metrics.exporter` are set to `none`) as [Lumigo OpenTelemetry endpoint](https://docs.lumigo.io/docs/lumigo-opentelemetry-endpoint) currently does not provide support for the `/v1/metrics` and `/v1/logs` endpoints. Note: In OpenTelemetry 2.x, the logs exporter is enabled by default upstream, but the Lumigo distro explicitly disables it to prevent unnecessary overhead.

@@ -17,7 +17,7 @@
  */
 package io.lumigo.javaagent.instrumentation.jdbc;
 
-import io.opentelemetry.javaagent.bootstrap.internal.InstrumentationConfig;
+import io.opentelemetry.javaagent.bootstrap.internal.AgentInstrumentationConfig;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -27,13 +27,9 @@ import java.util.List;
 public final class SqlUtility {
   public static final String JSON_TRUNCATION_MARKER = "✂";
 
-  public static final int ATTRIBUTE_VALUE_MAX_LENGTH;
-
-  static {
-    ATTRIBUTE_VALUE_MAX_LENGTH =
-        InstrumentationConfig.get()
-            .getInt("otel.instrumentation.jdbc.attribute-value-max-length", Integer.MAX_VALUE);
-  }
+  public static final int ATTRIBUTE_VALUE_MAX_LENGTH =
+      AgentInstrumentationConfig.get()
+          .getInt("otel.instrumentation.jdbc.attribute-value-max-length", Integer.MAX_VALUE);
 
   private SqlUtility() {}
 

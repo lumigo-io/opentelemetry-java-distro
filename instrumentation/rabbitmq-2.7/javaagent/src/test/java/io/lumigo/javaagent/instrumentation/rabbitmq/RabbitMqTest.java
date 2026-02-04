@@ -31,7 +31,7 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes;
 import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -137,7 +137,7 @@ public class RabbitMqTest {
                         span.hasName("exchange.declare")
                             .hasKind(SpanKind.CLIENT)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "exchange.declare");
                       },
@@ -145,7 +145,7 @@ public class RabbitMqTest {
                         span.hasName("queue.declare")
                             .hasKind(SpanKind.CLIENT)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "queue.declare");
                       },
@@ -153,25 +153,25 @@ public class RabbitMqTest {
                         span.hasName("queue.bind")
                             .hasKind(SpanKind.CLIENT)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(AttributeKey.stringKey("rabbitmq.command"), "queue.bind");
                       },
                       span -> {
                         span.hasName(exchangeName + " publish")
                             .hasKind(SpanKind.PRODUCER)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
+                                MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY,
+                                MessagingIncubatingAttributes.MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY,
                                 routingKey)
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "basic.publish")
                             .hasAttribute(
                                 AttributeKey.stringKey("messaging.message.payload"), JSON_BODY)
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES,
+                                MessagingIncubatingAttributes.MESSAGING_MESSAGE_BODY_SIZE,
                                 (long) JSON_BODY.getBytes().length);
                       });
             },
@@ -187,8 +187,8 @@ public class RabbitMqTest {
                             .hasKind(SpanKind.CONSUMER)
                             .hasParent(trace.getSpan(0))
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
-                            .hasAttribute(SemanticAttributes.MESSAGING_OPERATION, "receive")
+                                MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_OPERATION, "receive")
                             .hasAttribute(
                                 AttributeKey.stringKey("messaging.message.payload"), JSON_BODY)
                             .hasAttribute(AttributeKey.stringKey("rabbitmq.command"), "basic.get")
@@ -230,7 +230,7 @@ public class RabbitMqTest {
                         span.hasName("queue.declare")
                             .hasKind(SpanKind.CLIENT)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "queue.declare");
                       },
@@ -238,15 +238,15 @@ public class RabbitMqTest {
                         span.hasName("<default> publish")
                             .hasKind(SpanKind.PRODUCER)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_DESTINATION_NAME, "<default>")
+                                MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, "<default>")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "basic.publish")
                             .hasAttribute(
                                 AttributeKey.stringKey("messaging.message.payload"), JSON_BODY)
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES,
+                                MessagingIncubatingAttributes.MESSAGING_MESSAGE_BODY_SIZE,
                                 (long) JSON_BODY.getBytes().length);
                       });
             },
@@ -262,8 +262,8 @@ public class RabbitMqTest {
                             .hasKind(SpanKind.CONSUMER)
                             .hasParent(trace.getSpan(0))
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_DESTINATION_NAME, "<default>")
-                            .hasAttribute(SemanticAttributes.MESSAGING_OPERATION, "receive")
+                                MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, "<default>")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_OPERATION, "receive")
                             .hasAttribute(
                                 AttributeKey.stringKey("messaging.message.payload"), JSON_BODY)
                             .hasAttribute(AttributeKey.stringKey("rabbitmq.command"), "basic.get")
@@ -312,7 +312,7 @@ public class RabbitMqTest {
                         span.hasName("exchange.declare")
                             .hasKind(SpanKind.CLIENT)
                             .hasNoParent()
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "exchange.declare");
                       });
@@ -325,7 +325,7 @@ public class RabbitMqTest {
                         span.hasName("queue.declare")
                             .hasKind(SpanKind.CLIENT)
                             .hasNoParent()
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "queue.declare");
                       });
@@ -338,7 +338,7 @@ public class RabbitMqTest {
                         span.hasName("queue.bind")
                             .hasKind(SpanKind.CLIENT)
                             .hasNoParent()
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(AttributeKey.stringKey("rabbitmq.command"), "queue.bind");
                       });
             },
@@ -350,7 +350,7 @@ public class RabbitMqTest {
                         span.hasName("basic.consume")
                             .hasKind(SpanKind.CLIENT)
                             .hasNoParent()
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "basic.consume");
                       });
@@ -363,31 +363,31 @@ public class RabbitMqTest {
                         span.hasName(exchangeName + " publish")
                             .hasKind(SpanKind.PRODUCER)
                             .hasNoParent()
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
+                                MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "basic.publish")
                             .hasAttribute(
                                 AttributeKey.stringKey("messaging.message.payload"), JSON_BODY)
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES,
+                                MessagingIncubatingAttributes.MESSAGING_MESSAGE_BODY_SIZE,
                                 (long) JSON_BODY.getBytes().length);
                       },
                       span -> {
                         span.hasName("<generated> process")
                             .hasKind(SpanKind.CONSUMER)
                             .hasParent(trace.getSpan(0))
-                            .hasAttribute(SemanticAttributes.MESSAGING_SYSTEM, "rabbitmq")
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_SYSTEM, "rabbitmq")
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
-                            .hasAttribute(SemanticAttributes.MESSAGING_OPERATION, "process")
+                                MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME, exchangeName)
+                            .hasAttribute(MessagingIncubatingAttributes.MESSAGING_OPERATION, "process")
                             .hasAttribute(
                                 AttributeKey.stringKey("rabbitmq.command"), "basic.deliver")
                             .hasAttribute(
                                 AttributeKey.stringKey("messaging.message.payload"), JSON_BODY)
                             .hasAttribute(
-                                SemanticAttributes.MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES,
+                                MessagingIncubatingAttributes.MESSAGING_MESSAGE_BODY_SIZE,
                                 (long) JSON_BODY.getBytes().length);
                       });
             });

@@ -19,9 +19,9 @@ package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v5_0;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.semconv.HttpAttributes;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
-import io.opentelemetry.semconv.SemanticAttributes;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -86,18 +86,18 @@ public class JsonChunkedContentTest {
                       span -> span
                           .hasName("GET")
                           .hasKind(SpanKind.CLIENT)
-                          .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
                               List.of("application/json"))
                           .hasAttribute(AttributeKey.stringKey("http.request.body"), "null")
-                          .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("content-type"),
                               List.of("application/json"))
-                          .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("transfer-encoding"),
                               List.of("chunked"))
                           // Buffer size differences between local and GH Actions prevent us from
                           // using this assertion as response content differs
                           // .hasAttribute(AttributeKey.stringKey("http.response.body"), jsonBody)
-                          .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L)
                   ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(jsonBody);
@@ -149,18 +149,18 @@ public class JsonChunkedContentTest {
                         span -> span
                             .hasName("GET")
                             .hasKind(SpanKind.CLIENT)
-                            .hasAttribute(SemanticAttributes.HTTP_METHOD, "GET")
-                            .hasAttribute(AttributeKey.stringArrayKey("http.request.header.content_type"),
+                            .hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET")
+                          .hasAttribute(HttpAttributes.HTTP_REQUEST_HEADER.getAttributeKey("content-type"),
                                 List.of("application/json"))
                             .hasAttribute(AttributeKey.stringKey("http.request.body"), requestBody)
-                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.content_type"),
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("content-type"),
                                 List.of("application/json"))
-                            .hasAttribute(AttributeKey.stringArrayKey("http.response.header.transfer_encoding"),
+                          .hasAttribute(HttpAttributes.HTTP_RESPONSE_HEADER.getAttributeKey("transfer-encoding"),
                                 List.of("chunked"))
                             // Buffer size differences between local and GH Actions prevent us from
                             // using this assertion as response content differs
                             // .hasAttribute(AttributeKey.stringKey("http.response.body"), responseBody)
-                            .hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L)
+                            .hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L)
                     ));
 
     Assertions.assertThat(responsePayload.get()).isEqualTo(responseBody);

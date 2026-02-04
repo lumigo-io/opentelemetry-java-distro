@@ -25,7 +25,8 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.instrumentation.testing.junit.AgentInstrumentationExtension;
 import io.opentelemetry.instrumentation.testing.junit.InstrumentationExtension;
 import io.opentelemetry.sdk.testing.assertj.TracesAssert;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.DbIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,11 +87,11 @@ class LettuceClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "foo bar"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_ADDRESS, "127.0.0.1"),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_PORT, port))));
   }
 
   @Test
@@ -111,22 +112,22 @@ class LettuceClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "foo bar"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "OK"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_ADDRESS, "127.0.0.1"),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_PORT, port))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
                         span.hasName("GET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "foo"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "bar"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_ADDRESS, "127.0.0.1"),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_PORT, port))));
   }
 
   @Test
@@ -145,19 +146,19 @@ class LettuceClientTest {
                         span.hasName("SET")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
-                                equalTo(SemanticAttributes.DB_STATEMENT, "foo bar"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_STATEMENT, "foo bar"),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_ADDRESS, "127.0.0.1"),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_PORT, port))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
                         span.hasName("RANDOMKEY")
                             .hasKind(SpanKind.CLIENT)
                             .hasAttributesSatisfying(
-                                equalTo(SemanticAttributes.DB_SYSTEM, "redis"),
+                                equalTo(DbIncubatingAttributes.DB_SYSTEM, "redis"),
                                 equalTo(AttributeKey.stringKey("db.response.body"), "foo"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_NAME, "localhost"),
-                                equalTo(SemanticAttributes.NET_SOCK_PEER_PORT, port))));
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_ADDRESS, "127.0.0.1"),
+                                equalTo(NetworkIncubatingAttributes.NETWORK_PEER_PORT, port))));
   }
 }
