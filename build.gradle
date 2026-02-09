@@ -2,7 +2,7 @@
 buildscript {
   repositories {
     maven {
-      url "https://plugins.gradle.org/m2/"
+      url = "https://plugins.gradle.org/m2/"
     }
     maven {
       name = "sonatype"
@@ -16,7 +16,7 @@ buildscript {
   }
 }
 
-group 'io.lumigo.javaagent'
+group = 'io.lumigo.javaagent'
 
 subprojects {
   version = rootProject.version
@@ -45,9 +45,9 @@ subprojects {
 
   tasks.withType(Test) {
     testLogging {
-      exceptionFormat "full"
+      exceptionFormat = "full"
       events "started", "skipped", "passed", "failed"
-      showStandardStreams true
+      showStandardStreams = true
     }
   }
 
