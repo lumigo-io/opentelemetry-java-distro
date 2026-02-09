@@ -92,7 +92,7 @@ public class TestAppExtension
   @Retention(RetentionPolicy.RUNTIME)
   @java.lang.annotation.Target(ElementType.PARAMETER)
   public @interface Configuration {
-    String jdkVersion() default "8";
+    String jdkVersion() default "17";
 
     EnvVar[] env();
   }
