@@ -11,6 +11,9 @@ dependencies {
   implementation("io.grpc:grpc-protobuf:${versions.grpc16}")
   implementation("io.grpc:grpc-services:${versions.grpc16}")
   implementation("io.grpc:grpc-stub:${versions.grpc16}")
+
+  // Required for Java 11+ as javax.annotation.Generated was removed from JDK
+  compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 }
 
 protobuf {
