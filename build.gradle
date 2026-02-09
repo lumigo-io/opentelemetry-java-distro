@@ -124,6 +124,7 @@ subprojects {
     testImplementation(enforcedPlatform("org.junit:junit-bom:${versions.junit}"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")  // Required for Gradle 9.x
     testImplementation("org.junit.jupiter:junit-jupiter-params")
   }
 
