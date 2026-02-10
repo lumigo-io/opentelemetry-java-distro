@@ -28,6 +28,7 @@ import io.lumigo.instrumentation.core.CharBufferHolder;
 import io.lumigo.instrumentation.core.SpanAndRelatedObjectHolder;
 import io.opentelemetry.instrumentation.api.util.VirtualField;
 import io.opentelemetry.javaagent.bootstrap.CallDepth;
+import io.opentelemetry.javaagent.bootstrap.Java8BytecodeBridge;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import io.opentelemetry.javaagent.instrumentation.servlet.v3_0.Servlet3Accessor;
@@ -129,6 +130,15 @@ public class Servlet30AsyncInstrumentation implements TypeInstrumentation {
       requestVirtualField.set(servletRequest, requestSpanHolder);
 
       Servlet3Accessor accessor = Servlet3Accessor.INSTANCE;
+      // OpenTelemetry 2.15.0 Breaking Change:
+      // ServletHelper.getAsyncListenerResponse() now takes Context instead of HttpServletRequest.
+      // OpenTelemetry moved from storing async listener state in request attributes to storing it
+      // in the OpenTelemetry Context (their standard way of propagating tracing metadata).
+      //
+      // Java8BytecodeBridge.currentContext() provides safe access to the current OpenTelemetry
+      // Context from bytecode instrumentation. Despite the name, it's NOT about Java 8
+      // compatibility - it's a utility for accessing Context from Byte Buddy @Advice methods
+      // without classloader conflicts.
       accessor.addRequestAsyncListener(
           (HttpServletRequest) servletRequest,
           new AsyncResponseBodyListener(
@@ -140,7 +150,7 @@ public class Servlet30AsyncInstrumentation implements TypeInstrumentation {
               writerVirtualField,
               (HttpServletRequest) servletRequest),
           Servlet3Singletons.helper()
-              .getAsyncListenerResponse((HttpServletRequest) servletRequest));
+              .getAsyncListenerResponse(Java8BytecodeBridge.currentContext()));
       accessor.setRequestAttribute(
           (HttpServletRequest) servletRequest, LUMIGO_SERVLET_3_ASYNC_LISTENER_PRESENCE, true);
     }
