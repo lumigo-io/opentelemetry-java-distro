@@ -157,10 +157,11 @@ class GrpcTest extends AbstractGrpcTest {
           ListenableFuture<Helloworld.Response> future =
               Futures.transform(
                   stub.sayHello(Helloworld.Request.newBuilder().setName("a name").build()),
-                  resp -> {
-                    instrumentation.runWithSpan("child", () -> {});
-                    return resp;
-                  },
+                  (com.google.common.base.Function<Helloworld.Response, Helloworld.Response>)
+                      resp -> {
+                        instrumentation.runWithSpan("child", () -> {});
+                        return resp;
+                      },
                   MoreExecutors.directExecutor());
           try {
             response.set(Futures.getUnchecked(future));

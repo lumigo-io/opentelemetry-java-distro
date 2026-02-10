@@ -71,7 +71,7 @@ subprojects {
       servlet30                  : "3.0.1",
       springwebmvc31             : "3.1.0.RELEASE",
       springboot                 : "2.7.14",
-      storm                      : "2.6.0",
+      storm                      : "2.8.3",
       lettuce51                  : "6.3.2.RELEASE",
       netty41                    : "4.1.0.Final",
 
