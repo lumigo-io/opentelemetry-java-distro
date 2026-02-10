@@ -27,7 +27,7 @@ func TestSpringboot(t *testing.T) {
 		Setup(FeatureEnvFn(envfuncs.CreateNamespace(namespace))).
 		Teardown(FeatureEnvFn(envfuncs.DeleteNamespace(namespace))).
 		Setup(FeatureEnvFn(SetupOtelBackend(namespace))).
-		Setup(FeatureEnvFn(SetupSpringboot(namespace, 8, map[string]string{}))).
+		Setup(FeatureEnvFn(SetupSpringboot(namespace, 17, map[string]string{}))).
 		WithSetup("Call the service", func(ctx context.Context, t *testing.T, c *envconf.Config) context.Context {
 			require.NoError(t, greet(), "failed to GET /greeting")
 			return ctx
