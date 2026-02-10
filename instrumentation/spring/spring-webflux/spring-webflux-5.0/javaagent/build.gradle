@@ -50,7 +50,10 @@ dependencies {
   // Instrumentations for testing
   testInstrumentation project(":instrumentation:netty:netty-4.1:javaagent")
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.1:${versions.opentelemetryJavaagentAlpha}")
-  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4-common:${versions.opentelemetryJavaagentAlpha}")
+  // OpenTelemetry 2.14.0 Breaking Change:
+  // Artifact renamed: opentelemetry-javaagent-netty-4-common → opentelemetry-javaagent-netty-common-4.0
+  // The old artifact name only exists up to 2.13.3-alpha, the new versioned name starts from 2.14.0-alpha
+  testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-common-4.0:${versions.opentelemetryJavaagentAlpha}")
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-spring-webflux-5.0:${versions.opentelemetryJavaagentAlpha}")
 
 }
