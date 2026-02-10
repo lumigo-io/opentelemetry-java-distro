@@ -87,7 +87,7 @@ final class SpanKindEntryDeserializer extends JsonDeserializer<SpanKind> {
   public SpanKind deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
     JsonNode node = p.getCodec().readTree(p);
     switch (node.asInt()) {
-        // Unspecified
+      // Unspecified
       case 0:
         return null;
       case 1:
