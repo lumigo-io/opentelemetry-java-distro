@@ -54,7 +54,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: '3.11'
       - run: mkdir versions_artifacts
       - uses: actions/download-artifact@v4
         continue-on-error: true
@@ -94,4 +94,4 @@ jobs:
           body: ${{ env.new_versions }}
           base: main
           labels: version-testing, automerge
-          reviewers: GuyMoses,nadav3396
+          reviewers: GuyMoses,eugene-lumigo
