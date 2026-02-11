@@ -130,7 +130,6 @@ public class Servlet30AsyncInstrumentation implements TypeInstrumentation {
       requestVirtualField.set(servletRequest, requestSpanHolder);
 
       Servlet3Accessor accessor = Servlet3Accessor.INSTANCE;
-      // OpenTelemetry 2.15.0 Breaking Change:
       // ServletHelper.getAsyncListenerResponse() now takes Context instead of HttpServletRequest.
       // OpenTelemetry moved from storing async listener state in request attributes to storing it
       // in the OpenTelemetry Context (their standard way of propagating tracing metadata).

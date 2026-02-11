@@ -29,9 +29,7 @@ dependencies {
 
 // Instrumentations for testing
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-4.1:${versions.opentelemetryJavaagentAlpha}")
-  // OpenTelemetry 2.14.0 Breaking Change:
   // Artifact renamed: opentelemetry-javaagent-netty-4-common → opentelemetry-javaagent-netty-common-4.0
-  // The old artifact name only exists up to 2.13.3-alpha, the new versioned name starts from 2.14.0-alpha
   testInstrumentation("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-netty-common-4.0:${versions.opentelemetryJavaagentAlpha}")
 
   testImplementation("io.netty:netty-codec-http:${versions.netty41}")
