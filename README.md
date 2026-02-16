@@ -252,7 +252,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 
 | Instrumentation | Package | Supported Versions |
 | --- | --- | --- |
-| apache-httpclient-5.0 | [apache-httpclient-5.0](https://central.sonatype.com/artifact/org.apache.httpcomponents.client5/httpclient5) | 5.0.1~5.4.1 |
+| apache-httpclient-5.0 | [apache-httpclient-5.0](https://central.sonatype.com/artifact/org.apache.httpcomponents.client5/httpclient5) | 5.0.1~5.5.2 |
 | | | 5.0 |
 | | | 5.0-alpha1 |
 | | | 5.0-alpha2 |
@@ -273,11 +273,17 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.4-alpha1 |
 | | | 5.4-alpha2 |
 | | | 5.4-beta1 |
+| | | 5.5 |
+| | | 5.5-alpha1 |
+| | | 5.6 |
+| | | 5.6-alpha1 |
 | aws-sdk-1.11 | [aws-sdk-1.11](https://central.sonatype.com/artifact/com.amazonaws/aws-java-sdk-core) | 1.11.106~1.12.780 |
-| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.29.43 |
-| grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.69.0 |
+| aws-sdk-2.2 | [aws-sdk-2.2](https://central.sonatype.com/artifact/software.amazon.awssdk/aws-core) | 2.2.0~2.34.0 |
+| grpc-1.6 | [grpc-1.6](https://central.sonatype.com/artifact/io.grpc/grpc-core) | 1.6.0~1.73.0 |
 | java-http-client | [java-http-client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/package-summary.html) | 11 |
 | | | 17 |
+| | | 21 |
+| | | 25 |
 | jdbc | [jdbc](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html) | 11 |
 | | | 17 |
 | jedis-1.4 | [jedis-1.4](https://central.sonatype.com/artifact/redis.clients/jedis) | 1.4.0~1.5.2 |
@@ -302,11 +308,11 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 4.1.80.Final~4.1.90.Final |
 | | | 4.1.92.Final~4.1.101.Final |
 | | | 4.1.103.Final~4.2.0.Alpha2 |
-| | | 4.2.0.Alpha4~4.2.0.RC1 |
+| | | 4.2.0.Alpha4~4.2.1.Final |
 | rabbitmq-2.7 | [rabbitmq-2.7](https://central.sonatype.com/artifact/com.rabbitmq/amqp-client) | 2.7.0 |
 | | | 3.1.2~3.6.6 |
 | | | 4.0.0~4.12.0 |
-| | | 5.0.0~5.24.0 |
+| | | 5.0.0~5.25.0 |
 | servlet-3.0 | [servlet-3.0](https://central.sonatype.com/artifact/javax.servlet/javax.servlet-api) | 3.0.1~3.1.0 |
 | | | 4.0.0~4.0.1 |
 | | | 3.1-b01 |
@@ -322,8 +328,9 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | spring-webmvc-3.1 | [spring-webmvc-3.1](https://central.sonatype.com/artifact/org.springframework/spring-webmvc) | 3.1.0.RELEASE~3.2.18.RELEASE |
 | | | 4.0.0.RELEASE~4.3.30.RELEASE |
 | | | 5.0.0.RELEASE~5.3.31 |
-| | | 6.0.0~6.2.1 |
-| storm | [storm](https://central.sonatype.com/artifact/org.apache.storm/storm-client) | 2.0.0~2.7.1 |
+| | | 6.0.0~6.2.8 |
+| | | 7.0.0-M1~7.0.0-M6 |
+| storm | [storm](https://central.sonatype.com/artifact/org.apache.storm/storm-client) | 2.0.0~2.8.3 |
 
 ## Baseline setup
 
