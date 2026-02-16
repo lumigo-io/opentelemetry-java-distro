@@ -33,7 +33,7 @@ func FeatureEnvFn(fn env.Func) features.Func {
 }
 
 func targetImage(jdk int) string {
-	return fmt.Sprintf("ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-spring-boot:jdk%d-20211213.1570880324", jdk)
+	return fmt.Sprintf("ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-spring-boot:jdk%d-20260126.21350382958", jdk)
 }
 func SetupSpringboot(ns string, jdk int, extraEnvs map[string]string) env.Func {
 	return SetupManifest("config/springboot.yaml", ns, "", decoder.MutateOption(func(obj k8s.Object) error {

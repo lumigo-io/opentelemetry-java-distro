@@ -13,7 +13,7 @@ jobs:
       matrix:
         # NOTE: if these are updated, don't forget to
         # update the download-artifacts versions as well
-        jdk_version: [ 11, 17, 21]
+        jdk_version: [ 17, 21, 25]
     name: check-new-versions-of-instrumented-packages
     steps:
       - uses: actions/checkout@v4
@@ -54,13 +54,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: '3.11'
       - run: mkdir versions_artifacts
-      - uses: actions/download-artifact@v4
-        continue-on-error: true  # when there aren't changes the artifact won't be uploaded and this step will fail
-        with:
-          name: 11
-          path: versions_artifacts/11
       - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
@@ -71,6 +66,11 @@ jobs:
         with:
           name: 21
           path: versions_artifacts/21
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: 25
+          path: versions_artifacts/25
       - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: PYTHONPATH=${PYTHONPATH}:$(pwd)/.github python3 -m gather_version_artifacts
       - run: git --no-pager diff
@@ -94,4 +94,4 @@ jobs:
           body: ${{ env.new_versions }}
           base: main
           labels: version-testing, automerge
-          reviewers: GuyMoses,nadav3396
+          reviewers: GuyMoses,eugene-lumigo

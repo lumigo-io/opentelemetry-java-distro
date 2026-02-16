@@ -2,7 +2,7 @@
 buildscript {
   repositories {
     maven {
-      url "https://plugins.gradle.org/m2/"
+      url = "https://plugins.gradle.org/m2/"
     }
     maven {
       name = "sonatype"
@@ -10,13 +10,13 @@ buildscript {
     }
   }
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.19.0"
-    classpath "com.gradleup.shadow:shadow-gradle-plugin:8.3.5"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:8.0.0"
+    classpath "com.gradleup.shadow:shadow-gradle-plugin:8.3.9"
     classpath "io.opentelemetry.instrumentation:gradle-plugins:2.10.0-alpha"
   }
 }
 
-group 'io.lumigo.javaagent'
+group = 'io.lumigo.javaagent'
 
 subprojects {
   version = rootProject.version
@@ -45,20 +45,20 @@ subprojects {
 
   tasks.withType(Test) {
     testLogging {
-      exceptionFormat "full"
+      exceptionFormat = "full"
       events "started", "skipped", "passed", "failed"
-      showStandardStreams true
+      showStandardStreams = true
     }
   }
 
   ext {
     versions = [
-      opentelemetrySdk           : "1.45.0",
-      opentelemetryContrib       : "1.45.0-alpha",
-      opentelemetryJavaagent     : "2.11.0",
-      opentelemetryJavaagentAlpha: "2.11.0-alpha",
-      opentelemetrySemconv       : "1.30.0",
-      opentelemetrySemconvIncubating: "1.30.0-alpha",
+      opentelemetrySdk           : "1.49.0",
+      opentelemetryContrib       : "1.49.0-alpha",
+      opentelemetryJavaagent     : "2.15.0",
+      opentelemetryJavaagentAlpha: "2.15.0-alpha",
+      opentelemetrySemconv       : "1.32.0",
+      opentelemetrySemconvIncubating: "1.32.0-alpha",
 
       // Instrumentation versions
       apachehttpclient50         : "5.0",
@@ -71,7 +71,7 @@ subprojects {
       servlet30                  : "3.0.1",
       springwebmvc31             : "3.1.0.RELEASE",
       springboot                 : "2.7.14",
-      storm                      : "2.6.0",
+      storm                      : "2.8.3",
       lettuce51                  : "6.3.2.RELEASE",
       netty41                    : "4.1.0.Final",
 
@@ -124,6 +124,7 @@ subprojects {
     testImplementation(enforcedPlatform("org.junit:junit-bom:${versions.junit}"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")  // Required for Gradle 9.x
     testImplementation("org.junit.jupiter:junit-jupiter-params")
   }
 
@@ -133,7 +134,7 @@ subprojects {
     }
 
     compileJava {
-      options.release.set(8)
+      options.release.set(17)
     }
   }
 }

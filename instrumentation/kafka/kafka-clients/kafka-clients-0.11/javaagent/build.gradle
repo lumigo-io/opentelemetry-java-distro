@@ -14,7 +14,8 @@ dependencies {
 
   compileOnly("org.apache.kafka:kafka-clients:${versions.kafkaclients011}")
   compileOnly("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-kafka-clients-0.11-bootstrap:${versions.opentelemetryJavaagentAlpha}")
-  compileOnly("io.opentelemetry.instrumentation:opentelemetry-kafka-clients-common:${versions.opentelemetryJavaagentAlpha}")
+  // Artifact renamed: opentelemetry-kafka-clients-common → opentelemetry-kafka-clients-common-0.11
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-kafka-clients-common-0.11:${versions.opentelemetryJavaagentAlpha}")
   compileOnly("io.opentelemetry.javaagent.instrumentation:opentelemetry-javaagent-kafka-clients-0.11:${versions.opentelemetryJavaagentAlpha}")
 
 // Instrumentation for testing
