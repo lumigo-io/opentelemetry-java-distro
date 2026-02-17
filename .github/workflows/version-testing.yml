@@ -93,5 +93,5 @@ jobs:
           commit-message: ${{ env.new_versions }}
           body: ${{ env.new_versions }}
           base: main
-          labels: version-testing, automerge
+          labels: version-testing, automerge, ready-for-tests
           reviewers: GuyMoses,eugene-lumigo
