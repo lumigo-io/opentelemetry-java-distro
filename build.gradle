@@ -81,7 +81,7 @@ subprojects {
       autovalue                  : "1.10.1",
       junit                      : "5.11.3",
       mockito                    : "5.4.0",
-      testcontainers             : "1.17.6",
+      testcontainers             : "1.21.4",
       hamcrest                   : "2.2"
     ]
 
