@@ -295,6 +295,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 1.0.0~1.1.1 |
 | | | 2.0.0~2.8.2 |
 | | | 3.0.0~3.9.0 |
+| | | 4.1.2~4.2.0 |
 | lettuce-5.1 | [lettuce-5.1](https://central.sonatype.com/artifact/io.lettuce/lettuce-core) | 5.1.0.RELEASE~5.3.7.RELEASE |
 | | | 6.0.0.M1~6.6.0.BETA2 |
 | netty-4.1 | [netty-4.1](https://central.sonatype.com/artifact/io.netty/netty-codec-http) | 4.1.0.Final~4.1.1.Final |
@@ -330,7 +331,7 @@ Span.current().addEvent("<error-message>", eventAttributes);
 | | | 5.0.0.RELEASE~5.3.31 |
 | | | 6.0.0~6.2.8 |
 | | | 7.0.0-M1~7.0.0-M6 |
-| storm | [storm](https://central.sonatype.com/artifact/org.apache.storm/storm-client) | 2.0.0~2.8.3 |
+| storm | [storm](https://central.sonatype.com/artifact/org.apache.storm/storm-client) | 2.0.0~2.8.4 |
 
 ## Baseline setup
 
